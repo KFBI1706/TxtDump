@@ -16,7 +16,7 @@ class App extends Component {
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
+    console.log("Text submitted:", this.state.value)
     event.preventDefault();
   }
   render() {
@@ -29,11 +29,8 @@ class App extends Component {
         <p className="App-intro">
           insert ur text kiddo
         </p>
-        <form onSubmit={this.handleSubmit}>
-        <label>
-          Text<br />
-          <input type="text" className="textField" value={this.state.value} onChange={this.handleChange} /> <br />
-        </label>
+      <form onSubmit={this.handleSubmit}>
+        <input type="text" className="textField" value={this.state.value} onChange={this.handleChange} /> <br />
         <input type="submit" value="Submit" />
       </form>
       </div>
