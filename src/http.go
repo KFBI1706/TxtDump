@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -10,23 +11,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type postreq struct {
-	ID int
-}
 type postresp struct {
 	ID      int
 	Content string
 }
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Im working maayn")
+	fmt.Fprintf(w, "Jallo")
 }
 
 //Probably not the safest way of doing this but works for now
 func requestPostID(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 	generatedID := genFromSeed()
-	fmt.Fprintf(w, "Seed is: %v", generatedID)
+	requestedid := postresp{Content: "Your ID", ID: generatedID}
+	json.NewEncoder(w).Encode(requestedid)
 }
 func requestPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -37,6 +36,6 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	post := postreq{ID: i}
-	fmt.Fprintf(w, "U requested id: %v", post.ID)
+	post := postresp{ID: i, Content: "not implemented yet"}
+	json.NewEncoder(w).Encode(post)
 }
