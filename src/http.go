@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -18,6 +20,13 @@ type postresp struct {
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Im working maayn")
+}
+
+//Probably not the safest way of doing this but works for now
+func requestPostID(w http.ResponseWriter, r *http.Request) {
+	rand.Seed(time.Now().UnixNano())
+	generatedID := genFromSeed()
+	fmt.Fprintf(w, "Seed is: %v", generatedID)
 }
 func requestPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
