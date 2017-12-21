@@ -40,11 +40,11 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	newpost := postresp{}
-	err := decoder.Decode(&newpost)
+	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
-		panic(err)
+		fmt.Fprint(w, "No data posted!")
+		return
 	}
 	defer r.Body.Close()
 	fmt.Fprintf(w, "%v", newpost.Content)
