@@ -14,7 +14,7 @@ import (
 type postresp struct {
 	ID      int
 	Content string
-	Sucsess bool //OPTIONAL USE ONLY FOR CONFIRMING THAT A POST HAS BEEN POSTED
+	Sucsess bool //Optional
 }
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,7 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	post := postresp{ID: i, Content: "not implemented yet"}
+	post := postresp{ID: i, Content: "not implemented yet", Sucsess: true}
 	json.NewEncoder(w).Encode(post)
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
