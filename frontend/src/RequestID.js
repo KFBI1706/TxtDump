@@ -1,4 +1,4 @@
-import rp from 'require-promise';
+var rp = require('request-promise');
 
 function getPost(id, hosturi) {
     var options = {
@@ -9,10 +9,11 @@ function getPost(id, hosturi) {
         json: true  
     };
     rp(options)
-        .then(function (content) {
-            return content.length;
+        .then(function (htmlString) {
+            console.log(htmlString)
         })
         .catch(function(err){
             return "something went wrong";
         });
 }
+
