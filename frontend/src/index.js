@@ -3,12 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import {getPost} from './RequestID'
+var api = require('./RequestID.js')
 
-getPost(11, "http://localhost:1337", function(content){
-    console.log(content)
-});
-
+api.getPost(11, "http://localhost:1337");
 ReactDOM.render(<App />, document.getElementById('root'));
 
 registerServiceWorker();
