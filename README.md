@@ -32,5 +32,5 @@ HOST/post/{post id}/create | Creates the post with the submitted ID:
 Example:
 ```
 curl -H "Content-Type: application/json" -X POST -d '{"ID":23,"Content":"Doope"}' http://localhost:1337/post/23/create 
-returns: Doope
+Returns: {"ID":23,"Content":"Doope","Sucsess":true}   
 ```

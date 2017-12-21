@@ -14,6 +14,7 @@ import (
 type postresp struct {
 	ID      int
 	Content string
+	Sucsess bool //OPTIONAL USE ONLY FOR CONFIRMING THAT A POST HAS BEEN POSTED
 }
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +47,7 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "No data posted!")
 		return
 	}
+	newpost.Sucsess = true
 	defer r.Body.Close()
-	fmt.Fprintf(w, "%v", newpost.Content)
+	json.NewEncoder(w).Encode(newpost)
 }
