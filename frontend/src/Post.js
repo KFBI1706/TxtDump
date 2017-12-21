@@ -23,6 +23,7 @@ class CreateNew extends Component {
         <div>
         <p className="App-intro">
             insert ur text kiddo
+            {this.props.testdata}
         </p>
         <form onSubmit={this.handleSubmit}>
             <input type="text" className="textField" value={this.state.value} onChange={this.handleChange} /> <br />

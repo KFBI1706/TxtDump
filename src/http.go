@@ -39,3 +39,13 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 	post := postresp{ID: i, Content: "not implemented yet"}
 	json.NewEncoder(w).Encode(post)
 }
+func createPost(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	newpost := postresp{}
+	err := decoder.Decode(&newpost)
+	if err != nil {
+		panic(err)
+	}
+	defer r.Body.Close()
+	fmt.Fprintf(w, "%v", newpost.Content)
+}

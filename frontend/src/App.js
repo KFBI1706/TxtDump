@@ -20,7 +20,9 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
+          
         </header>
+        <p>{this.props.testData}</p>
       <PageAction action="CreatePost" />
       
       </div>
