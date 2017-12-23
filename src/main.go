@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	establishConn()
 	router := mux.NewRouter()
 	router.HandleFunc("/test", routerTest)
 	router.HandleFunc("/post/{id}/request", requestPost)
