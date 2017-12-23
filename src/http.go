@@ -47,6 +47,7 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
 	newpost := postresp{}
+	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
 	log.Print(newpost.PubID)
 	err := json.NewDecoder(r.Body).Decode(&newpost)
