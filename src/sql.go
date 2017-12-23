@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -14,12 +16,10 @@ func readDBstring(filename string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	returnstring := string(file)
-
-	return returnstring
+	return string(file)
 }
 
-func establishConn() {
+func testDBConnection() {
 	dbstring := readDBstring("dbstring")
 	db, err := sql.Open("postgres", dbstring)
 	if err != nil {
@@ -30,4 +30,27 @@ func establishConn() {
 		log.Fatal(err)
 	}
 	log.Println("DB Connetcion sucsessfully established")
+	db.Close()
+}
+
+func establishConn() *sql.DB {
+	dbstring := readDBstring("dbstring")
+	db, err := sql.Open("postgres", dbstring)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
+
+func createPostDB(post postresp) {
+	db := establishConn()
+	postdata, err := db.Exec("INSERT INTO text (pubid, text, created_at) VALUES ($1, $2, $3); ", post.PubID, post.Content, time.Now())
+	if err != nil {
+		fmt.Println(err, postdata)
+	}
+	db.Close()
 }

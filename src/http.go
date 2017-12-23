@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 type postresp struct {
 	ID      int
+	PubID   int
 	Content string
 	Sucsess bool //Optional
 }
@@ -42,12 +44,15 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
 	newpost := postresp{}
+	newpost.PubID = genFromSeed()
+	log.Print(newpost.PubID)
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		fmt.Fprint(w, "No data posted!")
 		return
 	}
-	newpost.Sucsess = true
 	defer r.Body.Close()
+	createPostDB(newpost)
+	newpost.Sucsess = true
 	json.NewEncoder(w).Encode(newpost)
 }

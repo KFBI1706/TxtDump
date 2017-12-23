@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	establishConn()
+	testDBConnection()
 	router := mux.NewRouter()
 	router.HandleFunc("/test", routerTest)
 	router.HandleFunc("/post/{id}/request", requestPost)
