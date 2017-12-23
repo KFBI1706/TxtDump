@@ -17,6 +17,7 @@ type postresp struct {
 	PubID   int
 	Content string
 	Sucsess bool //Optional
+	Time    string
 }
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,9 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	post := postresp{ID: i, Content: "not implemented yet", Sucsess: true}
+	result := readpostDB(i)
+	//Mabye remove POST ID later
+	post := postresp{ID: 0, PubID: i, Content: result.Content, Sucsess: true, Time: result.Time}
 	json.NewEncoder(w).Encode(post)
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
