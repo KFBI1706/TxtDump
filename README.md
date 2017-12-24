@@ -34,3 +34,17 @@ Example:
 curl -H "Content-Type: application/json" -X POST -d '{"ID":23,"Content":"Doope"}' http://localhost:1337/post/create 
 Returns: {"ID":23,"Content":"Doope","Sucsess":true}   
 ```
+
+Dbstring example:
+```
+user=postgres dbname=db password=12345 host=HOSTIP
+```
+
+```SQL
+CREATE TABLE text (
+    id serial PRIMARY KEY,
+    pubid integer NOT NULL,
+    text varchar NOT NULL,
+    created_at date
+);
+```
