@@ -13,7 +13,7 @@ import (
 )
 
 type postresp struct {
-	ID      int
+	ID      int `json:"-"`
 	PubID   int
 	Content string
 	Sucsess bool //Optional

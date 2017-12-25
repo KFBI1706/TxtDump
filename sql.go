@@ -58,7 +58,7 @@ func createPostDB(post postresp) {
 }
 
 func readpostDB(pubid int) postresp {
-	result := postresp{}
+	result := postresp{PubID: pubid}
 	db := establishConn()
 	trgpost, err := db.Query("SELECT text, created_at FROM text WHERE pubid = $1", pubid)
 	if err != nil {
