@@ -13,11 +13,11 @@ import (
 )
 
 type postresp struct {
-	ID      int `json:"-"`
-	PubID   int
-	Content string
-	Sucsess bool //Optional
-	Time    string
+	ID      int    `json:"-"`
+	PubID   int    `json:"PubID"`
+	Content string `json:"Content"`
+	Sucsess bool   `json:"Sucsess"` //Optional
+	Time    string `json:"Time"`
 }
 
 func routerTest(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +41,7 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	//Mabye remove POST ID later
-	post := postresp{ID: 0, PubID: i, Content: result.Content, Sucsess: true, Time: result.Time}
+	post := postresp{PubID: i, Content: result.Content, Sucsess: true, Time: result.Time}
 	json.NewEncoder(w).Encode(post)
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
