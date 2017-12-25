@@ -4,6 +4,6 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App testData />, document.getElementById('root'));
+ReactDOM.render(<App testdata="lul"/>, document.getElementById('root'));
 
 registerServiceWorker();

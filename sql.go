@@ -14,7 +14,8 @@ import (
 func readDBstring(filename string) string {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return "Something went wrong reading the db string. See readme.md for info about this"
 	}
 	return string(file)
 }
@@ -29,7 +30,7 @@ func testDBConnection() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("DB Connetcion sucsessfully established")
+	log.Println("DB connection sucsessfully established")
 	db.Close()
 }
 
@@ -53,6 +54,7 @@ func createPostDB(post postresp) {
 		fmt.Println(err, postdata)
 	}
 	db.Close()
+	log.Println(post)
 }
 
 func readpostDB(pubid int) postresp {
@@ -69,5 +71,6 @@ func readpostDB(pubid int) postresp {
 		}
 	}
 	db.Close()
+	log.Println(result)
 	return result
 }
