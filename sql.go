@@ -20,18 +20,21 @@ func readDBstring(filename string) string {
 	return string(file)
 }
 
-func testDBConnection() {
+func testDBConnection() error {
 	dbstring := readDBstring("dbstring")
 	db, err := sql.Open("postgres", dbstring)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
 	log.Println("DB connection sucsessfully established")
 	db.Close()
+	return nil
 }
 
 func establishConn() *sql.DB {
