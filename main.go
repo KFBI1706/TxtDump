@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -13,5 +14,8 @@ func main() {
 	router.HandleFunc("/post/{id}/request", requestPost).Methods("GET")
 	router.HandleFunc("/post/create", createPost).Methods("POST")
 	router.HandleFunc("/random/test", requestPostID).Methods("GET")
-	http.ListenAndServe(":1337", router)
+	err := http.ListenAndServe(":1337", router)
+	if err != nil {
+		log.Println(err)
+	}
 }

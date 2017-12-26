@@ -28,7 +28,7 @@ func routerTest(w http.ResponseWriter, r *http.Request) {
 func requestPostID(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 	generatedID := genFromSeed()
-	requestedid := postresp{Content: "Your ID", ID: generatedID}
+	requestedid := postresp{Content: "Your ID", PubID: generatedID}
 	json.NewEncoder(w).Encode(requestedid)
 }
 func requestPost(w http.ResponseWriter, r *http.Request) {
