@@ -8,13 +8,16 @@ import (
 )
 
 func main() {
-	testDBConnection()
+	err := testDBConnection()
+	if err != nil {
+		log.Println(err)
+	}
 	router := mux.NewRouter()
 	router.HandleFunc("/test", routerTest)
 	router.HandleFunc("/post/{id}/request", requestPost).Methods("GET")
 	router.HandleFunc("/post/create", createPost).Methods("POST")
 	router.HandleFunc("/random/test", requestPostID).Methods("GET")
-	err := http.ListenAndServe(":1337", router)
+	err = http.ListenAndServe(":1337", router)
 	if err != nil {
 		log.Println(err)
 	}
