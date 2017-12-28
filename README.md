@@ -36,6 +36,7 @@ Returns: {"PubID":9175728,"Content":"I really hate Javascript","Sucsess":true,"T
 ```
 
 Dbstring example:
+The program looks for a file named dbstring when running this is then converted into the info used to connect to the DB for more info about this read: https://godoc.org/github.com/lib/pq
 ```
 user=postgres dbname=db password=12345 host=HOSTIP
 ```
