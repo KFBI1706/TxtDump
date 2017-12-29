@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"math/rand"
 	"net/http"
@@ -16,22 +17,12 @@ type postresp struct {
 	ID      int    `json:"-"`
 	PubID   int    `json:"PubID"`
 	Content string `json:"Content"`
-	Sucsess bool   `json:"Sucsess"` //Optional
+	Title   string `json:"Title"`
+	Sucsess bool   `json:"Sucsess"`
 	Time    string `json:"Time"`
 }
 
-func routerTest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Jallo")
-}
-
-//Probably not the safest way of doing this but works for now
-func requestPostID(w http.ResponseWriter, r *http.Request) {
-	rand.Seed(time.Now().UnixNano())
-	generatedID := genFromSeed()
-	requestedid := postresp{Content: "Your ID", PubID: generatedID}
-	json.NewEncoder(w).Encode(requestedid)
-}
-func requestPost(w http.ResponseWriter, r *http.Request) {
+func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	i, err := strconv.Atoi(id)
@@ -41,7 +32,21 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postresp{PubID: i, Content: result.Content, Sucsess: true, Time: result.Time}
+	post := postresp{PubID: i, Content: result.Content, Title: "Title", Sucsess: true, Time: result.Time}
+	tmpl := template.Must(template.ParseFiles("front/index.html"))
+	tmpl.Execute(w, post)
+}
+func requestPostAPI(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Fprintf(w, "Request needs to be int")
+		return
+	}
+	result := readpostDB(i)
+	post := postresp{PubID: i, Content: result.Content, Title: "Title", Sucsess: true, Time: result.Time}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
