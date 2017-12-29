@@ -2,12 +2,12 @@ package main
 
 import "testing"
 
-func testdbconn(t *testing.T) {
+func TestDBconn(t *testing.T) {
 	err := testDBConnection()
 	if err != nil {
 		t.Error(err)
 	}
-	redpost := readpostDB(1)
+	redpost := readpostDB(9175728)
 	if redpost.Content == "" {
 		t.Error("Something went wrong reading from DB")
 	}
