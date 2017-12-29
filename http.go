@@ -42,6 +42,9 @@ func requestPost(w http.ResponseWriter, r *http.Request) {
 	}
 	result := readpostDB(i)
 	post := postresp{PubID: i, Content: result.Content, Sucsess: true, Time: result.Time}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
 }
 func createPost(w http.ResponseWriter, r *http.Request) {
