@@ -13,10 +13,10 @@ func main() {
 		log.Println(err)
 	}
 	router := mux.NewRouter()
-	router.HandleFunc("/test", routerTest)
-	router.HandleFunc("/post/{id}/request", requestPost).Methods("GET")
-	router.HandleFunc("/post/create", createPost).Methods("POST")
-	router.HandleFunc("/random/test", requestPostID).Methods("GET")
+	router.HandleFunc("/api/v1/post/{id}/request", requestPostAPI).Methods("GET")
+	router.HandleFunc("/post/{id}/request", requestPostHTML).Methods("GET")
+	router.HandleFunc("/api/v1/post/create", createPost).Methods("POST")
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
 	err = http.ListenAndServe(":1337", router)
 	if err != nil {
 		log.Println(err)
