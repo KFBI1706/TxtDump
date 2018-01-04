@@ -28,13 +28,3 @@ The program looks for a file named dbstring when running this is then converted 
 ```
 user=postgres dbname=db password=12345 host=HOSTIP
 ```
-
-```SQL
-CREATE TABLE text (
-    id serial PRIMARY KEY,
-    pubid integer NOT NULL,
-    text varchar NOT NULL,
-    title varchar,
-    created_at date
-);
-```
