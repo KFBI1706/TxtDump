@@ -63,18 +63,14 @@ func createPostDB(post postresp) {
 func readpostDB(pubid int) postresp {
 	result := postresp{PubID: pubid}
 	db := establishConn()
-	trgpost, err := db.Query("SELECT id, text, title, created_at FROM text WHERE pubid = $1", pubid)
+	err := db.QueryRow("SELECT id, text, title, created_at FROM text WHERE pubid = $1", pubid).Scan(&result.ID, &result.Content, &result.Title, &result.Time)
 	if err != nil {
-		log.Fatal(err)
-	}
-	for trgpost.Next() {
-		err = trgpost.Scan(&result.ID, &result.Content, &result.Title, &result.Time)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Println(err)
+		result.Sucsess = false
+		return result
 	}
 	db.Close()
-	result.Sucsess = true
 	log.Printf("%#v\n", result)
+	result.Sucsess = true
 	return result
 }
