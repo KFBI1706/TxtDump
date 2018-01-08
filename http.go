@@ -33,7 +33,7 @@ func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	}
 	result := readpostDB(i)
 	post := postresp{PubID: i, Content: result.Content, Title: "Title", Sucsess: true, Time: result.Time}
-	tmpl := template.Must(template.ParseFiles("front/index.html", "front/display.html"))
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	tmpl.ExecuteTemplate(w, "display", post)
 }
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
