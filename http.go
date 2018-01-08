@@ -32,8 +32,11 @@ func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postresp{PubID: i, Content: result.Content, Title: "Title", Sucsess: true, Time: result.Time}
+	post := postresp{PubID: i, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+	if post.Sucsess == false {
+		tmpl.ExecuteTemplate(w, "notFound", post)
+	}
 	tmpl.ExecuteTemplate(w, "display", post)
 }
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +49,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postresp{PubID: i, Content: result.Content, Title: "Title", Sucsess: true, Time: result.Time}
+	post := postresp{PubID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
