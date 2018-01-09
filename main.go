@@ -13,6 +13,7 @@ func main() {
 		log.Println(err)
 	}
 	router := mux.NewRouter()
+	router.HandleFunc("/", displayIndex).Methods("GET")
 	router.HandleFunc("/api/v1/post/{id}/request", requestPostAPI).Methods("GET")
 	router.HandleFunc("/post/{id}/request", requestPostHTML).Methods("GET")
 	router.HandleFunc("/api/v1/post/create", createPost).Methods("POST")

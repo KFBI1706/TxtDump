@@ -22,6 +22,10 @@ type postresp struct {
 	Time    string `json:"Time"`
 }
 
+func displayIndex(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
+	tmpl.ExecuteTemplate(w, "index", nil)
+}
 func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -36,6 +40,7 @@ func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)
+		return
 	}
 	tmpl.ExecuteTemplate(w, "display", post)
 }
