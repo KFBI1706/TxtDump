@@ -1,8 +1,12 @@
 {{define "index"}}
     {{ template "layout" }}
-        <main role="main" class="container col-md-6">
-            <div class="text-header col-md-12">
-              <h1 class="Title">{{.Count}} Post(s) in total</h1>
+        <main role="main" class="container col-md-3">
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{.Count}}</h5>
+                  <p class="card-text">Post(s) in total</p>
+
+                </div>
             </div>
         </main>
     {{ template "layoutEnd" }}

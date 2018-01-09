@@ -16,3 +16,13 @@ body {
 .text-content {
   height: 500px;
 }
+.counter {
+  font-size: 30px;
+
+}
+.sub-counter{
+  font-size: 22px;
+}
+.infobox {
+  height: 200px;
+}
