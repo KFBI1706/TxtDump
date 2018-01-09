@@ -21,10 +21,17 @@ type postresp struct {
 	Sucsess bool   `json:"Sucsess"`
 	Time    string `json:"Time"`
 }
+type postcounter struct {
+	Count int `json:"count"`
+}
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
+	posts := postcounter{Count: countPosts()}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
-	tmpl.ExecuteTemplate(w, "index", nil)
+	err := tmpl.ExecuteTemplate(w, "index", posts)
+	if err != nil {
+		log.Println(err)
+	}
 }
 func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

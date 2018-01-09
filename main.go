@@ -9,6 +9,8 @@ import (
 
 func main() {
 	err := testDBConnection()
+	posts := countPosts()
+	log.Printf("%v Post(s) Currently in DB\n", posts)
 	if err != nil {
 		log.Println(err)
 	}

@@ -74,3 +74,16 @@ func readpostDB(pubid int) postresp {
 	result.Sucsess = true
 	return result
 }
+func countPosts() int {
+	var count int
+	db := establishConn()
+	rows, err := db.Query("SELECT COUNT(*) as count FROM text")
+	if err != nil {
+		log.Println(err)
+	}
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	db.Close()
+	return count
+}
