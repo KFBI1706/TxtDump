@@ -33,6 +33,10 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
+func postcounterAPI(w http.ResponseWriter, r *http.Request) {
+	posts := postcounter{Count: countPosts()}
+	json.NewEncoder(w).Encode(posts)
+}
 func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
