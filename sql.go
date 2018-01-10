@@ -52,7 +52,7 @@ func establishConn() *sql.DB {
 
 func createPostDB(post postresp) {
 	db := establishConn()
-	postdata, err := db.Exec("INSERT INTO text (pubid, text, created_at) VALUES ($1, $2, $3); ", post.PubID, post.Content, time.Now())
+	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at) VALUES ($1, $2, $3); ", post.PubID, post.Title, post.Content, time.Now())
 	if err != nil {
 		fmt.Println(err, postdata)
 	}
@@ -64,10 +64,13 @@ func readpostDB(pubid int) postresp {
 	result := postresp{PubID: pubid}
 	db := establishConn()
 	err := db.QueryRow("SELECT id, text, title, created_at FROM text WHERE pubid = $1", pubid).Scan(&result.ID, &result.Content, &result.Title, &result.Time)
-	if err != nil {
+	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
 		result.Sucsess = false
 		return result
+	}
+	if err != nil && result.Title == "" {
+		result.Title = "No title"
 	}
 	db.Close()
 	log.Printf("%#v\n", result)

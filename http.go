@@ -22,7 +22,8 @@ type postresp struct {
 	Time    string `json:"Time"`
 }
 type postcounter struct {
-	Count int `json:"Count"`
+	Count   int   `json:"Count"`
+	PostIDs []int `json:"ID"`
 }
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
