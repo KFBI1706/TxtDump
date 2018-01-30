@@ -90,3 +90,26 @@ func countPosts() int {
 	db.Close()
 	return count
 }
+
+//canned function for now...
+func findallposts() postcounter {
+	posts := postcounter{}
+	db := establishConn()
+	rows, err := db.Query("SELECT pubid, title FROM text")
+	if err != nil && err == sql.ErrNoRows {
+		log.Printf("No posts found most likely this is because the db is not properly setup/has no posts")
+		return posts
+	}
+	var derp int
+	var lul string
+	for rows.Next() {
+		err := rows.Scan(&derp, &lul)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//posts = append(posts, postcounter{PostIDs: derp, Titles: lul})
+	}
+	log.Println(posts)
+	db.Close()
+	return posts
+}

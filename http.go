@@ -22,8 +22,9 @@ type postresp struct {
 	Time    string `json:"Time"`
 }
 type postcounter struct {
-	Count   int   `json:"Count"`
-	PostIDs []int `json:"ID"`
+	Count   int      `json:"Count"`
+	PostIDs []int    `json:"ID"`
+	Titles  []string `json:"Titles"`
 }
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +72,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
 }
-func createPost(w http.ResponseWriter, r *http.Request) {
+func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postresp{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
@@ -85,4 +86,17 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 	createPostDB(newpost)
 	newpost.Sucsess = true
 	json.NewEncoder(w).Encode(newpost)
+}
+func createPostWeb(w http.ResponseWriter, r *http.Request) {
+	newpost := postresp{}
+	rand.Seed(time.Now().UnixNano())
+	newpost.PubID = genFromSeed()
+	log.Print(newpost.PubID)
+}
+func handle404(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("front/display.html", "front/layout.html")
+	if err != nil {
+		log.Println(err)
+	}
+	tmpl.Execute(w, "404")
 }
