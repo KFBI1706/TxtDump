@@ -14,12 +14,12 @@ import (
 )
 
 type postresp struct {
-	ID      int    `json:"-"`
-	PubID   int    `json:"PubID"`
-	Content string `json:"Content"`
-	Title   string `json:"Title"`
-	Sucsess bool   `json:"Sucsess"`
-	Time    string `json:"Time"`
+	ID      int       `json:"-"`
+	PubID   int       `json:"PubID"`
+	Content string    `json:"Content"`
+	Title   string    `json:"Title"`
+	Sucsess bool      `json:"Sucsess"`
+	Time    time.Time `json:"Time"`
 }
 type postcounter struct {
 	Count   int      `json:"Count"`
@@ -98,5 +98,8 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	tmpl.Execute(w, "404")
+	err = tmpl.Execute(w, "404")
+	if err != nil {
+		log.Println(err)
+	}
 }
