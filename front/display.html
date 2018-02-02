@@ -31,21 +31,3 @@
     </div>
   </main>
 {{ end }}
-{{ define "createpost"}}
-  {{ template "layout" }}
-    <main>
-      <div class="text-header col-md-12 text-center">
-        <form>
-          <div class="form-group">
-            <label for="formGroupExampleInput">Title Optional</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input">
-          </div>
-          <div class="form-group">
-            <label for="formGroupExampleInput2">Text</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Another input">
-          </div>
-        </form>
-      </div>
-    </main>
-  {{ template "layoutEnd"}}
-{{end}}

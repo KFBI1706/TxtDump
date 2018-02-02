@@ -27,6 +27,10 @@ type postcounter struct {
 	Titles  []string `json:"Titles"`
 }
 
+/*
+	HTML:
+*/
+
 func displayIndex(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
@@ -35,11 +39,7 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
-func postcounterAPI(w http.ResponseWriter, r *http.Request) {
-	posts := postcounter{Count: countPosts()}
-	json.NewEncoder(w).Encode(posts)
-}
-func requestPostHTML(w http.ResponseWriter, r *http.Request) {
+func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	i, err := strconv.Atoi(id)
@@ -56,6 +56,42 @@ func requestPostHTML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl.ExecuteTemplate(w, "display", post)
+}
+func createPostTemplateWeb(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
+	err := tmpl.ExecuteTemplate(w, "createpost", nil)
+	if err != nil {
+		log.Println(err)
+	}
+}
+func createPostWeb(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+	newpost := postresp{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
+	rand.Seed(time.Now().UnixNano())
+	newpost.PubID = genFromSeed()
+	createPostDB(newpost)
+}
+func handle404(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("front/display.html", "front/layout.html")
+	if err != nil {
+		log.Println(err)
+	}
+	err = tmpl.Execute(w, "404")
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+/*
+	JSON API:
+*/
+
+func postcounterAPI(w http.ResponseWriter, r *http.Request) {
+	posts := postcounter{Count: countPosts()}
+	json.NewEncoder(w).Encode(posts)
 }
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -86,20 +122,4 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	createPostDB(newpost)
 	newpost.Sucsess = true
 	json.NewEncoder(w).Encode(newpost)
-}
-func createPostWeb(w http.ResponseWriter, r *http.Request) {
-	newpost := postresp{}
-	rand.Seed(time.Now().UnixNano())
-	newpost.PubID = genFromSeed()
-	log.Print(newpost.PubID)
-}
-func handle404(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("front/display.html", "front/layout.html")
-	if err != nil {
-		log.Println(err)
-	}
-	err = tmpl.Execute(w, "404")
-	if err != nil {
-		log.Println(err)
-	}
 }
