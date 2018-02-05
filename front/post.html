@@ -1,11 +1,13 @@
 {{ define "createpost"}}
   {{ template "layout" }}
-    <main>
-      <div class="text-header col-md-6 text-center">
+    <main class="container col-md-6">
+      <div class="text-header col-md-12 text-center card">
+        <div class="card-body">
+          <h1>Create a new post</h1>
         <form action="/post/create/new" method="POST">
           <div class="form-group">
-            <label for="formGroupExampleInput">Title (Optional)</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input" name="Title">
+            <label for="formGroupExampleInput">Title</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="(Optional)" name="Title">
           </div>
           <div class="form-group">
             <label for="formGroupExampleInput2">Text</label>
@@ -15,6 +17,7 @@
             <input type="submit" value="post">
           </div>
         </form>
+      </div>
       </div>
     </main>
   {{ template "layoutEnd"}}
