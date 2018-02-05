@@ -75,6 +75,8 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
 	createPostDB(newpost)
+	url := fmt.Sprintf("/post/%v/request", newpost.PubID)
+	http.Redirect(w, r, url, 302)
 }
 func handle404(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("front/display.html", "front/layout.html")
