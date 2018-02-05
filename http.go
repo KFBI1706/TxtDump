@@ -50,6 +50,8 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	}
 	result := readpostDB(i)
 	post := postresp{PubID: i, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time}
+	//content := strings.Replace(post.Content, "\n", "<br>", -1)
+	//post.Content = content
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)

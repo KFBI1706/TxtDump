@@ -73,7 +73,6 @@ func readpostDB(pubid int) postresp {
 		result.Title = "No title"
 	}
 	db.Close()
-	log.Printf("%#v\n", result)
 	result.Sucsess = true
 	return result
 }
