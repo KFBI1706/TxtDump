@@ -22,11 +22,6 @@ type postresp struct {
 	Sucsess bool      `json:"Sucsess"`
 	Time    time.Time `json:"Time"`
 }
-type postcounter struct {
-	Count   int      `json:"Count"`
-	PostIDs []int    `json:"ID"`
-	Titles  []string `json:"Titles"`
-}
 
 /*
 	HTML:

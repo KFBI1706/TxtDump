@@ -10,26 +10,33 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type postcounter struct {
+	Count   int      `json:"Count"`
+	PostIDs []int    `json:"ID"`
+	Titles  []string `json:"Titles"`
+}
+
 //Since the Postgresql Go libary just uses a string for info i just read a file with the private database info in it as a string with this see readme.md for more
-func readDBstring(filename string) string {
+func readDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err)
-		return "Something went wrong reading the db string. See readme.md for info about this"
+		return "", err
 	}
-	return string(file)
+	return string(file), nil
 }
 
 func testDBConnection() error {
-	dbstring := readDBstring("dbstring")
+	dbstring, err := readDBstring("dbstring")
+	if err != nil {
+		return err
+	}
 	db, err := sql.Open("postgres", dbstring)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	err = db.Ping()
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	log.Println("DB connection sucsessfully established")
@@ -38,7 +45,10 @@ func testDBConnection() error {
 }
 
 func establishConn() *sql.DB {
-	dbstring := readDBstring("dbstring")
+	dbstring, err := readDBstring("dbstring")
+	if err != nil {
+		log.Fatal(err)
+	}
 	db, err := sql.Open("postgres", dbstring)
 	if err != nil {
 		log.Fatal(err)

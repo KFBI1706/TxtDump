@@ -8,12 +8,13 @@ import (
 )
 
 func main() {
+	//Check that DB connection is ok before doing anything
 	err := testDBConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
 	posts := countPosts()
 	log.Printf("%v Post(s) Currently in DB\n", posts)
-	if err != nil {
-		log.Println(err)
-	}
 	router := mux.NewRouter()
 	router.HandleFunc("/", logging(displayIndex)).Methods("GET")
 	router.HandleFunc("/api/v1/post/amount", logging(postcounterAPI)).Methods("GET")
