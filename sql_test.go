@@ -1,13 +1,21 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDBconn(t *testing.T) {
 	err := testDBConnection()
 	if err != nil {
 		t.Error(err)
 	}
-	redpost := readpostDB(9175728)
+	post, err := findpostfortest()
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(post)
+	redpost := readpostDB(post)
 	if redpost.Content == "" {
 		t.Error("Something went wrong reading from DB")
 	}

@@ -122,3 +122,12 @@ func findallposts() postcounter {
 	db.Close()
 	return posts
 }
+func findpostfortest() (int, error) {
+	var post int
+	db := establishConn()
+	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
+	if err != nil {
+		log.Println(err)
+	}
+	return post, err
+}
