@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -85,6 +86,25 @@ func readpostDB(pubid int) postresp {
 	db.Close()
 	result.Sucsess = true
 	return result
+}
+func checkedid(post postresp) error {
+	db := establishConn()
+	var edid int
+	err := db.QueryRow("SELECT editid FROM text WHERE pubid = $1", post.PubID).Scan(&edid)
+	if err != nil {
+		log.Println(err)
+	}
+	if edid != post.EditID {
+		err = errors.New("Provided ID is not the same as in DB")
+		return err
+	}
+	db.Close()
+	return nil
+}
+func saveChanges(post postresp) error {
+	db := establishConn()
+
+	return nil
 }
 func countPosts() int {
 	var count int
