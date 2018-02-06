@@ -26,3 +26,7 @@ body {
 .infobox {
   height: 200px;
 }
+.content-box {
+  height: 500px;
+  width: 100%;
+}

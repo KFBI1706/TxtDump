@@ -4,7 +4,7 @@
   <main role="main" class="container col-md-6">
     <div class="text-header col-md-12">
       <h1 class="Title">{{.Title}}</h1>
-      <h6 class="Time">Post created at: {{.Time}}</h6>
+      <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
       <hr>
     </div>
     <div class="text-content col-md-12">
@@ -34,15 +34,25 @@
 
 {{define "edit"}}
   {{ template "layout" }}
-    <main role="main" class="container col-md-6">
-      <div class="text-header col-md-12">
-        <h1 class="Title">{{.Title}}</h1>
-        <h6 class="Time">Post created at: {{.Time}}</h6>
-        <hr>
-      </div>
-      <div class="text-content col-md-12">
-        <p class="content">{{.Content}}</p>
-      </div>
-    </main>
+  <main class="container col-md-6">
+    <div class="text-header col-md-12 text-center card">
+      <div class="card-body">
+        <h1>Edit Post</h1>
+      <form action="post" method="POST">
+        <div class="form-group">
+          <label for="formGroupExampleInput">Title</label>
+          <input type="text" class="form-control form-control-lg" id="formGroupExampleInput" value="{{.Title}}" name="Title" >
+        </div>
+        <div class="form-group">
+          <label for="formGroupExampleInput2">Text</label>
+          <textarea type="text" class="form-control content-box" id="formGroupExampleInput" value="{{.Content}}" name="Content">{{.Content}}</textarea>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Edit">
+        </div>
+      </form>
+    </div>
+    </div>
+  </main>
   {{ template "layoutEnd" }}
 {{end}}
