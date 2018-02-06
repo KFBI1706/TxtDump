@@ -38,14 +38,14 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	i, err := strconv.Atoi(id)
+	pubid, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	result := readpostDB(i)
-	post := postresp{PubID: i, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time}
+	result := readpostDB(pubid)
+	post := postresp{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time}
 	//content := strings.Replace(post.Content, "\n", "<br>", -1)
 	//post.Content = content
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
@@ -84,6 +84,24 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+}
+func editpost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pubid, _ := strconv.Atoi(vars["id"])
+	editid, _ := strconv.Atoi(vars["editid"])
+	post := readpostDB(pubid)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+
+	if editid == post.EditID {
+		err := tmpl.ExecuteTemplate(w, "edit", post)
+		if err != nil {
+			log.Println(err)
+		}
+	} else {
+		url := fmt.Sprintf("/post/%v/request", post.PubID)
+		http.Redirect(w, r, url, 302)
+	}
+
 }
 
 /*

@@ -20,6 +20,7 @@ func main() {
 	router.HandleFunc("/api/v1/post/amount", logging(postcounterAPI)).Methods("GET")
 	router.HandleFunc("/api/v1/post/{id}/request", logging(requestPostAPI)).Methods("GET")
 	router.HandleFunc("/post/{id}/request", logging(requestPostWeb)).Methods("GET")
+	router.HandleFunc("/post/{id}/edit/{editid}", logging(editpost))
 	router.HandleFunc("/api/v1/post/create", logging(createPostAPI)).Methods("POST")
 	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
 	router.HandleFunc("/post/create/new", logging(createPostWeb))
