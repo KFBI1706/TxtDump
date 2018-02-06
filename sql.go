@@ -52,7 +52,7 @@ func establishConn() *sql.DB {
 
 func createPostDB(post postresp) {
 	db := establishConn()
-	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at) VALUES ($1, $2, $3, $4); ", post.PubID, post.Title, post.Content, time.Now())
+	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.PubID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err, postdata)
 	}

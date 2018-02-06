@@ -16,6 +16,7 @@ import (
 type postresp struct {
 	ID      int       `json:"-"`
 	PubID   int       `json:"PubID"`
+	EditID  int       `json:"EditID"`
 	Content string    `json:"Content"`
 	Title   string    `json:"Title"`
 	Sucsess bool      `json:"Sucsess"`
@@ -74,6 +75,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	newpost := postresp{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
+	newpost.EditID = genFromSeed()
 	createPostDB(newpost)
 	url := fmt.Sprintf("/post/%v/request", newpost.PubID)
 	http.Redirect(w, r, url, 302)
@@ -83,7 +85,7 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	err = tmpl.Execute(w, "404")
+	err = tmpl.ExecuteTemplate(w, "404", nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -116,6 +118,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postresp{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
+	newpost.EditID = genFromSeed()
 	log.Print(newpost.PubID)
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
