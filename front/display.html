@@ -35,8 +35,7 @@
 {{define "edit"}}
   {{ template "layout" }}
   <main class="container col-md-6">
-    <div class="text-header col-md-12 text-center card">
-      <div class="card-body">
+    <div class="text-header col-md-12 text-center">
         <h1>Edit Post</h1>
       <form action="/post/{.Pubid}/edit/{.Editid}/post" method="POST">
         <div class="form-group">
@@ -48,10 +47,10 @@
           <textarea type="text" class="form-control content-box" id="formGroupExampleInput" value="{{.Content}}" name="Content">{{.Content}}</textarea>
         </div>
         <div class="form-group">
-          <input type="submit" value="Edit">
+          <input type="submit" class ="btn btn-primary"value="Edit">
         </div>
       </form>
-    </div>
+
     </div>
   </main>
   {{ template "layoutEnd" }}
