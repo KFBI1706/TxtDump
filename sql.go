@@ -128,6 +128,7 @@ func findpostfortest() (int, error) {
 	if err != nil {
 		log.Println(err)
 	}
+	db.Close()
 	return post, err
 }
 
