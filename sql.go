@@ -60,7 +60,6 @@ func establishConn() *sql.DB {
 	}
 	return db
 }
-
 func createPostDB(post postresp) {
 	db := establishConn()
 	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.PubID, post.Title, post.Content, time.Now(), post.EditID)
@@ -70,7 +69,6 @@ func createPostDB(post postresp) {
 	db.Close()
 	log.Println(post)
 }
-
 func readpostDB(pubid int) postresp {
 	result := postresp{PubID: pubid}
 	db := establishConn()
@@ -103,7 +101,11 @@ func checkedid(post postresp) error {
 }
 func saveChanges(post postresp) error {
 	db := establishConn()
-
+	_, err := db.Exec("UPDATE text SET title = $1, text = $2 WHERE pubid = $3;", post.Title, post.Content, post.PubID)
+	if err != nil {
+		return err
+	}
+	db.Close()
 	return nil
 }
 func countPosts() int {
@@ -119,8 +121,19 @@ func countPosts() int {
 	db.Close()
 	return count
 }
+func findpostfortest() (int, error) {
+	var post int
+	db := establishConn()
+	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
+	if err != nil {
+		log.Println(err)
+	}
+	return post, err
+}
 
-//canned function for now...
+/*
+Canned function for now because im bad at programming
+
 func findallposts() postcounter {
 	posts := postcounter{}
 	db := establishConn()
@@ -142,12 +155,4 @@ func findallposts() postcounter {
 	db.Close()
 	return posts
 }
-func findpostfortest() (int, error) {
-	var post int
-	db := establishConn()
-	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
-	if err != nil {
-		log.Println(err)
-	}
-	return post, err
-}
+*/

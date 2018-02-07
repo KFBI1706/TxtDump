@@ -103,6 +103,24 @@ func editpost(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func edit(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pubid, _ := strconv.Atoi(vars["id"])
+	editid, _ := strconv.Atoi(vars["editid"])
+	post := readpostDB(pubid)
+	if editid != post.EditID {
+		url := fmt.Sprintf("/post/%v/request", post.PubID)
+		http.Redirect(w, r, url, 302)
+	}
+	post.Content = r.FormValue("Content")
+	post.Title = r.FormValue("Title")
+	err := saveChanges(post)
+	if err != nil {
+		log.Println(err)
+	}
+	url := fmt.Sprintf("/post/%v/edit/%v", post.PubID, post.EditID)
+	http.Redirect(w, r, url, 302)
+}
 
 /*
 	JSON API:
