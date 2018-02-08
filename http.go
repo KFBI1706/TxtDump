@@ -85,7 +85,7 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
-func editpost(w http.ResponseWriter, r *http.Request) {
+func editPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pubid, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
@@ -125,7 +125,7 @@ func edit(w http.ResponseWriter, r *http.Request) {
 /*
 	JSON API:
 */
-func editpostAPI(w http.ResponseWriter, r *http.Request) {
+func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pubid, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
@@ -148,10 +148,21 @@ func editpostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(newpost)
 }
+func deletePostAPI(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pubid, _ := strconv.Atoi(vars["id"])
+	editid, _ := strconv.Atoi(vars["editid"])
+	exsistingpost := readpostDB(pubid)
+	if exsistingpost.EditID != editid {
+		return
+	}
+	deletepost(exsistingpost)
+}
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	json.NewEncoder(w).Encode(posts)
 }
+
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]

@@ -131,6 +131,20 @@ func findpostfortest() (int, error) {
 	db.Close()
 	return post, err
 }
+func deletepost(post postresp) error {
+	db := establishConn()
+	var id int
+	err := db.QueryRow("SELECT id FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID).Scan(&id)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DELETE FROM text WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	db.Close()
+	return nil
+}
 
 /*
 Canned function for now because im bad at programming
