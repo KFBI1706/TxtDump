@@ -1,8 +1,7 @@
 {{ define "createpost"}}
   {{ template "layout" }}
     <main class="container col-md-6">
-      <div class="text-header col-md-12 text-center card">
-        <div class="card-body">
+      <div class="text-header col-md-12 text-center">
           <h1>Create a new post</h1>
         <form action="/post/create/new" method="POST">
           <div class="form-group">
@@ -17,7 +16,6 @@
             <input type="submit" value="post">
           </div>
         </form>
-      </div>
       </div>
     </main>
   {{ template "layoutEnd"}}
