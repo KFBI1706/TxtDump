@@ -156,7 +156,10 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	if exsistingpost.EditID != editid {
 		return
 	}
-	deletepost(exsistingpost)
+	err := deletepost(exsistingpost)
+	if err != nil {
+		log.Println(err)
+	}
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
