@@ -141,11 +141,12 @@ func editpostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	newpost.PubID = exsistingpost.PubID
 	newpost.EditID = exsistingpost.EditID
-	log.Println(newpost)
+	newpost.Sucsess = true
 	err = saveChanges(newpost)
 	if err != nil {
 		log.Println(err)
 	}
+	json.NewEncoder(w).Encode(newpost)
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
