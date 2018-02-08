@@ -45,7 +45,7 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(pubid)
-	post := postresp{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditIDo}
+	post := postresp{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	//content := strings.Replace(post.Content, "\n", "<br>", -1)
 	//post.Content = content
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
