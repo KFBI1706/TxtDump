@@ -125,7 +125,28 @@ func edit(w http.ResponseWriter, r *http.Request) {
 /*
 	JSON API:
 */
-
+func editpostAPI(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pubid, _ := strconv.Atoi(vars["id"])
+	editid, _ := strconv.Atoi(vars["editid"])
+	exsistingpost := readpostDB(pubid)
+	newpost := postresp{}
+	err := json.NewDecoder(r.Body).Decode(&newpost)
+	if err != nil {
+		log.Println(err)
+	}
+	if exsistingpost.EditID != editid {
+		fmt.Fprintln(w, "Edit id did not match actual Edit id")
+		return
+	}
+	newpost.PubID = exsistingpost.PubID
+	newpost.EditID = exsistingpost.EditID
+	log.Println(newpost)
+	err = saveChanges(newpost)
+	if err != nil {
+		log.Println(err)
+	}
+}
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	json.NewEncoder(w).Encode(posts)
@@ -150,9 +171,9 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
 	newpost.EditID = genFromSeed()
-	log.Print(newpost.PubID)
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
+		log.Println(err)
 		fmt.Fprint(w, "No data posted!")
 		return
 	}
