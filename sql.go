@@ -26,7 +26,6 @@ func readDBstring(filename string) (string, error) {
 	}
 	return string(file), nil
 }
-
 func testDBConnection() error {
 	dbstring, err := readDBstring("dbstring")
 	if err != nil {
@@ -44,7 +43,6 @@ func testDBConnection() error {
 	db.Close()
 	return nil
 }
-
 func establishConn() *sql.DB {
 	dbstring, err := readDBstring("dbstring")
 	if err != nil {

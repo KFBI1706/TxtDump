@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	//Check that DB connection is ok before doing anything
 	err := testDBConnection()
 	if err != nil {
 		log.Fatal(err)
@@ -33,7 +32,6 @@ func main() {
 		log.Println(err)
 	}
 }
-
 func logging(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.URL.Path)

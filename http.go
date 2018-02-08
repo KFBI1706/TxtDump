@@ -46,8 +46,6 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	}
 	result := readpostDB(pubid)
 	post := postresp{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
-	//content := strings.Replace(post.Content, "\n", "<br>", -1)
-	//post.Content = content
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)
@@ -125,6 +123,7 @@ func edit(w http.ResponseWriter, r *http.Request) {
 /*
 	JSON API:
 */
+
 func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pubid, _ := strconv.Atoi(vars["id"])
@@ -165,7 +164,6 @@ func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	json.NewEncoder(w).Encode(posts)
 }
-
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
