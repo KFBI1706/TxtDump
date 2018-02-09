@@ -119,6 +119,19 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("/post/%v/edit/%v", post.PubID, post.EditID)
 	http.Redirect(w, r, url, 302)
 }
+func deletePostWeb(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pubid, _ := strconv.Atoi(vars["id"])
+	editid, _ := strconv.Atoi(vars["editid"])
+	exsistingpost := readpostDB(pubid)
+	if exsistingpost.EditID != editid {
+		return
+	}
+	err := deletepost(exsistingpost)
+	if err != nil {
+		log.Println(err)
+	}
+}
 
 /*
 	JSON API:

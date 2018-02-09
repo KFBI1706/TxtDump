@@ -24,6 +24,7 @@ func main() {
 	router.HandleFunc("/post/{id}/request", logging(requestPostWeb)).Methods("GET")
 	router.HandleFunc("/post/{id}/edit/{editid}", logging(editPost))
 	router.HandleFunc("/post/{id}/edit/{editid}/post", logging(edit))
+	router.HandleFunc("/post/{id}/delete/{editid}/", logging(deletePostWeb))
 	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
 	router.HandleFunc("/post/create/new", logging(createPostWeb))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))

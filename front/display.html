@@ -38,7 +38,7 @@
   <main class="container col-md-6">
     <div class="text-header col-md-12 text-center">
         <h1>Edit Post</h1>
-      <form action="/post/{.Pubid}/edit/{.Editid}/post" method="POST">
+      <form action="/post/{{.PubID}}/edit/{{.EditID}}/post" method="POST">
         <div class="form-group">
           <label for="formGroupExampleInput">Title</label>
           <input type="text" class="form-control form-control-lg" id="formGroupExampleInput" value="{{.Title}}" name="Title" >
