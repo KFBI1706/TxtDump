@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type postresp struct {
+type postdata struct {
 	ID      int       `json:"-"`
 	PubID   int       `json:"PubID"`
 	EditID  int       `json:"EditID"`
@@ -45,7 +45,7 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(pubid)
-	post := postresp{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
+	post := postdata{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)
@@ -65,7 +65,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := postresp{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
+	newpost := postdata{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
 	newpost.EditID = genFromSeed()
@@ -129,7 +129,7 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	pubid, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
 	exsistingpost := readpostDB(pubid)
-	newpost := postresp{}
+	newpost := postdata{}
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
@@ -174,13 +174,13 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postresp{PubID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
+	post := postdata{PubID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
 }
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
-	newpost := postresp{}
+	newpost := postdata{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.PubID = genFromSeed()
 	newpost.EditID = genFromSeed()

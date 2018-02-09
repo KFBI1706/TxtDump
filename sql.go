@@ -58,7 +58,7 @@ func establishConn() *sql.DB {
 	}
 	return db
 }
-func createPostDB(post postresp) {
+func createPostDB(post postdata) {
 	db := establishConn()
 	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.PubID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
@@ -67,8 +67,8 @@ func createPostDB(post postresp) {
 	db.Close()
 	log.Println(post)
 }
-func readpostDB(pubid int) postresp {
-	result := postresp{PubID: pubid}
+func readpostDB(pubid int) postdata {
+	result := postdata{PubID: pubid}
 	db := establishConn()
 	err := db.QueryRow("SELECT id, text, title, created_at, editid FROM text WHERE pubid = $1", pubid).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID)
 	if err != nil && err == sql.ErrNoRows {
@@ -83,7 +83,7 @@ func readpostDB(pubid int) postresp {
 	result.Sucsess = true
 	return result
 }
-func checkedid(post postresp) error {
+func checkedid(post postdata) error {
 	db := establishConn()
 	var edid int
 	err := db.QueryRow("SELECT editid FROM text WHERE pubid = $1", post.PubID).Scan(&edid)
@@ -97,7 +97,7 @@ func checkedid(post postresp) error {
 	db.Close()
 	return nil
 }
-func saveChanges(post postresp) error {
+func saveChanges(post postdata) error {
 	db := establishConn()
 	_, err := db.Exec("UPDATE text SET title = $1, text = $2 WHERE pubid = $3;", post.Title, post.Content, post.PubID)
 	if err != nil {
@@ -129,7 +129,7 @@ func findpostfortest() (int, error) {
 	db.Close()
 	return post, err
 }
-func deletepost(post postresp) error {
+func deletepost(post postdata) error {
 	db := establishConn()
 	var id int
 	err := db.QueryRow("SELECT id FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID).Scan(&id)
