@@ -6,6 +6,7 @@
       <h1 class="Title">{{.Title}}</h1>
       <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
       <h6><a href="/post/{{.PubID}}/edit/{{.EditID}}">Edit post</a></h6>
+      <h6><a href="/api/v1/post/{{.PubID}}/delete/{{.EditID}}">Delete post</a></h6>
       <hr>
     </div>
     <div class="text-content col-md-12">
