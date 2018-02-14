@@ -209,3 +209,12 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost.Sucsess = true
 	json.NewEncoder(w).Encode(newpost)
 }
+
+func routerWalk(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	t, err := route.GetPathTemplate()
+	if err != nil {
+		return err
+	}
+	fmt.Println(t)
+	return nil
+}

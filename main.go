@@ -28,6 +28,7 @@ func main() {
 	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
 	router.HandleFunc("/post/create/new", logging(createPostWeb))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
+	router.Walk(routerWalk)
 	err = http.ListenAndServe(":1337", router)
 	if err != nil {
 		log.Println(err)
