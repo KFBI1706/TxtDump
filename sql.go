@@ -131,12 +131,7 @@ func findpostfortest() (int, error) {
 }
 func deletepost(post postdata) error {
 	db := establishConn()
-	var id int
-	err := db.QueryRow("SELECT id FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID).Scan(&id)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("DELETE FROM text WHERE id = $1", id)
+	_, err := db.Exec("DELETE FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID)
 	if err != nil {
 		return err
 	}

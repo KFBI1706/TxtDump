@@ -18,7 +18,7 @@ Returns:
 #### Create Post:
 
 ```
-HOST/api/v1/post/create | Creates the postk:
+HOST/api/v1/post/create | Creates the post:
 ```
 Example:
 ```json
@@ -29,11 +29,20 @@ Response:
 {"PubID":5580586,"EditID":4553279,"Content":"text","Title":"Title","Sucsess":true,"Time":"0001-01-01T00:00:00Z"}
 ```
 #### Edit Post:
+
+```
+HOST/api/v1/post/{pubid}/edit/{editid} | Edits the post:
+```
 ```json
 curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
 "Content":"tyest"}' http://localhost:1337/api/v1/post/4750794/edit/8986640
 ```
 #### Delete Post:
+
+```
+HOST/api/v1/post/{pubid}/delete/{editid} | Deletes the post:
+```
+Example
 ```
 curl http://localhost:1337/api/v1/post/4750794/delete/8986640
 ```

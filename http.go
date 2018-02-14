@@ -171,6 +171,7 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	err := deletepost(exsistingpost)
 	if err != nil {
 		log.Println(err)
+		fmt.Fprintln(w, "No such post")
 	}
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
