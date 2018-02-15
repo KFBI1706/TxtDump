@@ -103,8 +103,14 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 }
 func edit(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, _ := strconv.Atoi(vars["id"])
-	editid, _ := strconv.Atoi(vars["editid"])
+	pubid, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		fmt.Fprintf(w, "Request needs to be int")
+	}
+	editid, err := strconv.Atoi(vars["editid"])
+	if err != nil {
+		fmt.Fprintf(w, "Request needs to be int")
+	}
 	post := readpostDB(pubid)
 	if editid != post.EditID {
 		url := fmt.Sprintf("/post/%v/request", post.PubID)
@@ -112,7 +118,7 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	}
 	post.Content = r.FormValue("Content")
 	post.Title = r.FormValue("Title")
-	err := saveChanges(post)
+	err = saveChanges(post)
 	if err != nil {
 		log.Println(err)
 	}
@@ -139,11 +145,17 @@ func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 
 func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, _ := strconv.Atoi(vars["id"])
-	editid, _ := strconv.Atoi(vars["editid"])
+	pubid, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		fmt.Fprintf(w, "Request needs to be int")
+	}
+	editid, err := strconv.Atoi(vars["editid"])
+	if err != nil {
+		fmt.Fprintf(w, "Request needs to be int")
+	}
 	exsistingpost := readpostDB(pubid)
 	newpost := postdata{}
-	err := json.NewDecoder(r.Body).Decode(&newpost)
+	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
 	}

@@ -12,8 +12,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	posts := countPosts()
-	log.Printf("%v Post(s) Currently in DB\n", posts)
+	log.Printf("%v Post(s) Currently in DB\n", countPosts())
 	router := mux.NewRouter()
 	router.HandleFunc("/", logging(displayIndex)).Methods("GET")
 	router.HandleFunc("/api/v1/post/amount", logging(postcounterAPI)).Methods("GET")

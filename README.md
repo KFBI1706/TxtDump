@@ -1,4 +1,22 @@
 # TxtDump
+
+## All current routes:
+```
+/
+/api/v1/post/amount
+/api/v1/post/{id}/request
+/api/v1/post/create
+/api/v1/post/{id}/edit/{editid}
+/api/v1/post/{id}/delete/{editid}
+/post/{id}/request
+/post/{id}/edit/{editid}
+/post/{id}/edit/{editid}/post
+/post/{id}/delete/{editid}/
+/post/create
+/post/create/new
+/static/
+```
+
 ## Routes (Api):
 
 #### Request a post:
