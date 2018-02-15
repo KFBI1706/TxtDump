@@ -119,16 +119,6 @@ func countPosts() int {
 	db.Close()
 	return count
 }
-func findpostfortest() (int, error) {
-	var post int
-	db := establishConn()
-	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
-	if err != nil {
-		log.Println(err)
-	}
-	db.Close()
-	return post, err
-}
 func deletepost(post postdata) error {
 	db := establishConn()
 	_, err := db.Exec("DELETE FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID)
