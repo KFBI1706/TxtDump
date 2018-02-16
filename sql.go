@@ -76,7 +76,7 @@ func readpostDB(pubid int) postdata {
 		return result
 	}
 	if err != nil && result.Title == "" {
-		result.Title = "No title"
+		result.Title = ""
 	}
 	db.Close()
 	result.Sucsess = true
