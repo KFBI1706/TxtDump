@@ -26,7 +26,8 @@ body {
 .infobox {
   height: 200px;
 }
-.content-box {
+.content {
   height: 500px;
   width: 100%;
+  white-space: pre-line;
 }

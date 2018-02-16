@@ -1,4 +1,4 @@
-axios.get('http://localhost:1337/post/9175728/request')
+fetch('http://localhost:1337/post/9175728/request')
   .then(function (response) {
     console.log(response.data);
     changeTest(response.data);
