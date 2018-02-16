@@ -65,7 +65,6 @@ func createPostDB(post postdata) {
 		fmt.Println(err, postdata)
 	}
 	db.Close()
-	log.Println(post)
 }
 func readpostDB(pubid int) postdata {
 	result := postdata{PubID: pubid}

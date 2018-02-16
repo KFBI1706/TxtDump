@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -21,6 +22,9 @@ type postdata struct {
 	Title   string    `json:"Title"`
 	Sucsess bool      `json:"Sucsess"`
 	Time    time.Time `json:"Time"`
+}
+type md struct {
+	Content template.HTML
 }
 
 /*
@@ -134,6 +138,18 @@ func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err := deletepost(exsistingpost)
+	if err != nil {
+		log.Println(err)
+	}
+}
+func documentation(w http.ResponseWriter, r *http.Request) {
+	file, err := ioutil.ReadFile("README.md")
+	if err != nil {
+		log.Println(err)
+	}
+	doc := parse(file)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+	err = tmpl.ExecuteTemplate(w, "doc", md{Content: template.HTML(doc)})
 	if err != nil {
 		log.Println(err)
 	}

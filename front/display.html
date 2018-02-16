@@ -1,15 +1,15 @@
 <!-- Html when a post is found in DB -->
 {{ define "display" }}
   {{ template "layout" }}
-  <main role="main" class="container col-md-6">
-    <div class="text-header col-md-12">
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
+    <div class="text-header ">
       <h1 class="Title">{{.Title}}</h1>
       <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
       <h6><a href="/post/{{.PubID}}/edit/{{.EditID}}">Edit post</a></h6>
       <h6><a href="/api/v1/post/{{.PubID}}/delete/{{.EditID}}">Delete post</a></h6>
       <hr>
     </div>
-    <div class="text-content col-md-12">
+    <div class="text-content ">
       <span class="content">{{.Content}}</span>
     </div>
   </main>
@@ -19,7 +19,7 @@
 <!-- The template when a post is not found --> 
 {{ define "notFound"}}
   {{ template "layout" }}
-    <main role="main" class="container col-md-6">
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
       <div class="text-header col-md-12 text-center">
         <h1 class="Title">Your post was not found</h1>  
       </div>
@@ -36,7 +36,7 @@
 
 {{define "edit"}}
   {{ template "layout" }}
-  <main class="container col-md-6">
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
     <div class="text-header col-md-12 text-center">
         <h1>Edit Post</h1>
       <form action="/post/{{.PubID}}/edit/{{.EditID}}/post" method="POST">
@@ -54,6 +54,13 @@
       </form>
 
     </div>
+  </main>
+  {{ template "layoutEnd" }}
+{{end}}
+{{define  "doc"}}
+  {{ template "layout" }}
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
+    <span>{{.Content}}</span>
   </main>
   {{ template "layoutEnd" }}
 {{end}}

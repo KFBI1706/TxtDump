@@ -31,3 +31,9 @@ body {
   width: 100%;
   white-space: pre-line;
 }
+.content-box {
+  height: 500px;
+}
+code {
+  background-color: #eee;
+}

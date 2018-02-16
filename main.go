@@ -26,6 +26,7 @@ func main() {
 	router.HandleFunc("/post/{id}/delete/{editid}/", logging(deletePostWeb))
 	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
 	router.HandleFunc("/post/create/new", logging(createPostWeb))
+	router.HandleFunc("/documentation", logging(documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
 	router.Walk(routerWalk)
 	err = http.ListenAndServe(":1337", router)
