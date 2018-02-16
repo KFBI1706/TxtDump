@@ -52,7 +52,6 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	if post.Title == "" {
 		md := []byte(post.Content)
 		html := parse(md)
-		log.Println(html)
 		post.Md = html
 		tmpl.ExecuteTemplate(w, "doc", post)
 		return
