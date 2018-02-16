@@ -15,16 +15,14 @@ import (
 )
 
 type postdata struct {
-	ID      int       `json:"-"`
-	PubID   int       `json:"PubID"`
-	EditID  int       `json:"EditID"`
-	Content string    `json:"Content"`
-	Title   string    `json:"Title"`
-	Sucsess bool      `json:"Sucsess"`
-	Time    time.Time `json:"Time"`
-}
-type md struct {
-	Content template.HTML
+	ID      int           `json:"-"`
+	PubID   int           `json:"PubID"`
+	EditID  int           `json:"EditID"`
+	Content string        `json:"Content"`
+	Md      template.HTML `json:"Md"`
+	Title   string        `json:"Title"`
+	Sucsess bool          `json:"Sucsess"`
+	Time    time.Time     `json:"Time"`
 }
 
 /*
@@ -51,10 +49,19 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	result := readpostDB(pubid)
 	post := postdata{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+	if post.Title == "" {
+		md := []byte(post.Content)
+		html := parse(md)
+		log.Println(html)
+		post.Md = html
+		tmpl.ExecuteTemplate(w, "doc", post)
+		return
+	}
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)
 		return
 	}
+
 	tmpl.ExecuteTemplate(w, "display", post)
 }
 func createPostTemplateWeb(w http.ResponseWriter, r *http.Request) {
@@ -149,7 +156,7 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 	}
 	doc := parse(file)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	err = tmpl.ExecuteTemplate(w, "doc", md{Content: template.HTML(doc)})
+	err = tmpl.ExecuteTemplate(w, "doc", postdata{Md: doc})
 	if err != nil {
 		log.Println(err)
 	}
