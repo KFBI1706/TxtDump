@@ -58,8 +58,8 @@ curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
 ```
 HOST/api/v1/post/{pubid}/delete/{editid} | Deletes the post:
 ```
-Example
-```
+Example:
+```bash
 curl http://localhost:1337/api/v1/post/4750794/delete/8986640
 ```
 <br>
