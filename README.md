@@ -13,6 +13,7 @@
 /post/{id}/delete/{editid}/
 /post/create
 /post/create/new
+/documentation
 /static/
 ```
 ## Routes (Api):
