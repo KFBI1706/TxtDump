@@ -49,19 +49,14 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	result := readpostDB(pubid)
 	post := postdata{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	if post.Title == "" {
-		md := []byte(post.Content)
-		html := parse(md)
-		post.Md = html
-		tmpl.ExecuteTemplate(w, "doc", post)
-		return
-	}
+	md := []byte(post.Content)
+	html := parse(md)
+	post.Md = html
+	tmpl.ExecuteTemplate(w, "display", post)
 	if post.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", post)
 		return
 	}
-
-	tmpl.ExecuteTemplate(w, "display", post)
 }
 func createPostTemplateWeb(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
@@ -242,6 +237,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	createPostDB(newpost)
 	newpost.Sucsess = true
 	json.NewEncoder(w).Encode(newpost)
+	r.Body.Close()
 }
 
 func routerWalk(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
