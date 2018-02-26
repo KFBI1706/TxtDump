@@ -60,5 +60,5 @@ curl http://localhost:1337/api/v1/post/4750794/delete/8986640
 #### Dbstring example:
 The program looks for a file named dbstring when running this is then converted into the info used to connect to the DB for more info about this read: https://godoc.org/github.com/lib/pq
 ```
-user=postgres dbname=db password=12345 host=HOSTIP
+user=postgres dbname=db password=12345 host=HOSTIP sslmode=disable
 ```
