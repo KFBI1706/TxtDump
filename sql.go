@@ -60,7 +60,7 @@ func establishConn() *sql.DB {
 }
 func createPostDB(post postdata) {
 	db := establishConn()
-	postdata, err := db.Exec("INSERT INTO text (pubid, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.PubID, post.Title, post.Content, time.Now(), post.EditID)
+	postdata, err := db.Exec("INSERT INTO text (id, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.PubID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err, postdata)
 	}
@@ -69,7 +69,7 @@ func createPostDB(post postdata) {
 func readpostDB(pubid int) postdata {
 	result := postdata{PubID: pubid}
 	db := establishConn()
-	err := db.QueryRow("SELECT id, text, title, created_at, editid FROM text WHERE pubid = $1", pubid).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID)
+	err := db.QueryRow("SELECT id, text, title, created_at, editid FROM text WHERE id = $1", pubid).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID)
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
 		result.Sucsess = false
@@ -85,7 +85,7 @@ func readpostDB(pubid int) postdata {
 func checkedid(post postdata) error {
 	db := establishConn()
 	var edid int
-	err := db.QueryRow("SELECT editid FROM text WHERE pubid = $1", post.PubID).Scan(&edid)
+	err := db.QueryRow("SELECT editid FROM text WHERE id = $1", post.PubID).Scan(&edid)
 	if err != nil {
 		log.Println(err)
 	}
@@ -98,7 +98,7 @@ func checkedid(post postdata) error {
 }
 func saveChanges(post postdata) error {
 	db := establishConn()
-	_, err := db.Exec("UPDATE text SET title = $1, text = $2 WHERE pubid = $3;", post.Title, post.Content, post.PubID)
+	_, err := db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.PubID)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func countPosts() int {
 }
 func deletepost(post postdata) error {
 	db := establishConn()
-	_, err := db.Exec("DELETE FROM text WHERE pubid = $1 AND editid = $2", post.PubID, post.EditID)
+	_, err := db.Exec("DELETE FROM text WHERE id = $1 AND editid = $2", post.PubID, post.EditID)
 	if err != nil {
 		return err
 	}
