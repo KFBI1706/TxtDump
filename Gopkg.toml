@@ -19,7 +19,7 @@
 # [[override]]
 #  name = "github.com/x/y"
 #  version = "2.4.0"
-
+required = ["github.com/russross/blackfriday"]
 
 [[constraint]]
   name = "github.com/gorilla/mux"
@@ -28,3 +28,6 @@
 [[constraint]]
   branch = "master"
   name = "github.com/lib/pq"
+[[constraint]]
+  version = "1.0.0"
+  name = "github.com/russross/blackfriday"
