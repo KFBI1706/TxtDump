@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 )
 
@@ -15,7 +14,7 @@ func findpostfortest() (int, error) {
 	db := establishConn()
 	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
 	if err != nil {
-		log.Println(err)
+		return 0, err
 	}
 	db.Close()
 	return post, err
