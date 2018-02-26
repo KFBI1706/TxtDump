@@ -38,6 +38,7 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func requestPostWeb(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)
 	id := vars["id"]
 	pubid, err := strconv.Atoi(id)
@@ -49,8 +50,7 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	result := readpostDB(pubid)
 	post := postdata{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	md := []byte(post.Content)
-	html := parse(md)
+	html := parse(post.Content)
 	post.Md = html
 	tmpl.ExecuteTemplate(w, "display", post)
 	if post.Sucsess == false {
@@ -148,7 +148,7 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	doc := parse(file)
+	doc := parse(string(file))
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	err = tmpl.ExecuteTemplate(w, "doc", postdata{Md: doc})
 	if err != nil {

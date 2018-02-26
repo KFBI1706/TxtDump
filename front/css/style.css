@@ -29,7 +29,6 @@ body {
 .content {
   height: 500px;
   width: 100%;
-  white-space: pre-line;
 }
 .content-box {
   height: 500px;
