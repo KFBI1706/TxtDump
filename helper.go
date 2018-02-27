@@ -12,7 +12,7 @@ func genFromSeed() int {
 func findpostfortest() (int, error) {
 	var post int
 	db := establishConn()
-	err := db.QueryRow("SELECT pubid FROM text WHERE id = $1", 1).Scan(&post)
+	err := db.QueryRow("SELECT ID FROM TEXT LIMIT 1;").Scan(&post)
 	if err != nil {
 		return 0, err
 	}
