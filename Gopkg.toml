@@ -28,6 +28,7 @@ required = ["github.com/russross/blackfriday"]
 [[constraint]]
   branch = "master"
   name = "github.com/lib/pq"
+
 [[constraint]]
   version = "1.0.0"
   name = "github.com/russross/blackfriday"
