@@ -15,7 +15,6 @@ import (
 )
 
 type postdata struct {
-	ID      int           `json:"-"`
 	PubID   int           `json:"PubID"`
 	EditID  int           `json:"EditID"`
 	Content string        `json:"Content"`

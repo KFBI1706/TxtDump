@@ -15,7 +15,7 @@ func TestDBconn(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Printf("The first post in the DB has the pubid: %v\n", post)
+	fmt.Printf("The first post in the DB has the id: %v\n", post)
 	redpost := readpostDB(post)
 	if redpost.Content == "" {
 		t.Error("Something went wrong reading from DB")
