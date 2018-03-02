@@ -43,6 +43,8 @@ func testDBConnection() error {
 	db.Close()
 	return nil
 }
+
+//establishConn() creates the DB Connnection Remember to always close these u dumbus
 func establishConn() *sql.DB {
 	dbstring, err := readDBstring("dbstring")
 	if err != nil {
@@ -133,5 +135,6 @@ func incrementViewCounter(id int) error {
 	if err != nil {
 		return err
 	}
+	db.Close()
 	return nil
 }

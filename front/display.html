@@ -5,6 +5,7 @@
     <div class="text-header ">
       <h1 class="Title">{{.Title}}</h1>
       <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
+      <h6>{{.Views}}</h6>
       <h6><a href="/post/{{.ID}}/edit/{{.EditID}}">Edit post</a></h6>
       <h6><a href="/api/v1/post/{{.ID}}/delete/{{.EditID}}">Delete post</a></h6>
       <hr>
