@@ -60,7 +60,7 @@ func establishConn() *sql.DB {
 }
 func createPostDB(post postdata) {
 	db := establishConn()
-	postdata, err := db.Exec("INSERT INTO text (id, title, text, created_at, editid) VALUES ($1, $2, $3, $4, $5); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
+	postdata, err := db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err, postdata)
 	}
@@ -69,7 +69,7 @@ func createPostDB(post postdata) {
 func readpostDB(ID int) postdata {
 	result := postdata{ID: ID}
 	db := establishConn()
-	err := db.QueryRow("SELECT id, text, title, created_at, editid FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID)
+	err := db.QueryRow("SELECT id, text, title, created_at, editid, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID, &result.Views)
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
 		result.Sucsess = false
@@ -125,5 +125,13 @@ func deletepost(post postdata) error {
 		return err
 	}
 	db.Close()
+	return nil
+}
+func incrementViewCounter(id int) error {
+	db := establishConn()
+	_, err := db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
 	return nil
 }

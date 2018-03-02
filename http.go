@@ -22,6 +22,7 @@ type postdata struct {
 	Title   string        `json:"Title"`
 	Sucsess bool          `json:"Sucsess"`
 	Time    time.Time     `json:"Time"`
+	Views   int           `json:"Views"`
 }
 
 /*
@@ -54,6 +55,10 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	if result.Sucsess == false {
 		tmpl.ExecuteTemplate(w, "notFound", result)
 		return
+	}
+	err = incrementViewCounter(result.ID)
+	if err != nil {
+		log.Println(err)
 	}
 }
 func createPostTemplateWeb(w http.ResponseWriter, r *http.Request) {
@@ -215,10 +220,16 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postdata{ID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	json.NewEncoder(w).Encode(post)
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		log.Println(err)
+	}
+	err = incrementViewCounter(result.ID)
+	if err != nil {
+		log.Println(err)
+	}
 }
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postdata{}

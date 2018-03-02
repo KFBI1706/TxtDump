@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"testing"
 	"time"
 )
@@ -28,6 +29,10 @@ func TestPostCreateEditDelete(t *testing.T) {
 	err := saveChanges(post)
 	if err != nil {
 		t.Error(err)
+	}
+	err = incrementViewCounter(post.ID)
+	if err != nil {
+		log.Println(err)
 	}
 	err = deletepost(post)
 	if err != nil {

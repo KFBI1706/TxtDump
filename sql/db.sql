@@ -4,5 +4,6 @@ CREATE TABLE public.text
    editid integer,
    text character varying NOT NULL,
    created_at timestamp without time zone,
-   title character varying
+   title character varying,
+   views integer
 );
