@@ -248,7 +248,6 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newpost)
 	r.Body.Close()
 }
-
 func routerWalk(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 	t, err := route.GetPathTemplate()
 	if err != nil {
