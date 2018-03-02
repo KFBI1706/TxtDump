@@ -15,7 +15,7 @@ import (
 )
 
 type postdata struct {
-	PubID   int           `json:"PubID"`
+	ID   	int           `json:"ID"`
 	EditID  int           `json:"EditID"`
 	Content string        `json:"Content"`
 	Md      template.HTML `json:"Md"`
@@ -40,14 +40,14 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)
 	id := vars["id"]
-	pubid, err := strconv.Atoi(id)
+	ID, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	result := readpostDB(pubid)
-	post := postdata{PubID: pubid, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
+	result := readpostDB(ID)
+	post := postdata{ID: ID, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	html := parse(post.Content)
 	post.Md = html
@@ -71,10 +71,10 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	}
 	newpost := postdata{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
 	rand.Seed(time.Now().UnixNano())
-	newpost.PubID = genFromSeed()
+	newpost.ID = genFromSeed()
 	newpost.EditID = genFromSeed()
 	createPostDB(newpost)
-	url := fmt.Sprintf("/post/%v/request", newpost.PubID)
+	url := fmt.Sprintf("/post/%v/request", newpost.ID)
 	http.Redirect(w, r, url, 302)
 }
 func handle404(w http.ResponseWriter, r *http.Request) {
@@ -89,9 +89,9 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 }
 func editPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, _ := strconv.Atoi(vars["id"])
+	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	post := readpostDB(pubid)
+	post := readpostDB(ID)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 
 	if editid == post.EditID {
@@ -100,14 +100,14 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 	} else {
-		url := fmt.Sprintf("/post/%v/request", post.PubID)
+		url := fmt.Sprintf("/post/%v/request", post.ID)
 		http.Redirect(w, r, url, 302)
 	}
 
 }
 func edit(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, err := strconv.Atoi(vars["id"])
+	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
@@ -115,9 +115,9 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	post := readpostDB(pubid)
+	post := readpostDB(ID)
 	if editid != post.EditID {
-		url := fmt.Sprintf("/post/%v/request", post.PubID)
+		url := fmt.Sprintf("/post/%v/request", post.ID)
 		http.Redirect(w, r, url, 302)
 	}
 	post.Content = r.FormValue("Content")
@@ -126,14 +126,14 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	url := fmt.Sprintf("/post/%v/edit/%v", post.PubID, post.EditID)
+	url := fmt.Sprintf("/post/%v/edit/%v", post.ID, post.EditID)
 	http.Redirect(w, r, url, 302)
 }
 func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, _ := strconv.Atoi(vars["id"])
+	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	exsistingpost := readpostDB(pubid)
+	exsistingpost := readpostDB(ID)
 	if exsistingpost.EditID != editid {
 		return
 	}
@@ -161,7 +161,7 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 
 func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, err := strconv.Atoi(vars["id"])
+	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
@@ -169,7 +169,7 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	exsistingpost := readpostDB(pubid)
+	exsistingpost := readpostDB(ID)
 	newpost := postdata{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
@@ -179,7 +179,7 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Edit id did not match actual Edit id")
 		return
 	}
-	newpost.PubID = exsistingpost.PubID
+	newpost.ID = exsistingpost.ID
 	newpost.EditID = exsistingpost.EditID
 	newpost.Sucsess = true
 	err = saveChanges(newpost)
@@ -190,9 +190,9 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 }
 func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pubid, _ := strconv.Atoi(vars["id"])
+	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	exsistingpost := readpostDB(pubid)
+	exsistingpost := readpostDB(ID)
 	if exsistingpost.EditID != editid {
 		return
 	}
@@ -216,7 +216,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(i)
-	post := postdata{PubID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
+	post := postdata{ID: i, Content: result.Content, Title: result.Title, Sucsess: true, Time: result.Time}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(post)
@@ -224,7 +224,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postdata{}
 	rand.Seed(time.Now().UnixNano())
-	newpost.PubID = genFromSeed()
+	newpost.ID = genFromSeed()
 	newpost.EditID = genFromSeed()
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
