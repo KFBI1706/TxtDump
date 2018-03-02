@@ -5,8 +5,8 @@
     <div class="text-header ">
       <h1 class="Title">{{.Title}}</h1>
       <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
-      <h6><a href="/post/{{.PubID}}/edit/{{.EditID}}">Edit post</a></h6>
-      <h6><a href="/api/v1/post/{{.PubID}}/delete/{{.EditID}}">Delete post</a></h6>
+      <h6><a href="/post/{{.ID}}/edit/{{.EditID}}">Edit post</a></h6>
+      <h6><a href="/api/v1/post/{{.ID}}/delete/{{.EditID}}">Delete post</a></h6>
       <hr>
     </div>
     <div class="text-content ">
@@ -39,7 +39,7 @@
   <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
     <div class="text-header col-md-12 text-center">
         <h1>Edit Post</h1>
-      <form action="/post/{{.PubID}}/edit/{{.EditID}}/post" method="POST">
+      <form action="/post/{{.ID}}/edit/{{.EditID}}/post" method="POST">
         <div class="form-group">
           <label for="formGroupExampleInput">Title</label>
           <input type="text" class="form-control form-control-lg" id="formGroupExampleInput" value="{{.Title}}" name="Title" >

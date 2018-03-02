@@ -15,7 +15,7 @@ import (
 )
 
 type postdata struct {
-	ID   	int           `json:"ID"`
+	ID      int           `json:"ID"`
 	EditID  int           `json:"EditID"`
 	Content string        `json:"Content"`
 	Md      template.HTML `json:"Md"`
@@ -47,13 +47,12 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := readpostDB(ID)
-	post := postdata{ID: ID, Content: result.Content, Title: result.Title, Sucsess: result.Sucsess, Time: result.Time, EditID: result.EditID}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	html := parse(post.Content)
-	post.Md = html
-	tmpl.ExecuteTemplate(w, "display", post)
-	if post.Sucsess == false {
-		tmpl.ExecuteTemplate(w, "notFound", post)
+	html := parse(result.Content)
+	result.Md = html
+	tmpl.ExecuteTemplate(w, "display", result)
+	if result.Sucsess == false {
+		tmpl.ExecuteTemplate(w, "notFound", result)
 		return
 	}
 }

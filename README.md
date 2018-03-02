@@ -27,7 +27,7 @@ curl http://localhost:1337/api/v1/post/{id}/request
 ```
 Returns:
 ```json
-{"PubID":9175728,"EditID":0,"Content":"I really REALLY hate javascript","Title":"Dette e ein title","Sucsess":true,"Time":"2017-12-27T00:00:00Z"}
+{"ID":9175728,"EditID":0,"Content":"I really REALLY hate javascript","Title":"Dette e ein title","Sucsess":true,"Time":"2017-12-27T00:00:00Z"}
 ```
 #### Create Post:
 ```
@@ -39,11 +39,11 @@ curl -H "Content-Type: application/json" -X POST -d '{"Title":"Title","Content":
 ```
 Response:
 ```json
-{"PubID":5580586,"EditID":4553279,"Content":"text","Title":"Title","Sucsess":true,"Time":"0001-01-01T00:00:00Z"}
+{"ID":5580586,"EditID":4553279,"Content":"text","Title":"Title","Sucsess":true,"Time":"0001-01-01T00:00:00Z"}
 ```
 #### Edit Post:
 ```
-HOST/api/v1/post/{pubid}/edit/{editid} | Edits the post:
+HOST/api/v1/post/{ID}/edit/{editid} | Edits the post:
 ```
 ```json
 curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
@@ -51,7 +51,7 @@ curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
 ```
 #### Delete Post:
 ```
-HOST/api/v1/post/{pubid}/delete/{editid} | Deletes the post:
+HOST/api/v1/post/{ID}/delete/{editid} | Deletes the post:
 ```
 Example:
 ```bash
