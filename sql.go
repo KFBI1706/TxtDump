@@ -138,3 +138,12 @@ func incrementViewCounter(id int) error {
 	db.Close()
 	return nil
 }
+func checkForDuplicateID(id int) bool {
+	db := establishConn()
+	res := db.QueryRow("SELECT id FROM text WHERE id = $1", id).Scan(id)
+	db.Close()
+	if res != sql.ErrNoRows {
+		return false
+	}
+	return true
+}

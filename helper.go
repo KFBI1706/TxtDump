@@ -1,12 +1,18 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 )
 
 //Probably not the best way to do this
 func genFromSeed() int {
 	num := rand.Intn(9999999-1000000) + 1000000
+	if checkForDuplicateID(num) {
+		return num
+	}
+	num = rand.Intn(9999999-1000000) + 1000000
+	log.Println(num)
 	return num
 }
 func findpostfortest() (int, error) {
