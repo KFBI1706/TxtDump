@@ -20,7 +20,6 @@ type postdata struct {
 	Content string        `json:"Content"`
 	Md      template.HTML `json:"Md"`
 	Title   string        `json:"Title"`
-	Sucsess bool          `json:"Sucsess"`
 	Time    time.Time     `json:"Time"`
 	Views   int           `json:"Views"`
 }
@@ -47,15 +46,17 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	result := readpostDB(ID)
+	result, err := readpostDB(ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	html := parse(result.Content)
 	result.Md = html
 	tmpl.ExecuteTemplate(w, "display", result)
-	if result.Sucsess == false {
-		tmpl.ExecuteTemplate(w, "notFound", result)
-		return
-	}
+
 	err = incrementViewCounter(result.ID)
 	if err != nil {
 		log.Println(err)
@@ -95,7 +96,12 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	post := readpostDB(ID)
+	post, err := readpostDB(ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 
 	if editid == post.EditID {
@@ -119,7 +125,12 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	post := readpostDB(ID)
+	post, err := readpostDB(ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	if editid != post.EditID {
 		url := fmt.Sprintf("/post/%v/request", post.ID)
 		http.Redirect(w, r, url, 302)
@@ -137,11 +148,16 @@ func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	exsistingpost := readpostDB(ID)
+	exsistingpost, err := readpostDB(ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	if exsistingpost.EditID != editid {
 		return
 	}
-	err := deletepost(exsistingpost)
+	err = deletepost(exsistingpost)
 	if err != nil {
 		log.Println(err)
 	}
@@ -173,7 +189,12 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	exsistingpost := readpostDB(ID)
+	exsistingpost, err := readpostDB(ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	newpost := postdata{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
@@ -185,7 +206,6 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	newpost.ID = exsistingpost.ID
 	newpost.EditID = exsistingpost.EditID
-	newpost.Sucsess = true
 	err = saveChanges(newpost)
 	if err != nil {
 		log.Println(err)
@@ -196,11 +216,11 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, _ := strconv.Atoi(vars["id"])
 	editid, _ := strconv.Atoi(vars["editid"])
-	exsistingpost := readpostDB(ID)
+	exsistingpost, err := readpostDB(ID)
 	if exsistingpost.EditID != editid {
 		return
 	}
-	err := deletepost(exsistingpost)
+	err = deletepost(exsistingpost)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintln(w, "No such post")
@@ -219,7 +239,12 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Request needs to be int")
 		return
 	}
-	result := readpostDB(i)
+	result, err := readpostDB(i)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	err = json.NewEncoder(w).Encode(result)
@@ -244,7 +269,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	createPostDB(newpost)
-	newpost.Sucsess = true
+
 	json.NewEncoder(w).Encode(newpost)
 	r.Body.Close()
 }

@@ -68,21 +68,20 @@ func createPostDB(post postdata) {
 	}
 	db.Close()
 }
-func readpostDB(ID int) postdata {
+func readpostDB(ID int) (postdata, error) {
 	result := postdata{ID: ID}
 	db := establishConn()
 	err := db.QueryRow("SELECT id, text, title, created_at, editid, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID, &result.Views)
+	db.Close()
+
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
-		result.Sucsess = false
-		return result
+		return result, err
 	}
 	if err != nil && result.Title == "" {
 		result.Title = ""
 	}
-	db.Close()
-	result.Sucsess = true
-	return result
+	return result, err
 }
 func checkedid(post postdata) error {
 	db := establishConn()
