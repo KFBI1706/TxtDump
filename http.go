@@ -47,12 +47,12 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := readpostDB(ID)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
+		tmpl.ExecuteTemplate(w, "notFound", result)
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	html := parse(result.Content)
 	result.Md = html
 	tmpl.ExecuteTemplate(w, "display", result)
@@ -218,6 +218,7 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	editid, _ := strconv.Atoi(vars["editid"])
 	exsistingpost, err := readpostDB(ID)
 	if exsistingpost.EditID != editid {
+		fmt.Fprintf(w, "Edit ID %v is not correct", editid)
 		return
 	}
 	err = deletepost(exsistingpost)
