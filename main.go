@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -39,4 +40,12 @@ func logging(f http.HandlerFunc) http.HandlerFunc {
 		log.Println(r.RemoteAddr, r.URL.Path)
 		f(w, r)
 	}
+}
+func routerWalk(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	t, err := route.GetPathTemplate()
+	if err != nil {
+		return err
+	}
+	fmt.Println(t)
+	return nil
 }
