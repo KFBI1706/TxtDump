@@ -19,6 +19,7 @@ type postdata struct {
 	Content string        `json:"Content"`
 	Md      template.HTML `json:"Md"`
 	Title   string        `json:"Title"`
+	TitleMD template.HTML `json:"TitleMD"`
 	Time    time.Time     `json:"Time"`
 	Views   int           `json:"Views"`
 }
@@ -52,8 +53,12 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "notFound", result)
 		return
 	}
-	html := parse(result.Content)
-	result.Md = html
+	result.Md = parse(result.Content)
+	if getMDHeader(result.Md) != "" && result.Title == "" {
+		result.Title = getMDHeader(result.Md)
+	}
+	result.TitleMD = template.HTML(result.Title)
+	log.Println(result.TitleMD)
 	tmpl.ExecuteTemplate(w, "display", result)
 
 	err = incrementViewCounter(result.ID)

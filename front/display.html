@@ -3,7 +3,7 @@
   {{ template "layout" }}
   <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
     <div class="text-header ">
-      <h1 class="Title">{{.Title}}</h1>
+      <h1 class="Title">{{.TitleMD}}</h1>
       <h6 class="Time">Post created at: {{.Time.Hour}}:{{.Time.Minute}} {{.Time.Day}} {{.Time.Month}} {{.Time.Year}}</h6>
       <h6>{{.Views}}</h6>
       <h6><a href="/post/{{.ID}}/edit/{{.EditID}}">Edit post</a></h6>
