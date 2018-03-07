@@ -16,7 +16,6 @@
 /documentation
 /static/
 ```
-
 ## Routes (Api):
 #### Request a post:
 ```
