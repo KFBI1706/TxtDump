@@ -16,6 +16,7 @@
 /documentation
 /static/
 ```
+
 ## Routes (Api):
 #### Request a post:
 ```
@@ -62,3 +63,5 @@ The program looks for a file named dbstring when running this is then converted 
 ```
 user=postgres dbname=db password=12345 host=HOSTIP sslmode=disable
 ```
+## Setup DB
+Run with flag ```-setupdb``` to configure db as long as dbstring is valid

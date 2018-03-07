@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 )
@@ -17,11 +18,28 @@ func genFromSeed() int {
 }
 func findpostfortest() (int, error) {
 	var post int
-	db := establishConn()
-	err := db.QueryRow("SELECT ID FROM TEXT LIMIT 1;").Scan(&post)
+	db, err := establishConn()
+	err = db.QueryRow("SELECT ID FROM TEXT LIMIT 1;").Scan(&post)
 	if err != nil {
 		return 0, err
 	}
 	db.Close()
 	return post, err
+}
+func setupDB() error {
+	db, err := establishConn()
+	if err != nil {
+		return err
+	}
+	sql, err := readDBstring("sql/db.sql")
+	if err != nil {
+		return err
+	}
+	res, err := db.Exec(sql)
+	if err != nil {
+		return err
+	}
+	fmt.Println(res)
+	db.Close()
+	return nil
 }

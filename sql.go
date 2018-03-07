@@ -45,23 +45,23 @@ func testDBConnection() error {
 }
 
 //establishConn() creates the DB Connnection Remember to always close these u dumbus
-func establishConn() *sql.DB {
+func establishConn() (*sql.DB, error) {
 	dbstring, err := readDBstring("dbstring")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	db, err := sql.Open("postgres", dbstring)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 func createPostDB(post postdata) {
-	db := establishConn()
+	db, err := establishConn()
 	postdata, err := db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err, postdata)
@@ -70,8 +70,8 @@ func createPostDB(post postdata) {
 }
 func readpostDB(ID int) (postdata, error) {
 	result := postdata{ID: ID}
-	db := establishConn()
-	err := db.QueryRow("SELECT id, text, title, created_at, editid, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID, &result.Views)
+	db, err := establishConn()
+	err = db.QueryRow("SELECT id, text, title, created_at, editid, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID, &result.Views)
 	db.Close()
 
 	if err != nil && err == sql.ErrNoRows {
@@ -84,9 +84,9 @@ func readpostDB(ID int) (postdata, error) {
 	return result, err
 }
 func checkedid(post postdata) error {
-	db := establishConn()
+	db, err := establishConn()
 	var edid int
-	err := db.QueryRow("SELECT editid FROM text WHERE id = $1", post.ID).Scan(&edid)
+	err = db.QueryRow("SELECT editid FROM text WHERE id = $1", post.ID).Scan(&edid)
 	if err != nil {
 		log.Println(err)
 	}
@@ -98,8 +98,8 @@ func checkedid(post postdata) error {
 	return nil
 }
 func saveChanges(post postdata) error {
-	db := establishConn()
-	_, err := db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
+	db, err := establishConn()
+	_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func saveChanges(post postdata) error {
 }
 func countPosts() int {
 	var count int
-	db := establishConn()
+	db, err := establishConn()
 	rows, err := db.Query("SELECT COUNT(*) as count FROM text")
 	if err != nil {
 		log.Println(err)
@@ -120,8 +120,8 @@ func countPosts() int {
 	return count
 }
 func deletepost(post postdata) error {
-	db := establishConn()
-	_, err := db.Exec("DELETE FROM text WHERE id = $1 AND editid = $2", post.ID, post.EditID)
+	db, err := establishConn()
+	_, err = db.Exec("DELETE FROM text WHERE id = $1 AND editid = $2", post.ID, post.EditID)
 	if err != nil {
 		return err
 	}
@@ -129,8 +129,8 @@ func deletepost(post postdata) error {
 	return nil
 }
 func incrementViewCounter(id int) error {
-	db := establishConn()
-	_, err := db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
+	db, err := establishConn()
+	_, err = db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,10 @@ func incrementViewCounter(id int) error {
 	return nil
 }
 func checkForDuplicateID(id int) bool {
-	db := establishConn()
+	db, err := establishConn()
+	if err != nil {
+		log.Println(err)
+	}
 	res := db.QueryRow("SELECT id FROM text WHERE id = $1", id).Scan(id)
 	db.Close()
 	if res != sql.ErrNoRows {

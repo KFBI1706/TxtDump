@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,14 @@ func main() {
 	err := testDBConnection()
 	if err != nil {
 		log.Fatal(err)
+	}
+	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
+	flag.Parse()
+	if *dbsetup == true {
+		err = setupDB()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	log.Printf("%v Post(s) Currently in DB\n", countPosts())
 	router := mux.NewRouter()
