@@ -58,9 +58,7 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		result.Title = getMDHeader(result.Md)
 	}
 	result.TitleMD = template.HTML(result.Title)
-	log.Println(result.TitleMD)
 	tmpl.ExecuteTemplate(w, "display", result)
-
 	err = incrementViewCounter(result.ID)
 	if err != nil {
 		log.Println(err)
