@@ -54,8 +54,9 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result.Md = parse(result.Content)
-	if getMDHeader(result.Md) != "" && result.Title == "" {
-		result.Title = getMDHeader(result.Md)
+	mdhead := getMDHeader(result.Md)
+	if mdhead != "" && result.Title == "" {
+		result.Title = mdhead
 	}
 	result.TitleMD = template.HTML(result.Title)
 	tmpl.ExecuteTemplate(w, "display", result)
