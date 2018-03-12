@@ -59,6 +59,8 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		fmt.Fprintln(w, "No such post")
 	}
+	fmt.Fprintf(w, "Post %v successfully deleted", exsistingpost.ID)
+	return
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
@@ -81,6 +83,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	result.EditID = 0
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Println(err)
