@@ -97,8 +97,18 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 }
 func editPost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	ID, _ := strconv.Atoi(vars["id"])
-	editid, _ := strconv.Atoi(vars["editid"])
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
+	editid, err := strconv.Atoi(vars["editid"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	post, err := readpostDB(ID)
 	if err != nil {
 		log.Println(err)
@@ -149,8 +159,18 @@ func edit(w http.ResponseWriter, r *http.Request) {
 }
 func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	ID, _ := strconv.Atoi(vars["id"])
-	editid, _ := strconv.Atoi(vars["editid"])
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
+	editid, err := strconv.Atoi(vars["editid"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	exsistingpost, err := readpostDB(ID)
 	if err != nil {
 		log.Println(err)

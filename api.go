@@ -16,11 +16,15 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		fmt.Fprintf(w, "Request needs to be int")
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
 	}
 	editid, err := strconv.Atoi(vars["editid"])
 	if err != nil {
-		fmt.Fprintf(w, "Request needs to be int")
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
 	}
 	exsistingpost, err := readpostDB(ID)
 	if err != nil {
@@ -47,8 +51,18 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 }
 func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	ID, _ := strconv.Atoi(vars["id"])
-	editid, _ := strconv.Atoi(vars["editid"])
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
+	editid, err := strconv.Atoi(vars["editid"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	exsistingpost, err := readpostDB(ID)
 	if exsistingpost.EditID != editid {
 		fmt.Fprintf(w, "Edit ID %v is not correct", editid)
