@@ -15,7 +15,9 @@ func main() {
 		log.Fatal(err)
 	}
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
+	port := flag.Int("port", 1337, "for using a custom port")
 	flag.Parse()
+	addr := fmt.Sprintf(":%v", *port)
 	if *dbsetup == true {
 		err = setupDB()
 		if err != nil {
@@ -39,9 +41,9 @@ func main() {
 	router.HandleFunc("/documentation", logging(documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
 	router.Walk(routerWalk)
-	err = http.ListenAndServe(":1337", router)
+	err = http.ListenAndServe(addr, router)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
 func logging(f http.HandlerFunc) http.HandlerFunc {
