@@ -62,5 +62,8 @@ The program looks for a file named dbstring when running this is then converted 
 ```
 user=postgres dbname=db password=12345 host=HOSTIP sslmode=disable
 ```
-## Setup DB
-Run with flag ```-setupdb``` to configure db as long as dbstring is valid
+## Command line arguments
+```
+-setupdb Creates the table used for storing posts using info from dbstring file
+-port Run with custom port. Defualt port is: 1337
+```

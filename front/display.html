@@ -37,9 +37,11 @@
 
 {{define "edit"}}
   {{ template "layout" }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+  <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
   <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-    <div class="text-header col-md-12 text-center">
-        <h1>Edit Post</h1>
+    <div class="text-header col-md-12">
+        <h1 class="text-center">Edit Post</h1>
       <form action="/post/{{.ID}}/edit/{{.EditID}}/post" method="POST">
         <div class="form-group">
           <label for="formGroupExampleInput">Title</label>
@@ -56,6 +58,7 @@
 
     </div>
   </main>
+  <script>var simplemde = new SimpleMDE();</script>
   {{ template "layoutEnd" }}
 {{end}}
 {{define  "doc"}}
