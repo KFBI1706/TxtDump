@@ -20,26 +20,20 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	editid, err := strconv.Atoi(vars["editid"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
-	exsistingpost, err := readpostDB(ID)
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
 	newpost := postdata{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
 	}
-	if exsistingpost.EditID != editid {
-		fmt.Fprintln(w, "Edit id did not match actual Edit id")
+	err = checkPass(newpost.EditID, ID)
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Password is not correct")
 		return
+	}
+	exsistingpost, err := readpostDB(ID)
+	if err != nil {
+		log.Println()
 	}
 	newpost.ID = exsistingpost.ID
 	newpost.EditID = exsistingpost.EditID
@@ -57,23 +51,17 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	editid, err := strconv.Atoi(vars["editid"])
+	post := postdata{ID: ID}
+	err = json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
 	}
-	exsistingpost, err := readpostDB(ID)
-	if exsistingpost.EditID != editid {
-		fmt.Fprintf(w, "Edit ID %v is not correct", editid)
-		return
-	}
-	err = deletepost(exsistingpost)
+	err = deletepost(post)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintln(w, "No such post")
 	}
-	fmt.Fprintf(w, "Post %v successfully deleted", exsistingpost.ID)
+	fmt.Fprintf(w, "Post %v successfully deleted", post.ID)
 	return
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +85,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result.EditID = 0
+	result.EditID = ""
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Println(err)
@@ -111,7 +99,6 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postdata{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
-	newpost.EditID = genFromSeed()
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)

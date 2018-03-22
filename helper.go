@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Probably not the best way to do this
@@ -42,4 +44,15 @@ func setupDB() error {
 	fmt.Println(res)
 	db.Close()
 	return nil
+}
+func securePass(ps string) (string, error) {
+	encrypted, err := bcrypt.GenerateFromPassword([]byte(ps), bcrypt.MinCost)
+	if err != nil {
+		return "", err
+	}
+	return string(encrypted), nil
+}
+func checkPass(ps string, id int) error {
+	err := bcrypt.CompareHashAndPassword(getHashedPS(id), []byte(ps))
+	return err
 }

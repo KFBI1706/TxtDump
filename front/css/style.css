@@ -39,3 +39,11 @@ code {
 pre {
   background-color: #eee;
 }
+.topbar{
+  padding-left:0px;
+  float:left;
+  display: inline;
+}
+.derpimbadatcss{
+  padding-right:0px;
+}

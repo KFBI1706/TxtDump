@@ -15,7 +15,7 @@ import (
 
 type postdata struct {
 	ID      int           `json:"ID"`
-	EditID  int           `json:"EditID"`
+	EditID  string        `json:"EditID"`
 	Content string        `json:"Content"`
 	Md      template.HTML `json:"Md"`
 	Title   string        `json:"Title"`
@@ -80,7 +80,14 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	newpost := postdata{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
-	newpost.EditID = genFromSeed()
+	newpost.EditID = string(genFromSeed())
+	if r.FormValue("CustomPass") == "on" {
+		sec, err := securePass(r.FormValue("Pass"))
+		if err != nil {
+			log.Println(err)
+		}
+		newpost.EditID = sec
+	}
 	createPostDB(newpost)
 	url := fmt.Sprintf("/post/%v/request", newpost.ID)
 	http.Redirect(w, r, url, 302)
@@ -103,12 +110,6 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	editid, err := strconv.Atoi(vars["editid"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
 	post, err := readpostDB(ID)
 	if err != nil {
 		log.Println(err)
@@ -117,14 +118,9 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 
-	if editid == post.EditID {
-		err := tmpl.ExecuteTemplate(w, "edit", post)
-		if err != nil {
-			log.Println(err)
-		}
-	} else {
-		url := fmt.Sprintf("/post/%v/request", post.ID)
-		http.Redirect(w, r, url, 302)
+	err = tmpl.ExecuteTemplate(w, "edit", post)
+	if err != nil {
+		log.Println(err)
 	}
 
 }
@@ -134,19 +130,11 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	editid, err := strconv.Atoi(vars["editid"])
-	if err != nil {
-		fmt.Fprintf(w, "Request needs to be int")
-	}
 	post, err := readpostDB(ID)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintf(w, "Something went wrong")
 		return
-	}
-	if editid != post.EditID {
-		url := fmt.Sprintf("/post/%v/request", post.ID)
-		http.Redirect(w, r, url, 302)
 	}
 	post.Content = r.FormValue("Content")
 	post.Title = r.FormValue("Title")
@@ -177,7 +165,7 @@ func deletePostWeb(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	if exsistingpost.EditID != editid {
+	if exsistingpost.EditID != string(editid) {
 		return
 	}
 	err = deletepost(exsistingpost)

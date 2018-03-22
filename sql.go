@@ -62,16 +62,16 @@ func establishConn() (*sql.DB, error) {
 }
 func createPostDB(post postdata) {
 	db, err := establishConn()
-	postdata, err := db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
-		fmt.Println(err, postdata)
+		fmt.Println(err)
 	}
 	db.Close()
 }
 func readpostDB(ID int) (postdata, error) {
 	result := postdata{ID: ID}
 	db, err := establishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, editid, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.EditID, &result.Views)
+	err = db.QueryRow("SELECT id, text, title, created_at, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views)
 	db.Close()
 
 	if err != nil && err == sql.ErrNoRows {
@@ -85,7 +85,7 @@ func readpostDB(ID int) (postdata, error) {
 }
 func checkedid(post postdata) error {
 	db, err := establishConn()
-	var edid int
+	var edid string
 	err = db.QueryRow("SELECT editid FROM text WHERE id = $1", post.ID).Scan(&edid)
 	if err != nil {
 		log.Println(err)
@@ -99,6 +99,10 @@ func checkedid(post postdata) error {
 }
 func saveChanges(post postdata) error {
 	db, err := establishConn()
+	checkPass(post.EditID, post.ID)
+	if err != nil {
+		return err
+	}
 	_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
 	if err != nil {
 		return err
@@ -148,4 +152,17 @@ func checkForDuplicateID(id int) bool {
 		return false
 	}
 	return true
+}
+func getHashedPS(id int) []byte {
+	var ps []byte
+	db, err := establishConn()
+	if err != nil {
+		log.Println(err)
+	}
+	err = db.QueryRow("SELECT editid FROM text WHERE id = $1").Scan(ps)
+	if err != nil {
+		log.Println(err)
+	}
+	db.Close()
+	return ps
 }
