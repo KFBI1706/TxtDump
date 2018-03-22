@@ -25,12 +25,6 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	err = checkPass(newpost.EditID, ID)
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Password is not correct")
-		return
-	}
 	exsistingpost, err := readpostDB(ID)
 	if err != nil {
 		log.Println()

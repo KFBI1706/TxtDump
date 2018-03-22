@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -62,6 +63,14 @@ func establishConn() (*sql.DB, error) {
 }
 func createPostDB(post postdata) {
 	db, err := establishConn()
+	if post.EditID == "" {
+		rand.Seed(time.Now().UnixNano())
+		post.EditID = string(genFromSeed())
+	}
+	post.EditID, err = securePass(post.EditID)
+	if err != nil {
+		log.Println(err)
+	}
 	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err)
@@ -124,8 +133,12 @@ func countPosts() int {
 	return count
 }
 func deletepost(post postdata) error {
+	err := checkPass(post.EditID, post.ID)
+	if err != nil {
+		return err
+	}
 	db, err := establishConn()
-	_, err = db.Exec("DELETE FROM text WHERE id = $1 AND editid = $2", post.ID, post.EditID)
+	_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
 	if err != nil {
 		return err
 	}
@@ -154,15 +167,15 @@ func checkForDuplicateID(id int) bool {
 	return true
 }
 func getHashedPS(id int) []byte {
-	var ps []byte
+	var hash string
 	db, err := establishConn()
 	if err != nil {
 		log.Println(err)
 	}
-	err = db.QueryRow("SELECT editid FROM text WHERE id = $1").Scan(ps)
+	err = db.QueryRow("SELECT editid FROM text WHERE id = $1", id).Scan(&hash)
 	if err != nil {
 		log.Println(err)
 	}
 	db.Close()
-	return ps
+	return []byte(hash)
 }

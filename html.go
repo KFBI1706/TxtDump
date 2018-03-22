@@ -82,10 +82,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	newpost.ID = genFromSeed()
 	newpost.EditID = string(genFromSeed())
 	if r.FormValue("CustomPass") == "on" {
-		sec, err := securePass(r.FormValue("Pass"))
-		if err != nil {
-			log.Println(err)
-		}
+		sec := r.FormValue("Pass")
 		newpost.EditID = sec
 	}
 	createPostDB(newpost)
