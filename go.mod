@@ -13,5 +13,6 @@ require (
 	"github.com/shurcooL/sanitized_anchor_name" v0.0.0-20170918181015-86672fcb3f95
 	"github.com/sourcegraph/annotate" v0.0.0-20160123013949-f4cad6c6324d
 	"github.com/sourcegraph/syntaxhighlight" v0.0.0-20170531221838-bd320f5d308e
+	"golang.org/x/crypto" v0.0.0-20180322175230-88942b9c40a4
 	"golang.org/x/net" v0.0.0-20180218175443-cbe0f9307d01
 )
