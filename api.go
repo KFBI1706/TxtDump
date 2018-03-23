@@ -30,10 +30,11 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 		log.Println()
 	}
 	newpost.ID = exsistingpost.ID
-	newpost.EditID = exsistingpost.EditID
 	err = saveChanges(newpost)
 	if err != nil {
 		log.Println(err)
+		fmt.Fprint(w, "Wrong Password")
+		return
 	}
 	json.NewEncoder(w).Encode(newpost)
 }
@@ -53,7 +54,8 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 	err = deletepost(post)
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintln(w, "No such post")
+		fmt.Fprintln(w, "Either the post does not exist or the password is wrong")
+		return
 	}
 	fmt.Fprintf(w, "Post %v successfully deleted", post.ID)
 	return

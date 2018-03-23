@@ -108,7 +108,10 @@ func checkedid(post postdata) error {
 }
 func saveChanges(post postdata) error {
 	db, err := establishConn()
-	checkPass(post.EditID, post.ID)
+	if err != nil {
+		return err
+	}
+	err = checkPass(post.EditID, post.ID)
 	if err != nil {
 		return err
 	}

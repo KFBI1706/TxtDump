@@ -35,27 +35,27 @@ HOST/api/v1/post/create | Creates the post:
 ```
 Example:
 ```json
-curl -H "Content-Type: application/json" -X POST -d '{"Title":"Title","Content":"text"}' http://localhost:1337/api/v1/post/create
+curl -H "Content-Type: application/json" -X POST -d '{"Title":"Title","Content":"text","EditID":"password"}' http://localhost:1337/api/v1/post/create
 ```
 Response:
 ```json
-{"ID":5580586,"EditID":4553279,"Content":"text","Title":"Title","Sucsess":true,"Time":"0001-01-01T00:00:00Z"}
+{"ID":5580586,"Content":"text","Title":"Title","Sucsess":true,"Time":"0001-01-01T00:00:00Z"}
 ```
 #### Edit Post:
 ```
-HOST/api/v1/post/{ID}/edit/{editid} | Edits the post:
+HOST/api/v1/post/{ID} | Edits the post:
 ```
 ```json
 curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
-"Content":"tyest"}' http://localhost:1337/api/v1/post/4750794/edit/8986640
+"Content":"tyest","EditID":"password"}' http://localhost:1337/api/v1/post/4750794/edit
 ```
 #### Delete Post:
 ```
-HOST/api/v1/post/{ID}/delete/{editid} | Deletes the post:
+HOST/api/v1/post/{ID}/delete | Deletes the post:
 ```
 Example:
-```bash
-curl http://localhost:1337/api/v1/post/4750794/delete/8986640
+```json
+curl -H "Content-Type: application/json" -X POST -d '{"EditID":"password"}' http://localhost:1337/api/v1/post/4750794/delete
 ```
 #### Dbstring example:
 The program looks for a file named dbstring when running this is then converted into the info used to connect to the DB for more info about this read: https://godoc.org/github.com/lib/pq

@@ -17,9 +17,9 @@ type postdata struct {
 	ID      int           `json:"ID"`
 	EditID  string        `json:"EditID"`
 	Content string        `json:"Content"`
-	Md      template.HTML `json:"Md"`
+	Md      template.HTML `json:""`
 	Title   string        `json:"Title"`
-	TitleMD template.HTML `json:"TitleMD"`
+	TitleMD template.HTML `json:""`
 	Time    time.Time     `json:"Time"`
 	Views   int           `json:"Views"`
 }

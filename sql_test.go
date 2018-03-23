@@ -35,6 +35,7 @@ func TestPostCreateEditDelete(t *testing.T) {
 		t.Errorf("Post with ID %v Already exsits", post.ID)
 	}
 	createPostDB(post)
+	checkPass(post.EditID, post.ID)
 	post.Content = "Second Phase"
 	err := saveChanges(post)
 	if err != nil {
