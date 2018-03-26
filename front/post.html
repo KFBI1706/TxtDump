@@ -13,7 +13,7 @@
             </div>
             <div class="form-group col-md-3 topbar derpimbadatcss">
                 <label class="">Use custom password</label><br>
-                <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()" checked="false">
+                <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()" >
                 <input type="password" name="Pass" class="form-control" id="customField" disabled="true" placeholder="(Optional)">
             </div>
           </div>
@@ -23,7 +23,7 @@
           </div>
 
           <div class="form-group">
-            <input type="submit" value="Post">
+            <input type="submit" class="btn btn-primary" value="Post">
           </div>
         </form>
       </div>
@@ -31,4 +31,51 @@
     <script>var simplemde = new SimpleMDE();</script>
 
   {{ template "layoutEnd"}}
+{{end}}
+
+{{define "deletepost"}}
+  {{ template "layout" }}
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
+    <div class="text-header col-md-12">
+      <h1>Delete post</h1>
+    </div>
+    <form action="/post/{{.ID}}/delete/post">
+      <label>Password</label>
+      <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
+      <br>
+      <input type="submit" class="btn btn-danger" value="Delete post">
+    </form>
+  </main>
+  {{ template "layoutEnd"}}
+{{end}}
+
+{{define "edit"}}
+  {{ template "layout" }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+  <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+  <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
+    <div class="text-header col-md-12">
+        <h1 class="text-center">Edit Post</h1>
+      <form action="/post/{{.ID}}/edit/post" method="POST">
+        <div class="form-group col-md-9 topbar">
+            <label for="formGroupExampleInput">Title <br>Markdown rendering only works on posts without titles for now</label>
+            <input type="text" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Title" value="{{.Title}}">
+          </div>
+          <div class="form-group col-md-3 topbar derpimbadatcss">
+              <label class="">Post password</label><br><br>
+              <input type="password" name="Pass" class="form-control" id="customField">
+          </div>
+        <div class="form-group">
+          <label for="formGroupExampleInput2">Text</label>
+          <textarea type="text" class="form-control content-box" id="formGroupExampleInput" value="{{.Content}}" name="Content">{{.Content}}</textarea>
+        </div>
+        <div class="form-group">
+          <input type="submit" class ="btn btn-primary"value="Edit">
+        </div>
+      </form>
+
+    </div>
+  </main>
+  <script>var simplemde = new SimpleMDE();</script>
+  {{ template "layoutEnd" }}
 {{end}}

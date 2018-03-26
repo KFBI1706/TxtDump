@@ -99,7 +99,7 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
-func editPost(w http.ResponseWriter, r *http.Request) {
+func editPostTemplate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -113,15 +113,14 @@ func editPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
 	err = tmpl.ExecuteTemplate(w, "edit", post)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-func edit(w http.ResponseWriter, r *http.Request) {
+func editPostForm(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -145,32 +144,31 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 }
-func deletePostWeb(w http.ResponseWriter, r *http.Request) {
+func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
+	err := tmpl.ExecuteTemplate(w, "deletepost", nil)
+	if err != nil {
+		log.Println(err)
+	}
+}
+func deletePostForm(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
+		fmt.Fprintf(w, "Request needs to be int")
 	}
-	editid, err := strconv.Atoi(vars["editid"])
+	post, err := readpostDB(ID)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	exsistingpost, err := readpostDB(ID)
+	post.EditID = r.FormValue("Pass")
+	err = deletepost(post)
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
+		fmt.Fprintf(w, "Wrong Password")
 		return
-	}
-	if exsistingpost.EditID != string(editid) {
-		return
-	}
-	err = deletepost(exsistingpost)
-	if err != nil {
-		log.Println(err)
 	}
 }
 func documentation(w http.ResponseWriter, r *http.Request) {
