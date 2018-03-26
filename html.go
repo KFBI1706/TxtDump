@@ -135,11 +135,14 @@ func edit(w http.ResponseWriter, r *http.Request) {
 	}
 	post.Content = r.FormValue("Content")
 	post.Title = r.FormValue("Title")
+	post.EditID = r.FormValue("Pass")
 	err = saveChanges(post)
 	if err != nil {
 		log.Println(err)
+		fmt.Fprintf(w, "Wrong Password")
+		return
 	}
-	url := fmt.Sprintf("/post/%v/edit/%v", post.ID, post.EditID)
+	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 }
 func deletePostWeb(w http.ResponseWriter, r *http.Request) {

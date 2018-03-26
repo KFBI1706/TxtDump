@@ -33,7 +33,7 @@ func main() {
 	router.HandleFunc("/api/v1/post/{id}/edit", logging(editPostAPI)).Methods("POST")
 	router.HandleFunc("/api/v1/post/{id}/delete", logging(deletePostAPI))
 	router.HandleFunc("/post/{id}/request", logging(requestPostWeb)).Methods("GET")
-	router.HandleFunc("/post/{id}/edit", logging(editPost)).Methods("POST")
+	router.HandleFunc("/post/{id}/edit", logging(editPost))
 	router.HandleFunc("/post/{id}/edit/post", logging(edit)).Methods("POST")
 	router.HandleFunc("/post/{id}/delete", logging(deletePostWeb)).Methods()
 	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
