@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -62,10 +61,6 @@ func establishConn() (*sql.DB, error) {
 }
 func createPostDB(post postdata) {
 	db, err := establishConn()
-	if post.EditID == "" {
-		rand.Seed(time.Now().UnixNano())
-		post.EditID = string(genFromSeed())
-	}
 	post.EditID, err = securePass(post.EditID)
 	if err != nil {
 		log.Println(err)

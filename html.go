@@ -24,10 +24,6 @@ type postdata struct {
 	Views   int           `json:"Views"`
 }
 
-/*
-	HTML:
-*/
-
 func displayIndex(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
@@ -145,8 +141,16 @@ func editPostForm(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, 302)
 }
 func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postid, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
-	err := tmpl.ExecuteTemplate(w, "deletepost", nil)
+	post := postdata{ID: postid}
+	err = tmpl.ExecuteTemplate(w, "deletepost", post)
 	if err != nil {
 		log.Println(err)
 	}

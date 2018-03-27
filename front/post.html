@@ -5,30 +5,55 @@
   <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
       <div class="text-header col-md-12">
           <h1 class="text-center">Create a new post</h1>
-        <form action="/post/create/new" method="POST">
+        <form action="/post/create/new" method="POST" id="postForm">
           <div class="topcontainer">
             <div class="form-group col-md-9 topbar">
-              <label for="formGroupExampleInput">Title <br>Markdown rendering only works on posts without titles for now</label>
+              <label for="formGroupExampleInput">Title</label><br><br>
               <input type="text" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Title">
             </div>
             <div class="form-group col-md-3 topbar derpimbadatcss">
                 <label class="">Use custom password</label><br>
                 <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()" >
-                <input type="password" name="Pass" class="form-control" id="customField" disabled="true" placeholder="(Optional)">
+                <input type="password" name="Pass" class="form-control" id="customField" disabled="true" placeholder="Password">
             </div>
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput2">Text(Github style markdown is supported)</label>
+            <label for="formGroupExampleInput2">Text</label>
             <textarea type="text" class="form-control content-box" id="formGroupExampleInput" name="Content"></textarea>
           </div>
 
-          <div class="form-group">
-            <input type="submit" class="btn btn-primary" value="Post">
+          <div class="form-group"> 
+            <button type="button" class="btn btn-primary" onclick="modalIfNoPass()">
+              Save Post      
+            </button>          
+          </div>
+            
+          <!-- Modal TODO: Write JS for this -->
+          <div class="modal fade" id="noPassModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Saving without password</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>You are about to save a post without a password. This means the post can never be edited</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind</button>
+                  <button type="submit" class="btn btn-primary">Save anyways</button>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       </div>
+
     </main>
     <script>var simplemde = new SimpleMDE();</script>
+    <!-- Button trigger modal -->
 
   {{ template "layoutEnd"}}
 {{end}}
@@ -36,15 +61,17 @@
 {{define "deletepost"}}
   {{ template "layout" }}
   <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-    <div class="text-header col-md-12">
-      <h1>Delete post</h1>
+    <div class="col-md-12">
+      <div class="text-header">
+        <h1>Delete post</h1>
+      </div>
+      <form action="/post/{{.ID}}/delete/post" method="POST">
+        <label>Password</label>
+        <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
+        <br>
+        <input type="submit" class="btn btn-danger" value="Delete post">
+      </form>
     </div>
-    <form action="/post/{{.ID}}/delete/post">
-      <label>Password</label>
-      <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
-      <br>
-      <input type="submit" class="btn btn-danger" value="Delete post">
-    </form>
   </main>
   {{ template "layoutEnd"}}
 {{end}}
@@ -58,22 +85,21 @@
         <h1 class="text-center">Edit Post</h1>
       <form action="/post/{{.ID}}/edit/post" method="POST">
         <div class="form-group col-md-9 topbar">
-            <label for="formGroupExampleInput">Title <br>Markdown rendering only works on posts without titles for now</label>
+            <label for="formGroupExampleInput">Title</label>
             <input type="text" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Title" value="{{.Title}}">
           </div>
           <div class="form-group col-md-3 topbar derpimbadatcss">
-              <label class="">Post password</label><br><br>
+              <label>Post password</label>
               <input type="password" name="Pass" class="form-control" id="customField">
           </div>
         <div class="form-group">
           <label for="formGroupExampleInput2">Text</label>
-          <textarea type="text" class="form-control content-box" id="formGroupExampleInput" value="{{.Content}}" name="Content">{{.Content}}</textarea>
+          <textarea type="text" class="form-control content-box" id="formGroupExampleInput" value="" name="Content">{{.Content}}</textarea>
         </div>
         <div class="form-group">
-          <input type="submit" class ="btn btn-primary"value="Edit">
+          <input type="submit" class ="btn btn-primary"value="Save Edit">
         </div>
       </form>
-
     </div>
   </main>
   <script>var simplemde = new SimpleMDE();</script>
