@@ -14,6 +14,7 @@ type postcounter struct {
 	Count   int      `json:"Count"`
 	PostIDs []int    `json:"ID"`
 	Titles  []string `json:"Titles"`
+	Views   []int    `json:"Views"`
 }
 
 //Since the Postgresql Go libary just uses a string for info i just read a file with the private database info in it as a string with this see readme.md for more
@@ -105,15 +106,28 @@ func saveChanges(post postdata) error {
 func countPosts() int {
 	var count int
 	db, err := establishConn()
-	rows, err := db.Query("SELECT COUNT(*) as count FROM text")
+	err = db.QueryRow("SELECT COUNT(*) as count FROM text").Scan(&count)
 	if err != nil {
 		log.Println(err)
 	}
-	for rows.Next() {
-		rows.Scan(&count)
-	}
 	db.Close()
 	return count
+}
+func postMeta() (postcounter, error) {
+	posts := postcounter{}
+	db, err := establishConn()
+	if err != nil {
+		return posts, err
+	}
+	err = db.QueryRow("SELECT COUNT(*) AS count FROM text").Scan(&posts.Count)
+	if err != nil {
+		return posts, err
+	}
+	rows, err := db.Query("SELECT id titles views FROM text LIMIT 20")
+	for rows.Next()
+
+	db.Close()
+	return posts, err
 }
 func deletepost(post postdata) error {
 	err := checkPass(post.EditID, post.ID)
