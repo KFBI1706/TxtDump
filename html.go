@@ -26,8 +26,12 @@ type postdata struct {
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
+	posts, err := postMeta()
+	if err != nil {
+		log.Println(err)
+	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
-	err := tmpl.ExecuteTemplate(w, "index", posts)
+	err = tmpl.ExecuteTemplate(w, "index", posts)
 	if err != nil {
 		log.Println(err)
 	}

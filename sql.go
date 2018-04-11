@@ -123,9 +123,19 @@ func postMeta() (postcounter, error) {
 	if err != nil {
 		return posts, err
 	}
-	rows, err := db.Query("SELECT id titles views FROM text LIMIT 20")
-	for rows.Next()
-
+	rows, err := db.Query("SELECT id, title, views  FROM text LIMIT 20")
+	if err != nil {
+		return posts, err
+	}
+	for rows.Next() {
+		var id int
+		var titles string
+		var views int
+		rows.Scan(&id, &titles, &views)
+		posts.PostIDs = append(posts.PostIDs, id)
+		posts.Titles = append(posts.Titles, titles)
+		posts.Views = append(posts.Views, views)
+	}
 	db.Close()
 	return posts, err
 }
