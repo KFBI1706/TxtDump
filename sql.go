@@ -11,10 +11,13 @@ import (
 )
 
 type postcounter struct {
-	Count   int      `json:"Count"`
-	PostIDs []int    `json:"ID"`
-	Titles  []string `json:"Titles"`
-	Views   []int    `json:"Views"`
+	Count int        `json:"Count"`
+	Meta  []postmeta `json:"Meta"`
+}
+type postmeta struct {
+	PostIDs int    `json:"ID"`
+	Titles  string `json:"Titles"`
+	Views   int    `json:"Views"`
 }
 
 //Since the Postgresql Go libary just uses a string for info i just read a file with the private database info in it as a string with this see readme.md for more
@@ -128,13 +131,9 @@ func postMeta() (postcounter, error) {
 		return posts, err
 	}
 	for rows.Next() {
-		var id int
-		var titles string
-		var views int
-		rows.Scan(&id, &titles, &views)
-		posts.PostIDs = append(posts.PostIDs, id)
-		posts.Titles = append(posts.Titles, titles)
-		posts.Views = append(posts.Views, views)
+		var meta postmeta
+		rows.Scan(&meta.PostIDs, &meta.Titles, &meta.Views)
+		posts.Meta = append(posts.Meta, meta)
 	}
 	db.Close()
 	return posts, err
