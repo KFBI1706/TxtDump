@@ -1,18 +1,17 @@
-function activateCustomPass(){
+function activateCustomPass() {
     var customPass = document.getElementById("customPass").checked;
-    if(customPass == true){
+    if (customPass == true) {
         document.getElementById('customField').disabled = false;
-    }
-    else{
+    } else {
         document.getElementById('customField').disabled = true;
     }
 }
-function modalIfNoPass(){
+
+function modalIfNoPass() {
     var customPass = document.getElementById("customPass").checked;
-    if(customPass == true){
+    if (customPass == true) {
         document.getElementById("postForm").submit();
-    }
-    else{
+    } else {
         $('#noPassModal').modal(document)
     }
 }

@@ -62,6 +62,10 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 }
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
+	posts, err := postMeta()
+	if err != nil {
+		log.Println(err)
+	}
 	json.NewEncoder(w).Encode(posts)
 }
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
