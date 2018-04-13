@@ -63,7 +63,7 @@ func establishConn() (*sql.DB, error) {
 	}
 	return db, nil
 }
-func createPostDB(post postdata) {
+func createPostDB(post postData) {
 	db, err := establishConn()
 	post.EditID, err = securePass(post.EditID)
 	if err != nil {
@@ -75,8 +75,8 @@ func createPostDB(post postdata) {
 	}
 	db.Close()
 }
-func readpostDB(ID int) (postdata, error) {
-	result := postdata{ID: ID}
+func readpostDB(ID int) (postData, error) {
+	result := postData{ID: ID}
 	db, err := establishConn()
 	err = db.QueryRow("SELECT id, text, title, created_at, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views)
 	db.Close()
@@ -90,7 +90,7 @@ func readpostDB(ID int) (postdata, error) {
 	}
 	return result, err
 }
-func saveChanges(post postdata) error {
+func saveChanges(post postData) error {
 	db, err := establishConn()
 	if err != nil {
 		return err
@@ -138,7 +138,7 @@ func postMeta() (postcounter, error) {
 	db.Close()
 	return posts, err
 }
-func deletepost(post postdata) error {
+func deletepost(post postData) error {
 	err := checkPass(post.EditID, post.ID)
 	if err != nil {
 		return err

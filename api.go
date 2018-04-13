@@ -20,7 +20,7 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	newpost := postdata{}
+	newpost := postData{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
@@ -46,7 +46,7 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	post := postdata{ID: ID}
+	post := postData{ID: ID}
 	err = json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		log.Println(err)
@@ -96,7 +96,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
-	newpost := postdata{}
+	newpost := postData{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
 	err := json.NewDecoder(r.Body).Decode(&newpost)

@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type postdata struct {
+type postData struct {
 	ID      int           `json:"ID"`
 	EditID  string        `json:"EditID"`
 	Content string        `json:"Content"`
@@ -77,7 +77,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := postdata{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
+	newpost := postData{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
 	newpost.EditID = string(genFromSeed())
@@ -153,7 +153,7 @@ func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
-	post := postdata{ID: postid}
+	post := postData{ID: postid}
 	err = tmpl.ExecuteTemplate(w, "deletepost", post)
 	if err != nil {
 		log.Println(err)
@@ -186,7 +186,7 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 	}
 	doc := parse(string(file))
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	err = tmpl.ExecuteTemplate(w, "doc", postdata{Md: doc})
+	err = tmpl.ExecuteTemplate(w, "doc", postData{Md: doc})
 	if err != nil {
 		log.Println(err)
 	}
