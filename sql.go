@@ -71,7 +71,7 @@ func createPostDB(post postData) {
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, passforview) VALUES ($1, $2, $3, $4, $5, 0, true); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, passforview) VALUES ($1, $2, $3, $4, $5, 0, $6); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PassforView)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -80,9 +80,8 @@ func createPostDB(post postData) {
 func readpostDB(ID int) (postData, error) {
 	result := postData{ID: ID}
 	db, err := establishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, views FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views)
+	err = db.QueryRow("SELECT id, text, title, created_at, views, passforview FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PassforView)
 	db.Close()
-
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
 		return result, err

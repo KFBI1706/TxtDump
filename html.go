@@ -14,15 +14,15 @@ import (
 )
 
 type postData struct {
-	ID         int           `json:"ID"`
-	EditID     string        `json:"EditID"`
-	PassToView bool          `json:"PassToView"`
-	Content    string        `json:"Content"`
-	Md         template.HTML `json:""`
-	Title      string        `json:"Title"`
-	TitleMD    template.HTML `json:""`
-	Time       time.Time     `json:"Time"`
-	Views      int           `json:"Views"`
+	ID          int           `json:"ID"`
+	EditID      string        `json:"EditID"`
+	PassforView bool          `json:"PassforView"`
+	Content     string        `json:"Content"`
+	Md          template.HTML `json:""`
+	Title       string        `json:"Title"`
+	TitleMD     template.HTML `json:""`
+	Time        time.Time     `json:"Time"`
+	Views       int           `json:"Views"`
 }
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
