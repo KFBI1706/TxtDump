@@ -71,7 +71,7 @@ func createPostDB(post postData) {
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views) VALUES ($1, $2, $3, $4, $5, 0); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, passforview) VALUES ($1, $2, $3, $4, $5, 0, true); ", post.ID, post.Title, post.Content, time.Now(), post.EditID)
 	if err != nil {
 		fmt.Println(err)
 	}
