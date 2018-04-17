@@ -15,13 +15,26 @@ func main() {
 		log.Fatal(err)
 	}
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
+	dbdrop := flag.Bool("dropdb", false, "Drop current table and all data")
 	port := flag.Int("port", 1337, "for using a custom port")
 	flag.Parse()
 	addr := fmt.Sprintf(":%v", *port)
-	if *dbsetup == true {
+	if *dbsetup == true && *dbdrop != true {
 		err = setupDB()
 		if err != nil {
 			log.Fatal(err)
+		}
+	}
+	if *dbdrop == true {
+		err = clearOutDB()
+		if err != nil {
+			log.Println(err)
+		}
+		if *dbsetup == true {
+			err = setupDB()
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 	log.Printf("%v Post(s) Currently in DB\n", countPosts())

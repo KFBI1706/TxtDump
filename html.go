@@ -83,8 +83,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	newpost.ID = genFromSeed()
 	newpost.EditID = string(genFromSeed())
 	if r.FormValue("CustomPass") == "on" {
-		sec := r.FormValue("Pass")
-		newpost.EditID = sec
+		newpost.EditID = r.FormValue("Pass")
 	}
 	createPostDB(newpost)
 	url := fmt.Sprintf("/post/%v/request", newpost.ID)

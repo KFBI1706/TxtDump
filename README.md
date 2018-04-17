@@ -65,5 +65,6 @@ user=postgres dbname=db password=12345 host=HOSTIP sslmode=disable
 ## Command line arguments
 ```
 -setupdb Creates the table used for storing posts using info from dbstring file
+-dropdb Drops the text table and all data. if run together with -setupdb it will drop then create a new emtpy table
 -port Run with custom port. Defualt port is: 1337
 ```

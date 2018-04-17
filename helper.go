@@ -56,3 +56,14 @@ func checkPass(ps string, id int) error {
 	err := bcrypt.CompareHashAndPassword(getHashedPS(id), []byte(ps))
 	return err
 }
+func clearOutDB() error {
+	db, err := establishConn()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DROP TABLE text")
+	if err != nil {
+		return err
+	}
+	return err
+}

@@ -65,7 +65,9 @@ func establishConn() (*sql.DB, error) {
 }
 func createPostDB(post postData) {
 	db, err := establishConn()
-	post.EditID, err = securePass(post.EditID)
+	if post.EditID != "" {
+		post.EditID, err = securePass(post.EditID)
+	}
 	if err != nil {
 		log.Println(err)
 	}
