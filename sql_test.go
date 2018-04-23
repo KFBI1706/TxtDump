@@ -27,7 +27,7 @@ func TestDBconn(t *testing.T) {
 	}
 }
 func TestPostCreateEditDelete(t *testing.T) {
-	post := postData{Content: "Post Generated for testing", Title: "Post Generated for testing", EditID: "mordi", Time: time.Now(), PassforView: false}
+	post := postData{Content: "Post Generated for testing", Title: "Post Generated for testing", EditID: "mordi", Time: time.Now(), PostPerms: 2}
 	rand.Seed(time.Now().UnixNano())
 	post.ID = genFromSeed()
 	fmt.Println(post.ID)

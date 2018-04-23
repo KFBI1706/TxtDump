@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -24,6 +25,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		os.Exit(3)
 	}
 	if *dbdrop == true {
 		err = clearOutDB()
@@ -35,6 +37,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+			os.Exit(3)
 		}
 	}
 	log.Printf("%v Post(s) Currently in DB\n", countPosts())

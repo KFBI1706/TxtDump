@@ -71,16 +71,16 @@ func createPostDB(post postData) {
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, passforview) VALUES ($1, $2, $3, $4, $5, 0, $6); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PassforView)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms) VALUES ($1, $2, $3, $4, $5, 0, $6); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms)
 	if err != nil {
 		fmt.Println(err)
 	}
 	db.Close()
 }
 func readpostDB(ID int) (postData, error) {
-	result := postData{ID: ID}
+	result := postData{}
 	db, err := establishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, views, passforview FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PassforView)
+	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms)
 	db.Close()
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)

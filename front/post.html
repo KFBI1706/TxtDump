@@ -20,10 +20,17 @@
         </div>
       </div>
       <div class="form-group">
+          <label>Viewing/editing settings</label><br>
+          <select class="form-control">
+            <option value="anarchy">Anarchy, anyone can view and edit the post without needing a password</option>
+            <option value="passforedit">Anyone with link can view, but not edit</option>
+            <option value="passforview">Require password to view(This will also encrypt the content)</option>
+          </select>
+        </div>
+      <div class="form-group">
         <label for="formGroupExampleInput2">Text</label>
         <textarea type="text" class="form-control content-box" id="formGroupExampleInput" name="Content"></textarea>
       </div>
-
       <div class="form-group">
         <button type="button" class="btn btn-primary" onclick="modalIfNoPass()">
           Save Post
@@ -58,8 +65,9 @@
   var simplemde = new SimpleMDE();
 </script>
 <!-- Button trigger modal -->
+{{ template "layoutEnd"}} {{end}}
 
-{{ template "layoutEnd"}} {{end}} {{define "deletepost"}} {{ template "layout" }}
+{{define "deletepost"}} {{ template "layout" }}
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <div class="col-md-12">
     <div class="text-header">
