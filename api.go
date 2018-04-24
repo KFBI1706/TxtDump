@@ -83,8 +83,8 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	if result.PostPerms == 2 || result.PostPerms == 1 {
-		fmt.Fprintf(w, "This post is password protected mah dude")
+	if result.PostPerms == 3 {
+		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the editID")
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -97,6 +97,26 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+}
+func requestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println(err)
+		fmt.Fprintf(w, "Something went wrong")
+		return
+	}
+	newpost := postData{}
+	err = json.NewDecoder(r.Body).Decode(&newpost)
+	if err != nil {
+		log.Println(err)
+	}
+	exsistingpost, err := readpostDB(ID)
+	if err != nil {
+		log.Println()
+	}
+	newpost.ID = exsistingpost.ID
+	json.NewEncoder(w).Encode(newpost)
 }
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postData{}
