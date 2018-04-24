@@ -79,6 +79,10 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	newpost := postData{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
+	newpost.PostPerms, err = determinePerms(r.FormValue("postperms"))
+	if err != nil {
+		log.Println(err)
+	}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
 	newpost.EditID = string(genFromSeed())

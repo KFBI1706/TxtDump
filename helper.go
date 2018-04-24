@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -66,4 +67,11 @@ func clearOutDB() error {
 		return err
 	}
 	return err
+}
+func determinePerms(postperm string) (int, error) {
+	num, err := strconv.Atoi(postperm)
+	if err != nil {
+		return 0, err
+	}
+	return num, err
 }

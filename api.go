@@ -102,7 +102,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
-		fmt.Fprint(w, "No data posted!")
+		fmt.Fprint(w, "Something went wrong")
 		return
 	}
 	defer r.Body.Close()
