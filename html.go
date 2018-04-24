@@ -60,7 +60,11 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		result.Title = mdhead
 	}
 	result.TitleMD = template.HTML(result.Title)
-	tmpl.ExecuteTemplate(w, "display", result)
+	if result.PostPerms == 1 || result.PostPerms == 2 {
+		tmpl.ExecuteTemplate(w, "display", result)
+	} else if result.PostPerms == 3 {
+		tmpl.ExecuteTemplate(w, "displayPass", result)
+	}
 	err = incrementViewCounter(result.ID)
 	if err != nil {
 		log.Println(err)

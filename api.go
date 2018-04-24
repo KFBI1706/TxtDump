@@ -83,6 +83,9 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
+	if result.PostPerms == 2 || result.PostPerms == 1 {
+		fmt.Fprintf(w, "This post is password protected mah dude")
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	result.EditID = ""
