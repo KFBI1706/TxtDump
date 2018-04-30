@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elithrar/simple-scrypt"
 	_scrypt "golang.org/x/crypto/scrypt"
@@ -59,17 +60,18 @@ func sha256encode(b []byte) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func securePass(ps string) (string, string, error) {
-	hash, err := scrypt.GenerateFromPassword([]byte(ps), scrypt.DefaultParams)
+func securePass(ps string) (string, string, string, error) {
+	sscrypt, err := scrypt.GenerateFromPassword([]byte(ps), scrypt.DefaultParams)
 	if err != nil {
 		log.Fatal(err)
-		return "", "", err
+		return "", "", "", err
 	}
-	vals := strings.Split(string(hash), "$")
+	vals := strings.Split(string(sscrypt), "$")
 	salt := vals[3]
 	sha256hash := sha256encode(hexToBytes(vals[4]))
+	hash := vals[4]
 	fmt.Println(vals[4])
-	return salt, sha256hash, nil
+	return salt, hash, sha256hash, nil
 }
 
 func checkPass(ps string, id int, perms int) bool {
@@ -84,11 +86,35 @@ func checkPass(ps string, id int, perms int) bool {
 	return false
 }
 
-func NewEncryptionKey() *[]byte {
-	key := make([]byte, 32)
-	if _, err := rand.Read(key); err != nil {
-		panic(err)
+func securePost(post *postData, pass string) {
+	rand.Seed(time.Now().UnixNano())
+	post.ID = genFromSeed()
+	if post.PostPerms > 1 {
+		if salt, _, sha256hash, err := securePass(pass); sha256hash != "" {
+			post.Salt = salt
+			post.Hash = sha256hash
+			if post.PostPerms == 2 {
+				key := NewEncryptionKey()
+				fmt.Println(key)
+				ct, _ := Encrypt([]byte(post.Content), key)
+				fmt.Println(ct)
+			}
+		} else {
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
+}
+
+func NewEncryptionKey() *[32]byte {
+	rnd := make([]byte, 32)
+	rand.Read(rnd)
+	key := [32]byte{}
+	copy(key[:], rnd[0:32])
+	//if _, err := rand.Read(key); err != nil {
+	//	panic(err)
+	//}
 	return &key
 }
 

@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -19,7 +18,8 @@ type postData struct {
 	Hash      string        `json:"Hash"`
 	Salt      string        `json:"Salt"`
 	authHash  string        `json:authHash`
-	PostPerms int           `json:"PostPerms"`
+	Key       string        `json:Key`
+	PostPerms int           `json:"PostPerms,string"`
 	Content   string        `json:"Content"`
 	Md        template.HTML `json:""`
 	Title     string        `json:"Title"`
@@ -90,18 +90,7 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	rand.Seed(time.Now().UnixNano())
-	newpost.ID = genFromSeed()
-	if newpost.PostPerms > 1 {
-		if salt, hash, err := securePass(r.FormValue("Pass")); hash != "" {
-			newpost.Salt = salt
-			newpost.Hash = hash
-		} else {
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
+	securePost(&newpost, r.FormValue("Pass"))
 	createPostDB(newpost)
 	url := fmt.Sprintf("/post/%v/request", newpost.ID)
 	http.Redirect(w, r, url, 302)

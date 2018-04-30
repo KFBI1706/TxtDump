@@ -8,6 +8,12 @@
   revision = "40e40b42552a9cb37d6e98f4ad31f63ae53ea43a"
 
 [[projects]]
+  name = "github.com/elithrar/simple-scrypt"
+  packages = ["."]
+  revision = "d150773194090feb6c897805a7bcea8d49544e2c"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/gorilla/context"
   packages = ["."]
   revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
@@ -115,8 +121,8 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
-    "bcrypt",
-    "blowfish"
+    "pbkdf2",
+    "scrypt"
   ]
   revision = "12892e8c234f4fe6f6803f052061de9057903bb2"
 
@@ -132,6 +138,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad275ac8d24c8caedf24b73028d17fa81efa5daac47bc8f8845681a6d1cb47e2"
+  inputs-digest = "f3d44e8e01bcbdb44bd22ba3cedfd8f6ca58bc11eb5b0c60be87ddb26026307f"
   solver-name = "gps-cdcl"
   solver-version = 1

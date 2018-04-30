@@ -1,9 +1,11 @@
 CREATE TABLE text
 (
    id character varying(100) PRIMARY KEY NOT NULL,
-   editid character varying NOT NULL,
+   editid integer NOT NULL,
+   hash character varying(256) NULL,
+   salt character varying(32) NULL,
    postperms integer NOT NULL,
-   text character varying NOT NULl,
+   text character varying NOT NULL,
    created_at timestamp without time zone,
    title character varying,
    views integer
