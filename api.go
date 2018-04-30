@@ -88,7 +88,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	result.EditID = ""
+	result.EditID = 0
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Println(err)
@@ -132,5 +132,4 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	createPostDB(newpost)
 
 	json.NewEncoder(w).Encode(newpost)
-	r.Body.Close()
 }

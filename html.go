@@ -15,7 +15,10 @@ import (
 
 type postData struct {
 	ID        int           `json:"ID"`
-	EditID    string        `json:"EditID"`
+	EditID    int           `json:"EditID"`
+	Hash      string        `json:"Hash"`
+	Salt      string        `json:"Salt"`
+	authHash  string        `json:authHash`
 	PostPerms int           `json:"PostPerms"`
 	Content   string        `json:"Content"`
 	Md        template.HTML `json:""`
@@ -89,9 +92,15 @@ func createPostWeb(w http.ResponseWriter, r *http.Request) {
 	}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = genFromSeed()
-	newpost.EditID = string(genFromSeed())
-	if r.FormValue("CustomPass") == "on" {
-		newpost.EditID = r.FormValue("Pass")
+	if newpost.PostPerms > 1 {
+		if salt, hash, err := securePass(r.FormValue("Pass")); hash != "" {
+			newpost.Salt = salt
+			newpost.Hash = hash
+		} else {
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
 	createPostDB(newpost)
 	url := fmt.Sprintf("/post/%v/request", newpost.ID)
@@ -142,7 +151,8 @@ func editPostForm(w http.ResponseWriter, r *http.Request) {
 	}
 	post.Content = r.FormValue("Content")
 	post.Title = r.FormValue("Title")
-	post.EditID = r.FormValue("Pass")
+	post.Hash = r.FormValue("Pass")
+
 	err = saveChanges(post)
 	if err != nil {
 		log.Println(err)
@@ -179,13 +189,14 @@ func deletePostForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Something went wrong")
 		return
 	}
-	post.EditID = r.FormValue("Pass")
+	post.Hash = r.FormValue("Pass")
 	err = deletepost(post)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintf(w, "Wrong Password")
 		return
 	}
+	http.Redirect(w, r, "/", 302)
 }
 func documentation(w http.ResponseWriter, r *http.Request) {
 	file, err := ioutil.ReadFile("README.md")

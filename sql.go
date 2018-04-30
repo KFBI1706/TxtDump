@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,6 +31,7 @@ func readDBstring(filename string) (string, error) {
 	}
 	return string(file), nil
 }
+
 func testDBConnection() error {
 	dbstring, err := readDBstring("dbstring")
 	if err != nil {
@@ -65,13 +68,11 @@ func establishConn() (*sql.DB, error) {
 }
 func createPostDB(post postData) {
 	db, err := establishConn()
-	if post.EditID != "" {
-		post.EditID, err = securePass(post.EditID)
-	}
+
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms) VALUES ($1, $2, $3, $4, $5, 0, $6); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms, hash, salt) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms, post.Hash, post.Salt)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -80,7 +81,7 @@ func createPostDB(post postData) {
 func readpostDB(ID int) (postData, error) {
 	result := postData{}
 	db, err := establishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms)
+	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt)
 	db.Close()
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
@@ -96,13 +97,12 @@ func saveChanges(post postData) error {
 	if err != nil {
 		return err
 	}
-	err = checkPass(post.EditID, post.ID)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
-	if err != nil {
-		return err
+
+	if valid := checkPass(post.Hash, post.ID, post.PostPerms); valid {
+		_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
+		if err != nil {
+			return err
+		}
 	}
 	db.Close()
 	return nil
@@ -140,16 +140,18 @@ func postMeta() (postcounter, error) {
 	return posts, err
 }
 func deletepost(post postData) error {
-	err := checkPass(post.EditID, post.ID)
-	if err != nil {
-		return err
+	if valid := checkPass(post.Hash, post.ID, post.PostPerms); valid {
+
+		db, _ := establishConn()
+		_, err := db.Exec("DELETE FROM text WHERE id = $1", post.ID)
+		if err != nil {
+			return err
+		}
+		db.Close()
+
+	} else {
+		return errors.New("test")
 	}
-	db, err := establishConn()
-	_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
-	if err != nil {
-		return err
-	}
-	db.Close()
 	return nil
 }
 func incrementViewCounter(id int) error {
@@ -173,16 +175,40 @@ func checkForDuplicateID(id int) bool {
 	}
 	return true
 }
+
+func hexToBytes(s string) []byte {
+	data, err := hex.DecodeString(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return data
+}
+
 func getHashedPS(id int) []byte {
 	var hash string
 	db, err := establishConn()
 	if err != nil {
 		log.Println(err)
 	}
-	err = db.QueryRow("SELECT editid FROM text WHERE id = $1", id).Scan(&hash)
+	err = db.QueryRow("SELECT hash FROM text WHERE id = $1", id).Scan(&hash)
 	if err != nil {
 		log.Println(err)
 	}
 	db.Close()
-	return []byte(hash)
+
+	return hexToBytes(hash)
+}
+
+func getSalt(id int) []byte {
+	var salt string
+	db, err := establishConn()
+	if err != nil {
+		log.Println(err)
+	}
+	err = db.QueryRow("SELECT salt FROM text WHERE id = $1", id).Scan(&salt)
+	if err != nil {
+		log.Println(err)
+	}
+	db.Close()
+	return hexToBytes(salt)
 }
