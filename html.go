@@ -173,8 +173,7 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		tmp, _ := base64.StdEncoding.DecodeString(post.Key)
 		key := [32]byte{}
 		copy(key[:], tmp[0:32])
-		ct, _ := Encrypt([]byte(post.Content), &key)
-		post.Content = base64.StdEncoding.EncodeToString(ct)
+		post.Content, _ = EncryptPost([]byte(post.Content), &key)
 		err = saveChanges(post)
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
