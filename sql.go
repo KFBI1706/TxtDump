@@ -72,7 +72,7 @@ func createPostDB(post postData) {
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms, hash, salt) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms, post.Hash, post.Salt)
+	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms, hash, salt, key) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms, post.Hash, post.Salt, post.Key)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -81,7 +81,7 @@ func createPostDB(post postData) {
 func readpostDB(ID int) (postData, error) {
 	result := postData{}
 	db, err := establishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt)
+	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt, key FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt, &result.Key)
 	db.Close()
 	if err != nil && err == sql.ErrNoRows {
 		log.Println(err)
@@ -150,7 +150,7 @@ func deletepost(post postData) error {
 		db.Close()
 
 	} else {
-		return errors.New("test")
+		return errors.New("Wrong Password!")
 	}
 	return nil
 }
@@ -184,31 +184,19 @@ func hexToBytes(s string) []byte {
 	return data
 }
 
-func getHashedPS(id int) []byte {
-	var hash string
-	db, err := establishConn()
-	if err != nil {
-		log.Println(err)
+func getProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
+	if prop == "salt" || prop == "hash" {
+		var hash string
+		db, err := establishConn()
+		if err != nil {
+			log.Println(err)
+		}
+		err = db.QueryRow("SELECT "+prop+" FROM text WHERE id = $1", id).Scan(&hash)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Close()
+		return hexToBytes(hash), err
 	}
-	err = db.QueryRow("SELECT hash FROM text WHERE id = $1", id).Scan(&hash)
-	if err != nil {
-		log.Println(err)
-	}
-	db.Close()
-
-	return hexToBytes(hash)
-}
-
-func getSalt(id int) []byte {
-	var salt string
-	db, err := establishConn()
-	if err != nil {
-		log.Println(err)
-	}
-	err = db.QueryRow("SELECT salt FROM text WHERE id = $1", id).Scan(&salt)
-	if err != nil {
-		log.Println(err)
-	}
-	db.Close()
-	return hexToBytes(salt)
+	return nil, nil
 }

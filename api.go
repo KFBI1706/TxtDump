@@ -129,6 +129,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+	securePost(&newpost, newpost.Hash)
 	createPostDB(newpost)
 
 	json.NewEncoder(w).Encode(newpost)

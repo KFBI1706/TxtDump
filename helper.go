@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/sha256"
 	"crypto/subtle"
+	b64 "encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -75,15 +76,44 @@ func securePass(ps string) (string, string, string, error) {
 }
 
 func checkPass(ps string, id int, perms int) bool {
-	dk, err := _scrypt.Key([]byte(ps), getSalt(id), 16384, 8, 1, scrypt.DefaultParams.DKLen)
+	prop, err := getProp("salt", id)
+	if err != nil {
+		log.Println(err)
+	}
+	dk, err := _scrypt.Key([]byte(ps), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	if subtle.ConstantTimeCompare(hexToBytes(sha256encode(dk)), getHashedPS(id)) == 1 || perms == 1 {
+	prop, err = getProp("hash", id)
+	if err != nil {
+		log.Println(err)
+	}
+	if subtle.ConstantTimeCompare(hexToBytes(sha256encode(dk)), prop) == 1 || perms == 1 {
 		return true
 	}
 	return false
+}
+
+func requestDecrypt(post *postData) bool {
+	if checkPass(post.Hash, post.ID, post.PostPerms) {
+		prop, err := getProp("salt", post.ID)
+		if err != nil {
+			log.Println(err)
+		}
+		dk, _ := _scrypt.Key([]byte(post.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
+		fmt.Println(dk)
+		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
+		key := [32]byte{}
+		copy(key[:], tmp[0:32])
+		ct, _ := b64.StdEncoding.DecodeString(post.Content)
+		pt, _ := Decrypt(ct, &key)
+		post.Content = string(pt)
+		return true
+	} else {
+		return false
+	}
+
 }
 
 func securePost(post *postData, pass string) {
@@ -93,11 +123,15 @@ func securePost(post *postData, pass string) {
 		if salt, _, sha256hash, err := securePass(pass); sha256hash != "" {
 			post.Salt = salt
 			post.Hash = sha256hash
-			if post.PostPerms == 2 {
+			if post.PostPerms == 3 {
 				key := NewEncryptionKey()
-				fmt.Println(key)
+				tmp := make([]byte, 32)
 				ct, _ := Encrypt([]byte(post.Content), key)
-				fmt.Println(ct)
+				fmt.Println("ct: " + b64.StdEncoding.EncodeToString(ct))
+				post.Content = b64.StdEncoding.EncodeToString(ct)
+				copy(tmp, key[:])
+				fmt.Println("key: " + b64.StdEncoding.EncodeToString(tmp))
+				post.Key = b64.StdEncoding.EncodeToString(tmp)
 			}
 		} else {
 			if err != nil {

@@ -40,23 +40,55 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
-func requestPostWeb(w http.ResponseWriter, r *http.Request) {
+
+func processRequest(w http.ResponseWriter, r *http.Request) (post postData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)
-	id := vars["id"]
-	ID, err := strconv.Atoi(id)
+	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		fmt.Println(err)
 		fmt.Fprintf(w, "Request needs to be int")
-		return
 	}
-	result, err := readpostDB(ID)
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+	post, err = readpostDB(id)
 	if err != nil {
 		log.Println(err)
-		tmpl.ExecuteTemplate(w, "notFound", result)
-		return
+		fmt.Fprintf(w, "Something went wrong")
 	}
+	return
+}
+
+func requestPostDecrypt(w http.ResponseWriter, r *http.Request) {
+	post := processRequest(w, r)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
+	post.Hash = r.FormValue("Pass")
+	fmt.Println("request for decryption: " + post.Hash)
+	if requestDecrypt(&post) {
+		err := incrementViewCounter(post.ID)
+		if err != nil {
+			log.Println(err)
+		}
+		post.Md = parse(post.Content)
+		mdhead := getMDHeader(post.Md)
+		if mdhead != "" && post.Title == "" {
+			post.Title = mdhead
+		}
+		post.TitleMD = template.HTML(post.Title)
+		if post.PostPerms == 1 || post.PostPerms == 2 {
+			tmpl.ExecuteTemplate(w, "display", post)
+			err = incrementViewCounter(post.ID)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+		tmpl.ExecuteTemplate(w, "display", post)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
+
+}
+
+func requestPostWeb(w http.ResponseWriter, r *http.Request) {
+	result := processRequest(w, r)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	result.Md = parse(result.Content)
 	mdhead := getMDHeader(result.Md)
 	if mdhead != "" && result.Title == "" {
@@ -65,12 +97,12 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 	result.TitleMD = template.HTML(result.Title)
 	if result.PostPerms == 1 || result.PostPerms == 2 {
 		tmpl.ExecuteTemplate(w, "display", result)
+		err := incrementViewCounter(result.ID)
+		if err != nil {
+			log.Println(err)
+		}
 	} else if result.PostPerms == 3 {
 		tmpl.ExecuteTemplate(w, "displayPass", result)
-	}
-	err = incrementViewCounter(result.ID)
-	if err != nil {
-		log.Println(err)
 	}
 }
 func createPostTemplateWeb(w http.ResponseWriter, r *http.Request) {
@@ -106,86 +138,47 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func editPostTemplate(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
-	post, err := readpostDB(ID)
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
-	err = tmpl.ExecuteTemplate(w, "edit", post)
-	if err != nil {
-		log.Println(err)
-	}
-
+	postTemplate(w, r, "edit")
 }
-func editPostForm(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Fprintf(w, "Request needs to be int")
-	}
-	post, err := readpostDB(ID)
+
+func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
+	postTemplate(w, r, "deletepost")
+}
+
+func postTemplate(w http.ResponseWriter, r *http.Request, templateString string) {
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
+	post := processRequest(w, r)
+	err := tmpl.ExecuteTemplate(w, templateString, post)
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
 	}
+}
+
+func editPostForm(w http.ResponseWriter, r *http.Request) {
+	post := processRequest(w, r)
 	post.Content = r.FormValue("Content")
 	post.Title = r.FormValue("Title")
 	post.Hash = r.FormValue("Pass")
-
-	err = saveChanges(post)
+	err := saveChanges(post)
+	url := "/"
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Wrong Password")
-		return
+	} else {
+		url = fmt.Sprintf("/post/%v/request", post.ID)
 	}
-	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 }
-func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	postid, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
-	post := postData{ID: postid}
-	err = tmpl.ExecuteTemplate(w, "deletepost", post)
-	if err != nil {
-		log.Println(err)
-	}
-}
 func deletePostForm(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Fprintf(w, "Request needs to be int")
-	}
-	post, err := readpostDB(ID)
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
+	post := processRequest(w, r)
 	post.Hash = r.FormValue("Pass")
-	err = deletepost(post)
+	err := deletepost(post)
+	url := "/"
 	if err != nil {
 		log.Println(err)
-		fmt.Fprintf(w, "Wrong Password")
-		return
+	} else {
+		url = fmt.Sprintf("/post/%v/request", post.ID)
 	}
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, url, 302)
 }
 func documentation(w http.ResponseWriter, r *http.Request) {
 	file, err := ioutil.ReadFile("README.md")

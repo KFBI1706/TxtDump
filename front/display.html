@@ -42,8 +42,16 @@
 
 {{ define "displayPass"}} {{ template "layout" }}
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-  <div class="text-header col-md-12 text-center">
-    <h1 class="Title">Not implemented yet</h1>
+  <div class="col-md-12">
+    <div class="text-header">
+      <h1>Unencrypt File</h1>
+    </div>
+    <form action="/post/{{.ID}}/request/decrypt" method="POST">
+      <label>Password</label>
+      <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
+      <br>
+      <input type="submit" class="btn btn-danger" value="Submit password">
+    </form>
   </div>
 </main>
 {{ template "layoutEnd" }} {{ end }}

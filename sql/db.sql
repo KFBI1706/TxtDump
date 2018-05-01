@@ -4,6 +4,7 @@ CREATE TABLE text
    editid integer NOT NULL,
    hash character varying(256) NULL,
    salt character varying(32) NULL,
+   key character varying(256) NULL,
    postperms integer NOT NULL,
    text character varying NOT NULL,
    created_at timestamp without time zone,
