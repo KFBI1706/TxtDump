@@ -116,6 +116,17 @@ func requestDecrypt(post *postData) bool {
 
 }
 
+func EncryptPost(content []byte, key *[32]byte) (string, string) {
+	ct, _ := Encrypt(content, key)
+	fmt.Println("ct: " + b64.StdEncoding.EncodeToString(ct))
+	encodedContent := b64.StdEncoding.EncodeToString(ct)
+	tmp := make([]byte, 32)
+	copy(tmp, key[:])
+	fmt.Println("key: " + b64.StdEncoding.EncodeToString(tmp))
+	encodedKey := b64.StdEncoding.EncodeToString(tmp)
+	return encodedContent, encodedKey
+}
+
 func securePost(post *postData, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = genFromSeed()
@@ -125,13 +136,7 @@ func securePost(post *postData, pass string) {
 			post.Hash = sha256hash
 			if post.PostPerms == 3 {
 				key := NewEncryptionKey()
-				tmp := make([]byte, 32)
-				ct, _ := Encrypt([]byte(post.Content), key)
-				fmt.Println("ct: " + b64.StdEncoding.EncodeToString(ct))
-				post.Content = b64.StdEncoding.EncodeToString(ct)
-				copy(tmp, key[:])
-				fmt.Println("key: " + b64.StdEncoding.EncodeToString(tmp))
-				post.Key = b64.StdEncoding.EncodeToString(tmp)
+				post.Content, post.Key = EncryptPost([]byte(post.Content), key)
 			}
 		} else {
 			if err != nil {

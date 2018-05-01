@@ -46,7 +46,7 @@
     <div class="text-header">
       <h1>Unencrypt File</h1>
     </div>
-    <form action="/post/{{.ID}}/request/decrypt" method="POST">
+    <form action="/post/{{.ID}}/{{.Mode}}/decrypt" method="POST">
       <label>Password</label>
       <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
       <br>

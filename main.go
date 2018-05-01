@@ -47,6 +47,7 @@ func main() {
 	router.HandleFunc("/post/{id}/request", logging(requestPostWeb)).Methods("GET")
 	router.HandleFunc("/post/{id}/request/decrypt", logging(requestPostDecrypt)).Methods("POST")
 	router.HandleFunc("/post/{id}/edit", logging(editPostTemplate))
+	router.HandleFunc("/post/{id}/edit/decrypt", logging(editPostDecrypt))
 	router.HandleFunc("/post/{id}/edit/post", logging(editPostForm)).Methods("POST")
 	router.HandleFunc("/post/{id}/delete", logging(deletePostTemplate))
 	router.HandleFunc("/post/{id}/delete/post", logging(deletePostForm))

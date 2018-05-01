@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -26,6 +27,11 @@ type postData struct {
 	TitleMD   template.HTML `json:""`
 	Time      time.Time     `json:"Time"`
 	Views     int           `json:"Views"`
+}
+
+type postDecrypt struct {
+	ID   int
+	Mode string
 }
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +92,7 @@ func requestPostWeb(w http.ResponseWriter, r *http.Request) {
 		parsePost(&post)
 		tmpl.ExecuteTemplate(w, "display", post)
 	} else if post.PostPerms == 3 {
-		tmpl.ExecuteTemplate(w, "displayPass", post)
+		tmpl.ExecuteTemplate(w, "displayPass", postDecrypt{ID: post.ID, Mode: "request"})
 	}
 }
 
@@ -125,11 +131,26 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 }
 
 func postTemplate(w http.ResponseWriter, r *http.Request, templateString string) {
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
 	post := processRequest(w, r)
-	err := tmpl.ExecuteTemplate(w, templateString, post)
+	var err error
+	if post.PostPerms == 3 && templateString == "edit" {
+		err = tmpl.ExecuteTemplate(w, "displayPass", postDecrypt{ID: post.ID, Mode: "edit"})
+	} else {
+		err = tmpl.ExecuteTemplate(w, templateString, post)
+	}
 	if err != nil {
 		log.Println(err)
+	}
+}
+
+func editPostDecrypt(w http.ResponseWriter, r *http.Request) {
+	post := processRequest(w, r)
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
+	post.Hash = r.FormValue("Pass")
+	if requestDecrypt(&post) {
+		parsePost(&post)
+		tmpl.ExecuteTemplate(w, "edit", post)
 	}
 }
 
@@ -148,6 +169,12 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
+		//encrypting again..
+		tmp, _ := base64.StdEncoding.DecodeString(post.Key)
+		key := [32]byte{}
+		copy(key[:], tmp[0:32])
+		ct, _ := Encrypt([]byte(post.Content), &key)
+		post.Content = base64.StdEncoding.EncodeToString(ct)
 		err = saveChanges(post)
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
@@ -156,7 +183,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	url := "/"
 	if err != nil {
 		log.Println(err)
-	} else {
 		url = fmt.Sprintf("/post/%v/request", post.ID)
 	}
 	http.Redirect(w, r, url, 302)
