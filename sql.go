@@ -160,7 +160,7 @@ func incrementViewCounter(id int) error {
 	if err != nil {
 		return err
 	}
-	db.Close()
+	defer db.Close()
 	return nil
 }
 func checkForDuplicateID(id int) bool {
