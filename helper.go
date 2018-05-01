@@ -51,7 +51,6 @@ func setupDB() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(res)
 	db.Close()
 	return nil
 }
@@ -71,7 +70,6 @@ func securePass(ps string) (string, string, string, error) {
 	salt := vals[3]
 	sha256hash := sha256encode(hexToBytes(vals[4]))
 	hash := vals[4]
-	fmt.Println(vals[4])
 	return salt, hash, sha256hash, nil
 }
 
@@ -102,7 +100,6 @@ func requestDecrypt(post *postData) bool {
 			log.Println(err)
 		}
 		dk, _ := _scrypt.Key([]byte(post.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
-		fmt.Println(dk)
 		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
 		key := [32]byte{}
 		copy(key[:], tmp[0:32])
@@ -118,11 +115,9 @@ func requestDecrypt(post *postData) bool {
 
 func EncryptPost(content []byte, key *[32]byte) (string, string) {
 	ct, _ := Encrypt(content, key)
-	fmt.Println("ct: " + b64.StdEncoding.EncodeToString(ct))
 	encodedContent := b64.StdEncoding.EncodeToString(ct)
 	tmp := make([]byte, 32)
 	copy(tmp, key[:])
-	fmt.Println("key: " + b64.StdEncoding.EncodeToString(tmp))
 	encodedKey := b64.StdEncoding.EncodeToString(tmp)
 	return encodedContent, encodedKey
 }
@@ -207,7 +202,7 @@ func clearOutDB() error {
 	if err != nil {
 		return err
 	}
-	return err
+	return nil
 }
 func determinePerms(postperm string) (int, error) {
 	num, err := strconv.Atoi(postperm)
