@@ -48,6 +48,7 @@ func setupDB() error {
 		return err
 	}
 	res, err := db.Exec(sql)
+	fmt.Println(res)
 	if err != nil {
 		return err
 	}
@@ -95,14 +96,12 @@ func checkPass(ps string, id int, perms int) bool {
 
 func requestDecrypt(post *postData) bool {
 	if checkPass(post.Hash, post.ID, post.PostPerms) {
-		prop, err := getProp("salt", post.ID)
-		if err != nil {
-			log.Println(err)
-		}
-		dk, _ := _scrypt.Key([]byte(post.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
+		dk := getKey(post)
 		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
 		key := [32]byte{}
-		copy(key[:], tmp[0:32])
+		copy(key[:], dk[0:32])
+		encKey, _ := Decrypt(tmp, &key)
+		copy(key[:], encKey[0:32])
 		ct, _ := b64.StdEncoding.DecodeString(post.Content)
 		pt, _ := Decrypt(ct, &key)
 		post.Content = string(pt)
@@ -110,7 +109,18 @@ func requestDecrypt(post *postData) bool {
 	} else {
 		return false
 	}
+}
 
+func getKey(post *postData) (dk []byte) {
+	prop, err := getProp("salt", post.ID)
+	if err != nil {
+		log.Println(err)
+	}
+	dk, _ = _scrypt.Key([]byte(post.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
 }
 
 func EncryptPost(content []byte, key *[32]byte) (string, string) {
@@ -126,12 +136,19 @@ func securePost(post *postData, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = genFromSeed()
 	if post.PostPerms > 1 {
-		if salt, _, sha256hash, err := securePass(pass); sha256hash != "" {
+		if salt, hash, sha256hash, err := securePass(pass); sha256hash != "" {
 			post.Salt = salt
 			post.Hash = sha256hash
 			if post.PostPerms == 3 {
-				key := NewEncryptionKey()
-				post.Content, post.Key = EncryptPost([]byte(post.Content), key)
+				encKey := NewEncryptionKey()
+				post.Content, post.Key = EncryptPost([]byte(post.Content), encKey)
+				tmpKey := hexToBytes(hash)
+				key := [32]byte{}
+				copy(key[:], tmpKey[0:32])
+				tmpKey, _ = b64.StdEncoding.DecodeString(post.Key) //same as encKey
+				tmpKey, _ = Encrypt(tmpKey, &key)                  //encrypt the file key with the password hash
+				post.Key = b64.StdEncoding.EncodeToString(tmpKey)
+
 			}
 		} else {
 			if err != nil {

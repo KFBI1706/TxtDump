@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/base64"
+	b64 "encoding/base64"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -170,10 +170,17 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
 		//encrypting again..
-		tmp, _ := base64.StdEncoding.DecodeString(post.Key)
+		dk := getKey(&post)
 		key := [32]byte{}
-		copy(key[:], tmp[0:32])
-		post.Content, _ = EncryptPost([]byte(post.Content), &key)
+		copy(key[:], dk[0:32])
+		tmpKey, _ := b64.StdEncoding.DecodeString(post.Key)
+		encKey, err := Decrypt(tmpKey, &key)
+		copy(key[:], encKey[0:32])
+		ct, err := Encrypt([]byte(post.Content), &key)
+		if err != nil {
+			log.Fatal(err)
+		}
+		post.Content = b64.StdEncoding.EncodeToString(ct)
 		err = saveChanges(post)
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
@@ -191,6 +198,7 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 func editPostForm(w http.ResponseWriter, r *http.Request) {
 	postForm(w, r, "edit")
 }
+
 func deletePostForm(w http.ResponseWriter, r *http.Request) {
 	postForm(w, r, "delete")
 }
