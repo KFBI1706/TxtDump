@@ -90,6 +90,9 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Something went wrong")
 		return
 	}
+	if newpost.PostPerms == 0 || newpost.PostPerms > 4 {
+		newpost.PostPerms = 2
+	}
 	securePost(&newpost, newpost.Hash)
 	createPostDB(newpost)
 	json.NewEncoder(w).Encode(newpost)
