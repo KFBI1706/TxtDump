@@ -170,17 +170,19 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
 		//encrypting again..
-		dk := getKey(&post)
-		key := [32]byte{}
-		copy(key[:], dk[0:32])
-		tmpKey, _ := b64.StdEncoding.DecodeString(post.Key)
-		encKey, err := decrypt(tmpKey, &key)
-		copy(key[:], encKey[0:32])
-		ct, err := encrypt([]byte(post.Content), &key)
-		if err != nil {
-			log.Fatal(err)
+		if post.PostPerms == 3 {
+			dk := getKey(&post)
+			key := [32]byte{}
+			copy(key[:], dk[0:32])
+			tmpKey, _ := b64.StdEncoding.DecodeString(post.Key)
+			encKey, err := decrypt(tmpKey, &key)
+			copy(key[:], encKey[0:32])
+			ct, err := encrypt([]byte(post.Content), &key)
+			if err != nil {
+				log.Fatal(err)
+			}
+			post.Content = b64.StdEncoding.EncodeToString(ct)
 		}
-		post.Content = b64.StdEncoding.EncodeToString(ct)
 		err = saveChanges(post)
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
