@@ -6,28 +6,15 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func editPostAPI(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
+	existingpost := processRequest(w, r)
 	newpost := postData{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
-	}
-	exsistingpost, err := readpostDB(ID)
-	if err != nil {
-		log.Println()
 	}
 	newpost.ID = exsistingpost.ID
 	err = saveChanges(newpost)
@@ -38,14 +25,9 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(newpost)
 }
+
 func deletePostAPI(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
+	processRequest(w, r)
 	post := postData{ID: ID}
 	err = json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
@@ -58,8 +40,8 @@ func deletePostAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "Post %v successfully deleted", post.ID)
-	return
 }
+
 func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
 	posts, err := postMeta()
@@ -68,26 +50,14 @@ func postcounterAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(posts)
 }
+
 func requestPostAPI(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Fprintf(w, "Request needs to be int")
-		return
-	}
-	result, err := readpostDB(i)
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
-	if result.PostPerms == 3 {
-		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the editID")
-	}
+	result := processRequest(w, r)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if result.PostPerms == 3 {
+		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the Hash")
+	}
 	result.EditID = 0
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
@@ -98,26 +68,18 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
+
 func requestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println(err)
-		fmt.Fprintf(w, "Something went wrong")
-		return
-	}
+	existingpost := processRequest(w, r)
 	newpost := postData{}
 	err = json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
 	}
-	exsistingpost, err := readpostDB(ID)
-	if err != nil {
-		log.Println()
-	}
 	newpost.ID = exsistingpost.ID
 	json.NewEncoder(w).Encode(newpost)
 }
+
 func createPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := postData{}
 	rand.Seed(time.Now().UnixNano())
@@ -128,9 +90,7 @@ func createPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Something went wrong")
 		return
 	}
-	defer r.Body.Close()
 	securePost(&newpost, newpost.Hash)
 	createPostDB(newpost)
-
 	json.NewEncoder(w).Encode(newpost)
 }
