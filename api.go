@@ -12,11 +12,11 @@ import (
 func editPostAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := processRequest(w, r)
 	newpost := postData{}
-	err = json.NewDecoder(r.Body).Decode(&newpost)
+	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
 	}
-	newpost.ID = exsistingpost.ID
+	newpost.ID = existingpost.ID
 	err = saveChanges(newpost)
 	if err != nil {
 		log.Println(err)
@@ -27,9 +27,8 @@ func editPostAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func deletePostAPI(w http.ResponseWriter, r *http.Request) {
-	processRequest(w, r)
-	post := postData{ID: ID}
-	err = json.NewDecoder(r.Body).Decode(&post)
+	post := processRequest(w, r)
+	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		log.Println(err)
 	}
@@ -59,7 +58,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the Hash")
 	}
 	result.EditID = 0
-	err = json.NewEncoder(w).Encode(result)
+	err := json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Println(err)
 	}
@@ -72,11 +71,11 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 func requestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := processRequest(w, r)
 	newpost := postData{}
-	err = json.NewDecoder(r.Body).Decode(&newpost)
+	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
 	}
-	newpost.ID = exsistingpost.ID
+	newpost.ID = existingpost.ID
 	json.NewEncoder(w).Encode(newpost)
 }
 
