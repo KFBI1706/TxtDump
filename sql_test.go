@@ -27,7 +27,7 @@ func TestDBconn(t *testing.T) {
 	}
 }
 func TestPostCreateEditDelete(t *testing.T) {
-	post := postData{Content: "Post Generated for testing", Title: "Post Generated for testing", EditID: "mordi", Time: time.Now(), PostPerms: 2}
+	post := postData{Content: "Post Generated for testing", Title: "Post Generated for testing", EditID: 100, Time: time.Now(), PostPerms: 2}
 	rand.Seed(time.Now().UnixNano())
 	post.ID = genFromSeed()
 	fmt.Println(post.ID)
@@ -35,7 +35,7 @@ func TestPostCreateEditDelete(t *testing.T) {
 		t.Errorf("Post with ID %v Already exsits", post.ID)
 	}
 	createPostDB(post)
-	checkPass(post.Hash, post.ID)
+	checkPass(post.Hash, post.ID, 2)
 	post.Content = "Second Phase"
 	err := saveChanges(post)
 	if err != nil {

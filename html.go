@@ -18,8 +18,8 @@ type postData struct {
 	EditID    int           `json:"EditID"`
 	Hash      string        `json:"Hash"`
 	Salt      string        `json:"Salt"`
-	authHash  string        `json:authHash`
-	Key       string        `json:Key`
+	AuthHash  string        `json:"authHash"`
+	Key       string        `json:"Key"`
 	PostPerms int           `json:"PostPerms,string"`
 	Content   string        `json:"Content"`
 	Md        template.HTML `json:""`
@@ -47,19 +47,19 @@ func displayIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func processRequest(w http.ResponseWriter, r *http.Request) (post postData) {
+func processRequest(w http.ResponseWriter, r *http.Request) postData {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	post, err = readpostDB(id)
+	post, err := readpostDB(id)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintf(w, "ID not found")
 	}
-	return
+	return post
 }
 
 func parsePost(post *postData) {
@@ -164,7 +164,7 @@ func deletePostTemplate(w http.ResponseWriter, r *http.Request) {
 
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	post := processRequest(w, r)
-	var err error = nil
+	var err error
 	if operation == "edit" {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
@@ -174,9 +174,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		key := [32]byte{}
 		copy(key[:], dk[0:32])
 		tmpKey, _ := b64.StdEncoding.DecodeString(post.Key)
-		encKey, err := Decrypt(tmpKey, &key)
+		encKey, err := decrypt(tmpKey, &key)
 		copy(key[:], encKey[0:32])
-		ct, err := Encrypt([]byte(post.Content), &key)
+		ct, err := encrypt([]byte(post.Content), &key)
 		if err != nil {
 			log.Fatal(err)
 		}

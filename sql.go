@@ -150,7 +150,7 @@ func deletepost(post postData) error {
 		db.Close()
 
 	} else {
-		return errors.New("Wrong Password!")
+		return errors.New("Wrong Password")
 	}
 	return nil
 }

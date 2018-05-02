@@ -99,15 +99,14 @@ func requestDecrypt(post *postData) bool {
 		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
 		key := [32]byte{}
 		copy(key[:], dk[0:32])
-		encKey, _ := Decrypt(tmp, &key)
+		encKey, _ := decrypt(tmp, &key)
 		copy(key[:], encKey[0:32])
 		ct, _ := b64.StdEncoding.DecodeString(post.Content)
-		pt, _ := Decrypt(ct, &key)
+		pt, _ := decrypt(ct, &key)
 		post.Content = string(pt)
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func getKey(post *postData) (dk []byte) {
@@ -122,8 +121,8 @@ func getKey(post *postData) (dk []byte) {
 	return
 }
 
-func EncryptPost(content []byte, key *[32]byte) (string, string) {
-	ct, _ := Encrypt(content, key)
+func encryptPost(content []byte, key *[32]byte) (string, string) {
+	ct, _ := encrypt(content, key)
 	encodedContent := b64.StdEncoding.EncodeToString(ct)
 	tmp := make([]byte, 32)
 	copy(tmp, key[:])
@@ -139,13 +138,13 @@ func securePost(post *postData, pass string) {
 			post.Salt = salt
 			post.Hash = sha256hash
 			if post.PostPerms == 3 {
-				encKey := NewEncryptionKey()
-				post.Content, post.Key = EncryptPost([]byte(post.Content), encKey)
+				encKey := newEncryptionKey()
+				post.Content, post.Key = encryptPost([]byte(post.Content), encKey)
 				tmpKey := hexToBytes(hash)
 				key := [32]byte{}
 				copy(key[:], tmpKey[0:32])
 				tmpKey, _ = b64.StdEncoding.DecodeString(post.Key) //same as encKey
-				tmpKey, _ = Encrypt(tmpKey, &key)                  //encrypt the file key with the password hash
+				tmpKey, _ = encrypt(tmpKey, &key)                  //encrypt the file key with the password hash
 				post.Key = b64.StdEncoding.EncodeToString(tmpKey)
 
 			}
@@ -157,7 +156,7 @@ func securePost(post *postData, pass string) {
 	}
 }
 
-func NewEncryptionKey() *[32]byte {
+func newEncryptionKey() *[32]byte {
 	rnd := make([]byte, 32)
 	rand.Read(rnd)
 	key := [32]byte{}
@@ -168,7 +167,7 @@ func NewEncryptionKey() *[32]byte {
 	return &key
 }
 
-func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
+func encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err
@@ -187,7 +186,7 @@ func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
-func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
+func decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err
