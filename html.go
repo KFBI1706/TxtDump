@@ -16,7 +16,7 @@ import (
 type postData struct {
 	ID        int           `json:"ID"`
 	EditID    int           `json:"EditID"`
-	Hash      string        `json:"Hash"`
+	Hash      string        `json:"Password"`
 	Salt      string        `json:"Salt"`
 	AuthHash  string        `json:"authHash"`
 	Key       string        `json:"Key"`
