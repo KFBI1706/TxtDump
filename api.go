@@ -56,6 +56,7 @@ func requestPostAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if result.PostPerms == 3 {
 		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the Hash")
+		return
 	}
 	result.EditID = 0
 	err := json.NewEncoder(w).Encode(result)

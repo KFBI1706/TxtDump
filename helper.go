@@ -21,7 +21,7 @@ import (
 //Probably not the best way to do this
 func genFromSeed() int {
 	num := rand.Intn(9999999-1000000) + 1000000
-	for checkForDuplicateID(num) {
+	for !checkForDuplicateID(num) {
 		num = rand.Intn(9999999-1000000) + 1000000
 	}
 	log.Println(num)
