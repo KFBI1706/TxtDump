@@ -39,13 +39,15 @@ func securePass(ps string) (string, string, string, error) {
 	return salt, hash, sha256hash, nil
 }
 
+//CheckPass takes argument ps(string),id(int), perms(int). Where:
+// ps is the password in string form, id is the id of the post and perms is the post permissions
+// it returns a bool based on it's success
 func CheckPass(ps string, id int, perms int) bool {
 	prop, err := sql.GetProp("salt", id)
 	if err != nil {
 		log.Println(err)
 	}
 	dk, err := _scrypt.Key([]byte(ps), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,23 +61,37 @@ func CheckPass(ps string, id int, perms int) bool {
 	return false
 }
 
+//RequestDecrypt decrypts the post if the field post.Hash is the correct password.
+//It takes a pointer to the model.PostData as the only argument
+//and returns a bool based on if the post is successfuly decrypted
 func RequestDecrypt(post *model.PostData) bool {
 	if CheckPass(post.Hash, post.ID, post.PostPerms) {
-		dk := GetKey(post)
-		tmp, _ := base64.StdEncoding.DecodeString(post.Key)
-		key := [32]byte{}
-		copy(key[:], dk[0:32])
-		encKey, _ := Decrypt(tmp, &key)
-		copy(key[:], encKey[0:32])
+		key := GetEncKey(post)
 		ct, _ := base64.StdEncoding.DecodeString(post.Content)
-		pt, _ := Decrypt(ct, &key)
+		pt, err := decrypt(ct, &key)
+		if err != nil {
+			log.Fatal(err)
+		}
 		post.Content = string(pt)
 		return true
 	}
 	return false
 }
 
-func GetKey(post *model.PostData) (dk []byte) {
+//GetEncKey gets the encryption key used for the file by decrypting the stored-key with the passord scrypt-hash
+//takes a pointer to model.PostData as the only argument
+// and returns a 32 length byte array
+func GetEncKey(post *model.PostData) (key [32]byte) {
+	dk := getKey(post)
+	key = [32]byte{}
+	copy(key[:], dk[0:32])
+	tmp, _ := base64.StdEncoding.DecodeString(post.Key)
+	encKey, _ := decrypt(tmp, &key)
+	copy(key[:], encKey[0:32])
+	return
+}
+
+func getKey(post *model.PostData) (dk []byte) {
 	prop, err := sql.GetProp("salt", post.ID)
 	if err != nil {
 		log.Println(err)
@@ -88,7 +104,7 @@ func GetKey(post *model.PostData) (dk []byte) {
 }
 
 func encryptPost(content []byte, key *[32]byte) (string, string) {
-	ct, _ := Encrypt(content, key)
+	ct, _ := encrypt(content, key)
 	encodedContent := base64.StdEncoding.EncodeToString(ct)
 	tmp := make([]byte, 32)
 	copy(tmp, key[:])
@@ -96,6 +112,9 @@ func encryptPost(content []byte, key *[32]byte) (string, string) {
 	return encodedContent, encodedKey
 }
 
+//SecurePost generates a secure post for a unencrypted post. encryption varies based upon PostPerms
+//takes a pointer to model.PostData and a unencrypted password-string as arguments
+//returns nothing
 func SecurePost(post *model.PostData, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = helper.GenFromSeed()
@@ -104,13 +123,13 @@ func SecurePost(post *model.PostData, pass string) {
 			post.Salt = salt
 			post.Hash = sha256hash
 			if post.PostPerms == 3 {
-				encKey := newEncryptionKey()
+				encKey := newencryptionKey()
 				post.Content, post.Key = encryptPost([]byte(post.Content), encKey)
 				tmpKey := sql.HexToBytes(hash)
 				key := [32]byte{}
 				copy(key[:], tmpKey[0:32])
 				tmpKey, _ = base64.StdEncoding.DecodeString(post.Key) //same as encKey
-				tmpKey, _ = Encrypt(tmpKey, &key)                     //encrypt the file key with the password hash
+				tmpKey, _ = encrypt(tmpKey, &key)                     //encrypt the file key with the password hash
 				post.Key = base64.StdEncoding.EncodeToString(tmpKey)
 
 			}
@@ -122,7 +141,7 @@ func SecurePost(post *model.PostData, pass string) {
 	}
 }
 
-func newEncryptionKey() *[32]byte {
+func newencryptionKey() *[32]byte {
 	rnd := make([]byte, 32)
 	rand.Read(rnd)
 	key := [32]byte{}
@@ -133,7 +152,18 @@ func newEncryptionKey() *[32]byte {
 	return &key
 }
 
-func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
+//EncryptBytes is used to encrypt bytes with a key, pretty self-explanatory..
+//takes a byte slice b and a pointer to a 32 byte array key
+//returns a byte slice (ct) and a error (err)
+func EncryptBytes(b []byte, key *[32]byte) (ct []byte, err error) {
+	ct, err = encrypt(b, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
+func encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err
@@ -152,7 +182,7 @@ func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
-func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
+func decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err

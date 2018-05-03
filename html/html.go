@@ -154,13 +154,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Hash = r.FormValue("Pass")
 		//encrypting again..
 		if post.PostPerms == 3 {
-			dk := crypto.GetKey(&post)
-			key := [32]byte{}
-			copy(key[:], dk[0:32])
-			tmpKey, _ := b64.StdEncoding.DecodeString(post.Key)
-			encKey, err := crypto.Decrypt(tmpKey, &key)
-			copy(key[:], encKey[0:32])
-			ct, err := crypto.Encrypt([]byte(post.Content), &key)
+			key := crypto.GetEncKey(&post)
+			b, _ := b64.StdEncoding.DecodeString(post.Content)
+			ct, err := crypto.EncryptBytes(b, &key)
 			if err != nil {
 				log.Fatal(err)
 			}
