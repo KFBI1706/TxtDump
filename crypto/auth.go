@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/sha256"
 	"crypto/subtle"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -12,10 +13,11 @@ import (
 	"strings"
 	"time"
 
-	helper "github.com/KFBI1706/Txtdump/helper"
+	"github.com/KFBI1706/Txtdump/helper"
 	model "github.com/KFBI1706/Txtdump/model"
-
+	"github.com/KFBI1706/Txtdump/sql"
 	scrypt "github.com/elithrar/simple-scrypt"
+	_scrypt "golang.org/x/crypto/scrypt"
 )
 
 func sha256encode(b []byte) string {
@@ -32,13 +34,13 @@ func securePass(ps string) (string, string, string, error) {
 	}
 	vals := strings.Split(string(sscrypt), "$")
 	salt := vals[3]
-	sha256hash := sha256encode(helper.HexToBytes(vals[4]))
+	sha256hash := sha256encode(sql.HexToBytes(vals[4]))
 	hash := vals[4]
 	return salt, hash, sha256hash, nil
 }
 
-func checkPass(ps string, id int, perms int) bool {
-	prop, err := getProp("salt", id)
+func CheckPass(ps string, id int, perms int) bool {
+	prop, err := sql.GetProp("salt", id)
 	if err != nil {
 		log.Println(err)
 	}
@@ -47,34 +49,34 @@ func checkPass(ps string, id int, perms int) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-	prop, err = getProp("hash", id)
+	prop, err = sql.GetProp("hash", id)
 	if err != nil {
 		log.Println(err)
 	}
-	if subtle.ConstantTimeCompare(hexToBytes(sha256encode(dk)), prop) == 1 || perms == 1 {
+	if subtle.ConstantTimeCompare(sql.HexToBytes(sha256encode(dk)), prop) == 1 || perms == 1 {
 		return true
 	}
 	return false
 }
 
 func RequestDecrypt(post *model.PostData) bool {
-	if checkPass(post.Hash, post.ID, post.PostPerms) {
-		dk := getKey(post)
-		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
+	if CheckPass(post.Hash, post.ID, post.PostPerms) {
+		dk := GetKey(post)
+		tmp, _ := base64.StdEncoding.DecodeString(post.Key)
 		key := [32]byte{}
 		copy(key[:], dk[0:32])
-		encKey, _ := decrypt(tmp, &key)
+		encKey, _ := Decrypt(tmp, &key)
 		copy(key[:], encKey[0:32])
-		ct, _ := b64.StdEncoding.DecodeString(post.Content)
-		pt, _ := decrypt(ct, &key)
+		ct, _ := base64.StdEncoding.DecodeString(post.Content)
+		pt, _ := Decrypt(ct, &key)
 		post.Content = string(pt)
 		return true
 	}
 	return false
 }
 
-func getKey(post *model.PostData) (dk []byte) {
-	prop, err := getProp("salt", post.ID)
+func GetKey(post *model.PostData) (dk []byte) {
+	prop, err := sql.GetProp("salt", post.ID)
 	if err != nil {
 		log.Println(err)
 	}
@@ -86,17 +88,17 @@ func getKey(post *model.PostData) (dk []byte) {
 }
 
 func encryptPost(content []byte, key *[32]byte) (string, string) {
-	ct, _ := encrypt(content, key)
-	encodedContent := b64.StdEncoding.EncodeToString(ct)
+	ct, _ := Encrypt(content, key)
+	encodedContent := base64.StdEncoding.EncodeToString(ct)
 	tmp := make([]byte, 32)
 	copy(tmp, key[:])
-	encodedKey := b64.StdEncoding.EncodeToString(tmp)
+	encodedKey := base64.StdEncoding.EncodeToString(tmp)
 	return encodedContent, encodedKey
 }
 
-func securePost(post *model.PostData, pass string) {
+func SecurePost(post *model.PostData, pass string) {
 	rand.Seed(time.Now().UnixNano())
-	post.ID = genFromSeed()
+	post.ID = helper.GenFromSeed()
 	if post.PostPerms > 1 {
 		if salt, hash, sha256hash, err := securePass(pass); sha256hash != "" {
 			post.Salt = salt
@@ -104,12 +106,12 @@ func securePost(post *model.PostData, pass string) {
 			if post.PostPerms == 3 {
 				encKey := newEncryptionKey()
 				post.Content, post.Key = encryptPost([]byte(post.Content), encKey)
-				tmpKey := hexToBytes(hash)
+				tmpKey := sql.HexToBytes(hash)
 				key := [32]byte{}
 				copy(key[:], tmpKey[0:32])
-				tmpKey, _ = b64.StdEncoding.DecodeString(post.Key) //same as encKey
-				tmpKey, _ = encrypt(tmpKey, &key)                  //encrypt the file key with the password hash
-				post.Key = b64.StdEncoding.EncodeToString(tmpKey)
+				tmpKey, _ = base64.StdEncoding.DecodeString(post.Key) //same as encKey
+				tmpKey, _ = Encrypt(tmpKey, &key)                     //encrypt the file key with the password hash
+				post.Key = base64.StdEncoding.EncodeToString(tmpKey)
 
 			}
 		} else {
@@ -131,7 +133,7 @@ func newEncryptionKey() *[32]byte {
 	return &key
 }
 
-func encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
+func Encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err
@@ -150,7 +152,7 @@ func encrypt(plaintext []byte, key *[32]byte) (ciphertext []byte, err error) {
 	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
-func decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
+func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err

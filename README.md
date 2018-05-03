@@ -46,8 +46,7 @@ Response:
 HOST/api/v1/post/{ID} | Edits the post:
 ```
 ```json
-curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao",
-"Content":"tyest","Hash":"password"}' http://localhost:1337/api/v1/post/4750794/edit
+curl -H "Content-Type: application/json" -X POST -d '{"Title":"lmao", "Content":"tyest","Hash":"password"}' http://localhost:1337/api/v1/post/4750794/edit
 ```
 #### Delete Post:
 ```

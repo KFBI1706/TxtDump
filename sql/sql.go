@@ -1,27 +1,26 @@
-package main
+package sql
 
 import (
 	"database/sql"
-	"errors"
+	"encoding/hex"
 	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/KFBI1706/Txtdump/model"
 	_ "github.com/lib/pq"
 )
 
-type postcounter struct {
-	Count int        `json:"Count"`
-	Meta  []postmeta `json:"Meta"`
-}
-type postmeta struct {
-	PostID int    `json:"ID"`
-	Title  string `json:"Title"`
-	Views  int    `json:"View"`
+func HexToBytes(s string) []byte {
+	data, err := hex.DecodeString(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return data
 }
 
 //Since the Postgresql Go libary just uses a string for info i just read a file with the private database info in it as a string with this see readme.md for more
-func readDBstring(filename string) (string, error) {
+func ReadDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err)
@@ -30,8 +29,8 @@ func readDBstring(filename string) (string, error) {
 	return string(file), nil
 }
 
-func testDBConnection() error {
-	dbstring, err := readDBstring("dbstring")
+func TestDBConnection() error {
+	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {
 		return err
 	}
@@ -48,9 +47,9 @@ func testDBConnection() error {
 	return nil
 }
 
-//establishConn() creates the DB Connnection Remember to always close these u dumbus
-func establishConn() (*sql.DB, error) {
-	dbstring, err := readDBstring("dbstring")
+//EstablishConn() creates the DB Connnection Remember to always close these u dumbus
+func EstablishConn() (*sql.DB, error) {
+	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +63,8 @@ func establishConn() (*sql.DB, error) {
 	}
 	return db, nil
 }
-func createPostDB(post postData) error {
-	db, err := establishConn()
+func CreatePostDB(post model.PostData) error {
+	db, err := EstablishConn()
 	defer db.Close()
 	if err != nil {
 		return err
@@ -76,9 +75,9 @@ func createPostDB(post postData) error {
 	}
 	return nil
 }
-func readpostDB(ID int) (postData, error) {
-	result := postData{}
-	db, err := establishConn()
+func ReadpostDB(ID int) (model.PostData, error) {
+	result := model.PostData{}
+	db, err := EstablishConn()
 	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt, key FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt, &result.Key)
 	db.Close()
 	if err != nil && err == sql.ErrNoRows {
@@ -90,24 +89,22 @@ func readpostDB(ID int) (postData, error) {
 	}
 	return result, err
 }
-func saveChanges(post postData) error {
-	db, err := establishConn()
+func SaveChanges(post model.PostData) error {
+	db, err := EstablishConn()
 	if err != nil {
 		return err
 	}
 
-	if valid := checkPass(post.Hash, post.ID, post.PostPerms); valid {
-		_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
-		if err != nil {
-			return err
-		}
+	_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
+	if err != nil {
+		return err
 	}
 	db.Close()
 	return nil
 }
-func countPosts() int {
+func CountPosts() int {
 	var count int
-	db, err := establishConn()
+	db, err := EstablishConn()
 	err = db.QueryRow("SELECT COUNT(*) as count FROM text").Scan(&count)
 	if err != nil {
 		log.Println(err)
@@ -115,9 +112,9 @@ func countPosts() int {
 	db.Close()
 	return count
 }
-func postMeta() (postcounter, error) {
-	posts := postcounter{}
-	db, err := establishConn()
+func PostMetas() (model.PostCounter, error) {
+	posts := model.PostCounter{}
+	db, err := EstablishConn()
 	if err != nil {
 		return posts, err
 	}
@@ -130,31 +127,27 @@ func postMeta() (postcounter, error) {
 		return posts, err
 	}
 	for rows.Next() {
-		var meta postmeta
+		var meta model.PostMeta
 		rows.Scan(&meta.PostID, &meta.Title, &meta.Views)
 		posts.Meta = append(posts.Meta, meta)
 	}
 	db.Close()
 	return posts, err
 }
-func deletepost(post postData) error {
-	if valid := checkPass(post.Hash, post.ID, post.PostPerms); valid {
-		db, err := establishConn()
-		if err != nil {
-			return err
-		}
-		_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
-		if err != nil {
-			return err
-		}
-		db.Close()
-	} else {
-		return errors.New("Wrong Password")
+func Deletepost(post model.PostData) error {
+	db, err := EstablishConn()
+	if err != nil {
+		return err
 	}
+	_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
+	if err != nil {
+		return err
+	}
+	db.Close()
 	return nil
 }
-func incrementViewCounter(id int) error {
-	db, err := establishConn()
+func IncrementViewCounter(id int) error {
+	db, err := EstablishConn()
 	_, err = db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
 	if err != nil {
 		return err
@@ -162,8 +155,8 @@ func incrementViewCounter(id int) error {
 	defer db.Close()
 	return nil
 }
-func checkForDuplicateID(id int) bool {
-	db, err := establishConn()
+func CheckForDuplicateID(id int) bool {
+	db, err := EstablishConn()
 	if err != nil {
 		log.Println(err)
 	}
@@ -175,19 +168,19 @@ func checkForDuplicateID(id int) bool {
 	return true
 }
 
-func getProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
+func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
 		var hash string
-		db, err := establishConn()
+		db, err := EstablishConn()
 		if err != nil {
-			return nil, err
+			log.Println(err)
 		}
 		err = db.QueryRow("SELECT "+prop+" FROM text WHERE id = $1", id).Scan(&hash)
 		if err != nil {
-			return nil, err
+			log.Println(err)
 		}
 		db.Close()
-		return hexToBytes(hash), err
+		return HexToBytes(hash), err
 	}
 	return nil, nil
 }

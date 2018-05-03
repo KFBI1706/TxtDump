@@ -1,33 +1,25 @@
 package helper
 
 import (
-	"encoding/hex"
 	"fmt"
-	"log"
 	"math/rand"
 	"strconv"
+
+	"github.com/KFBI1706/Txtdump/sql"
 )
 
 //Probably not the best way to do this
-func genFromSeed() int {
+func GenFromSeed() int {
 	num := rand.Intn(9999999-1000000) + 1000000
-	for !checkForDuplicateID(num) {
+	for !sql.CheckForDuplicateID(num) {
 		num = rand.Intn(9999999-1000000) + 1000000
 	}
 	return num
 }
 
-func HexToBytes(s string) []byte {
-	data, err := hex.DecodeString(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return data
-}
-
 func findpostfortest() (int, error) {
 	var post int
-	db, err := establishConn()
+	db, err := sql.EstablishConn()
 	err = db.QueryRow("SELECT ID FROM TEXT LIMIT 1;").Scan(&post)
 	if err != nil {
 		return 0, err
@@ -35,12 +27,12 @@ func findpostfortest() (int, error) {
 	db.Close()
 	return post, err
 }
-func setupDB() error {
-	db, err := establishConn()
+func SetupDB() error {
+	db, err := sql.EstablishConn()
 	if err != nil {
 		return err
 	}
-	sql, err := readDBstring("sql/db.sql")
+	sql, err := sql.ReadDBstring("sql/db.sql")
 	if err != nil {
 		return err
 	}
@@ -49,23 +41,24 @@ func setupDB() error {
 	if err != nil {
 		return err
 	}
-	db.Close()
+	defer db.Close()
 	return nil
 }
 
-func clearOutDB() error {
-	db, err := establishConn()
+func ClearOutDB() error {
+	db, err := sql.EstablishConn()
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("DROP TABLE text")
+	_, err = db.Exec("DROP TABLE text;")
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 	return nil
 }
 
-func determinePerms(postperm string) (int, error) {
+func DeterminePerms(postperm string) (int, error) {
 	num, err := strconv.Atoi(postperm)
 	if err != nil {
 		return 0, err

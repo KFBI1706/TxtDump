@@ -7,11 +7,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/KFBI1706/Txtdump/api"
+	"github.com/KFBI1706/Txtdump/html"
+
+	"github.com/KFBI1706/Txtdump/helper"
+	"github.com/KFBI1706/Txtdump/sql"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	err := testDBConnection()
+	err := sql.TestDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,38 +27,39 @@ func main() {
 	addr := fmt.Sprintf(":%v", *port)
 	if *dbdrop || *dbsetup {
 		if *dbdrop {
-			err = clearOutDB()
+			err = helper.ClearOutDB()
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 		}
+		fmt.Println(*dbsetup)
 		if *dbsetup {
-			err = setupDB()
+			err = helper.SetupDB()
 			if err != nil {
 				log.Println(err)
 			}
 		}
 		os.Exit(3)
 	}
-	log.Printf("%v Post(s) Currently in DB\n", countPosts())
+	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
 	router := mux.NewRouter()
-	router.HandleFunc("/", logging(displayIndex)).Methods("GET")
-	router.HandleFunc("/api/v1/post/amount", logging(postcounterAPI)).Methods("GET")
-	router.HandleFunc("/api/v1/post/{id}/request", logging(requestPostAPI)).Methods("GET")
-	router.HandleFunc("/api/v1/post/{id}/request", logging(requestPostWithPassAPI)).Methods("POST")
-	router.HandleFunc("/api/v1/post/create", logging(createPostAPI)).Methods("POST")
-	router.HandleFunc("/api/v1/post/{id}/edit", logging(editPostAPI)).Methods("POST")
-	router.HandleFunc("/api/v1/post/{id}/delete", logging(deletePostAPI))
-	router.HandleFunc("/post/{id}/request", logging(requestPostWeb)).Methods("GET")
-	router.HandleFunc("/post/{id}/request/decrypt", logging(requestPostDecrypt)).Methods("POST")
-	router.HandleFunc("/post/{id}/edit", logging(editPostTemplate))
-	router.HandleFunc("/post/{id}/edit/decrypt", logging(editPostDecrypt))
-	router.HandleFunc("/post/{id}/edit/post", logging(editPostForm)).Methods("POST")
-	router.HandleFunc("/post/{id}/delete", logging(deletePostTemplate))
-	router.HandleFunc("/post/{id}/delete/post", logging(deletePostForm))
-	router.HandleFunc("/post/create", logging(createPostTemplateWeb))
-	router.HandleFunc("/post/create/new", logging(createPostWeb))
-	router.HandleFunc("/documentation", logging(documentation))
+	router.HandleFunc("/", logging(html.DisplayIndex)).Methods("GET")
+	router.HandleFunc("/api/v1/post/amount", logging(api.PostcounterAPI)).Methods("GET")
+	router.HandleFunc("/api/v1/post/{id}/request", logging(api.RequestPostAPI)).Methods("GET")
+	router.HandleFunc("/api/v1/post/{id}/request", logging(api.RequestPostWithPassAPI)).Methods("POST")
+	router.HandleFunc("/api/v1/post/create", logging(api.CreatePostAPI)).Methods("POST")
+	router.HandleFunc("/api/v1/post/{id}/edit", logging(api.EditPostAPI)).Methods("POST")
+	router.HandleFunc("/api/v1/post/{id}/delete", logging(api.DeletePostAPI))
+	router.HandleFunc("/post/{id}/request", logging(html.RequestPostWeb)).Methods("GET")
+	router.HandleFunc("/post/{id}/request/decrypt", logging(html.RequestPostDecrypt)).Methods("POST")
+	router.HandleFunc("/post/{id}/edit", logging(html.EditPostTemplate))
+	router.HandleFunc("/post/{id}/edit/decrypt", logging(html.EditPostDecrypt))
+	router.HandleFunc("/post/{id}/edit/post", logging(html.EditPostForm)).Methods("POST")
+	router.HandleFunc("/post/{id}/delete", logging(html.DeletePostTemplate))
+	router.HandleFunc("/post/{id}/delete/post", logging(html.DeletePostForm))
+	router.HandleFunc("/post/create", logging(html.CreatePostTemplateWeb))
+	router.HandleFunc("/post/create/new", logging(html.CreatePostWeb))
+	router.HandleFunc("/documentation", logging(html.Documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
 	router.Walk(routerWalk)
 	err = http.ListenAndServe(addr, router)

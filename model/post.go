@@ -25,3 +25,13 @@ type PostDecrypt struct {
 	ID   int
 	Mode string
 }
+
+type PostCounter struct {
+	Count int        `json:"Count"`
+	Meta  []PostMeta `json:"Meta"`
+}
+type PostMeta struct {
+	PostID int    `json:"ID"`
+	Title  string `json:"Title"`
+	Views  int    `json:"View"`
+}
