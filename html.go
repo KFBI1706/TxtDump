@@ -8,31 +8,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
+	"github.com/KFBI1706/Txtdump/crypto"
 	"github.com/gorilla/mux"
 )
-
-type postData struct {
-	ID        int           `json:"ID"`
-	EditID    int           `json:"EditID"`
-	Hash      string        `json:"Password"`
-	Salt      string        `json:"Salt"`
-	AuthHash  string        `json:"authHash"`
-	Key       string        `json:"Key"`
-	PostPerms int           `json:"PostPerms,string"`
-	Content   string        `json:"Content"`
-	Md        template.HTML `json:""`
-	Title     string        `json:"Title"`
-	TitleMD   template.HTML `json:""`
-	Time      time.Time     `json:"Time"`
-	Views     int           `json:"Views"`
-}
-
-type postDecrypt struct {
-	ID   int
-	Mode string
-}
 
 func displayIndex(w http.ResponseWriter, r *http.Request) {
 	posts := postcounter{Count: countPosts()}
@@ -79,7 +58,7 @@ func requestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := processRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	post.Hash = r.FormValue("Pass")
-	if requestDecrypt(&post) {
+	if crypto.RequestDecrypt(&post) {
 		parsePost(&post)
 		tmpl.ExecuteTemplate(w, "display", post)
 	}
@@ -148,7 +127,7 @@ func editPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := processRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
 	post.Hash = r.FormValue("Pass")
-	if requestDecrypt(&post) {
+	if crypto.RequestDecrypt(&post) {
 		parsePost(&post)
 		tmpl.ExecuteTemplate(w, "edit", post)
 	}

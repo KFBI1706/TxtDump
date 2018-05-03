@@ -1,58 +1,23 @@
-package main
+package crypto
 
 import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/sha256"
 	"crypto/subtle"
-	b64 "encoding/base64"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/elithrar/simple-scrypt"
-	_scrypt "golang.org/x/crypto/scrypt"
+	helper "github.com/KFBI1706/Txtdump/helper"
+	model "github.com/KFBI1706/Txtdump/model"
+
+	scrypt "github.com/elithrar/simple-scrypt"
 )
 
-//Probably not the best way to do this
-func genFromSeed() int {
-	num := rand.Intn(9999999-1000000) + 1000000
-	for !checkForDuplicateID(num) {
-		num = rand.Intn(9999999-1000000) + 1000000
-	}
-	return num
-}
-func findpostfortest() (int, error) {
-	var post int
-	db, err := establishConn()
-	err = db.QueryRow("SELECT ID FROM TEXT LIMIT 1;").Scan(&post)
-	if err != nil {
-		return 0, err
-	}
-	db.Close()
-	return post, err
-}
-func setupDB() error {
-	db, err := establishConn()
-	if err != nil {
-		return err
-	}
-	sql, err := readDBstring("sql/db.sql")
-	if err != nil {
-		return err
-	}
-	res, err := db.Exec(sql)
-	fmt.Println(res)
-	if err != nil {
-		return err
-	}
-	db.Close()
-	return nil
-}
 func sha256encode(b []byte) string {
 	h := sha256.New()
 	h.Write(b)
@@ -67,7 +32,7 @@ func securePass(ps string) (string, string, string, error) {
 	}
 	vals := strings.Split(string(sscrypt), "$")
 	salt := vals[3]
-	sha256hash := sha256encode(hexToBytes(vals[4]))
+	sha256hash := sha256encode(helper.HexToBytes(vals[4]))
 	hash := vals[4]
 	return salt, hash, sha256hash, nil
 }
@@ -92,7 +57,7 @@ func checkPass(ps string, id int, perms int) bool {
 	return false
 }
 
-func requestDecrypt(post *postData) bool {
+func RequestDecrypt(post *model.PostData) bool {
 	if checkPass(post.Hash, post.ID, post.PostPerms) {
 		dk := getKey(post)
 		tmp, _ := b64.StdEncoding.DecodeString(post.Key)
@@ -108,7 +73,7 @@ func requestDecrypt(post *postData) bool {
 	return false
 }
 
-func getKey(post *postData) (dk []byte) {
+func getKey(post *model.PostData) (dk []byte) {
 	prop, err := getProp("salt", post.ID)
 	if err != nil {
 		log.Println(err)
@@ -129,7 +94,7 @@ func encryptPost(content []byte, key *[32]byte) (string, string) {
 	return encodedContent, encodedKey
 }
 
-func securePost(post *postData, pass string) {
+func securePost(post *model.PostData, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = genFromSeed()
 	if post.PostPerms > 1 {
@@ -205,23 +170,4 @@ func decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 		ciphertext[gcm.NonceSize():],
 		nil,
 	)
-}
-
-func clearOutDB() error {
-	db, err := establishConn()
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("DROP TABLE text")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-func determinePerms(postperm string) (int, error) {
-	num, err := strconv.Atoi(postperm)
-	if err != nil {
-		return 0, err
-	}
-	return num, err
 }

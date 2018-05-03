@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -174,14 +173,6 @@ func checkForDuplicateID(id int) bool {
 		return false
 	}
 	return true
-}
-
-func hexToBytes(s string) []byte {
-	data, err := hex.DecodeString(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return data
 }
 
 func getProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
