@@ -24,7 +24,6 @@ func genFromSeed() int {
 	for !checkForDuplicateID(num) {
 		num = rand.Intn(9999999-1000000) + 1000000
 	}
-	log.Println(num)
 	return num
 }
 func findpostfortest() (int, error) {

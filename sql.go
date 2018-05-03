@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"time"
@@ -66,17 +65,17 @@ func establishConn() (*sql.DB, error) {
 	}
 	return db, nil
 }
-func createPostDB(post postData) {
+func createPostDB(post postData) error {
 	db, err := establishConn()
-
+	defer db.Close()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms, hash, salt, key) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms, post.Hash, post.Salt, post.Key)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
-	db.Close()
+	return nil
 }
 func readpostDB(ID int) (postData, error) {
 	result := postData{}
@@ -141,14 +140,15 @@ func postMeta() (postcounter, error) {
 }
 func deletepost(post postData) error {
 	if valid := checkPass(post.Hash, post.ID, post.PostPerms); valid {
-
-		db, _ := establishConn()
-		_, err := db.Exec("DELETE FROM text WHERE id = $1", post.ID)
+		db, err := establishConn()
+		if err != nil {
+			return err
+		}
+		_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
 		if err != nil {
 			return err
 		}
 		db.Close()
-
 	} else {
 		return errors.New("Wrong Password")
 	}
