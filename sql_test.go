@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -27,25 +26,23 @@ func TestDBconn(t *testing.T) {
 	}
 }
 func TestPostCreateEditDelete(t *testing.T) {
-	post := postData{Content: "Post Generated for testing", Title: "Post Generated for testing", EditID: 100, Time: time.Now(), PostPerms: 2}
+	newpost := postData{Title: "Test Post", Content: "Test Content", PostPerms: 2, Hash: "Testpass"}
 	rand.Seed(time.Now().UnixNano())
-	post.ID = genFromSeed()
-	fmt.Println(post.ID)
-	if checkForDuplicateID(post.ID) != true {
-		t.Errorf("Post with ID %v Already exsits", post.ID)
-	}
-	createPostDB(post)
-	checkPass(post.Hash, post.ID, 2)
-	post.Content = "Second Phase"
-	err := saveChanges(post)
+	newpost.ID = genFromSeed()
+	securePost(&newpost, newpost.Hash)
+	err := createPostDB(newpost)
 	if err != nil {
 		t.Error(err)
 	}
-	err = incrementViewCounter(post.ID)
+	createdpost, err := readpostDB(newpost.ID)
+	createdpost.Hash = "Testpass"
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 	}
-	err = deletepost(post)
+	if createdpost.Title != newpost.Title {
+		t.Error(createdpost.Content, newpost.Title)
+	}
+	err = deletepost(createdpost)
 	if err != nil {
 		t.Error(err)
 	}

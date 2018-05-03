@@ -189,11 +189,11 @@ func getProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 		var hash string
 		db, err := establishConn()
 		if err != nil {
-			log.Println(err)
+			return nil, err
 		}
 		err = db.QueryRow("SELECT "+prop+" FROM text WHERE id = $1", id).Scan(&hash)
 		if err != nil {
-			log.Println(err)
+			return nil, err
 		}
 		db.Close()
 		return hexToBytes(hash), err
