@@ -19,7 +19,8 @@ func HexToBytes(s string) []byte {
 	return data
 }
 
-//Since the Postgresql Go libary just uses a string for info i just read a file with the private database info in it as a string with this see readme.md for more
+/*Since the Postgresql Go libary just uses a string for info i just read a file,
+with the private database info in it as a string. See READM.md for more*/
 func ReadDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -47,7 +48,7 @@ func TestDBConnection() error {
 	return nil
 }
 
-//EstablishConn() creates the DB Connnection Remember to always close these u dumbus
+//EstablishConn() creates the DB Connnection
 func EstablishConn() (*sql.DB, error) {
 	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {

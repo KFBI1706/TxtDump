@@ -152,7 +152,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
-		//encrypting again..
 		if post.PostPerms == 3 {
 			key := crypto.GetEncKey(&post)
 			b, _ := b64.StdEncoding.DecodeString(post.Content)

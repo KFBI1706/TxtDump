@@ -8,9 +8,9 @@ import (
 	"github.com/KFBI1706/Txtdump/sql"
 )
 
-//GenFromSeed generates a guaranteed random number that's not already in the database
-//no input arguments
-//one return argument int (num)
+/*GenFromSeed generates a guaranteed random number that's not already in the database
+no input arguments
+one return argument int (num)*/
 func GenFromSeed() int {
 	num := rand.Intn(9999999-1000000) + 1000000
 	for !sql.CheckForDuplicateID(num) {
@@ -30,9 +30,9 @@ func findpostfortest() (int, error) {
 	return post, err
 }
 
-//SetupDB is used to setup the database
-// no input arguments
-// returns error
+/*SetupDB is used to setup the database
+no input arguments
+returns error*/
 func SetupDB() error {
 	db, err := sql.EstablishConn()
 	if err != nil {
@@ -51,9 +51,9 @@ func SetupDB() error {
 	return nil
 }
 
-//ClearOutDB is used to clear a table
-// no input arguments
-// returns error
+/*ClearOutDB is used to clear a table
+no input arguments
+returns error*/
 func ClearOutDB() error {
 	db, err := sql.EstablishConn()
 	if err != nil {
@@ -67,9 +67,9 @@ func ClearOutDB() error {
 	return nil
 }
 
-//DeterminePerms converts the postPerm string to int
-//one input argument string (postperm)
-//two return arugments which returns the int (num), and error (err)
+/*DeterminePerms converts the postPerm string to int
+one input argument string (postperm)
+two return arugments which returns the int (num), and error (err)*/
 func DeterminePerms(postperm string) (int, error) {
 	num, err := strconv.Atoi(postperm)
 	if err != nil {

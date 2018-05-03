@@ -2,7 +2,9 @@ package sql_test
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestDBconn(t *testing.T) {
@@ -24,26 +26,25 @@ func TestDBconn(t *testing.T) {
 	}
 }
 
-//func TestPostCreateEditDelete(t *testing.T) {
-//	newpost := postData{Title: "Test Post", Content: "Test Content", PostPerms: 2, Hash: "Testpass"}
-//	rand.Seed(time.Now().UnixNano())
-//	newpost.ID = genFromSeed()
-//	securePost(&newpost, newpost.Hash)
-//	err := createPostDB(newpost)
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	createdpost, err := readpostDB(newpost.ID)
-//	createdpost.Hash = "Testpass"
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	if createdpost.Title != newpost.Title {
-//		t.Error(createdpost.Content, newpost.Title)
-//	}
-//	err = deletepost(createdpost)
-//	if err != nil {
-//		t.Error(err)
-//	}
-//}
-//
+func TestPostCreateEditDelete(t *testing.T) {
+	newpost := postData{Title: "Test Post", Content: "Test Content", PostPerms: 2, Hash: "Testpass"}
+	rand.Seed(time.Now().UnixNano())
+	newpost.ID = genFromSeed()
+	securePost(&newpost, newpost.Hash)
+	err := createPostDB(newpost)
+	if err != nil {
+		t.Error(err)
+	}
+	createdpost, err := readpostDB(newpost.ID)
+	createdpost.Hash = "Testpass"
+	if err != nil {
+		t.Error(err)
+	}
+	if createdpost.Title != newpost.Title {
+		t.Error(createdpost.Content, newpost.Title)
+	}
+	err = deletepost(createdpost)
+	if err != nil {
+		t.Error(err)
+	}
+}
