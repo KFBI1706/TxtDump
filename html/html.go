@@ -37,7 +37,7 @@ func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
 	if err != nil {
 		fmt.Fprintf(w, "Request needs to be int")
 	}
-	post, err := sql.ReadpostDB(id)
+	post, err := sql.ReadPostDB(id)
 	if err != nil {
 		log.Println(err)
 		fmt.Fprintf(w, "ID not found")
@@ -142,7 +142,7 @@ func EditPostTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
-	postTemplate(w, r, "deletepost")
+	postTemplate(w, r, "DeletePost")
 }
 
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {
@@ -167,7 +167,7 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		}
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
-		err = sql.Deletepost(post)
+		err = sql.DeletePost(post)
 	}
 	url := "/"
 	if err != nil {

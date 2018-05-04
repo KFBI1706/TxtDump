@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/KFBI1706/Txtdump/model"
+	//Import Postgres Libary
 	_ "github.com/lib/pq"
 )
 
+// HexToBytes decodes the inputted hex string
 func HexToBytes(s string) []byte {
 	data, err := hex.DecodeString(s)
 	if err != nil {
@@ -19,8 +21,7 @@ func HexToBytes(s string) []byte {
 	return data
 }
 
-/*Since the Postgresql Go libary just uses a string for info i just read a file,
-with the private database info in it as a string. See READM.md for more*/
+//ReadDBstring Returns the file in filename as a string.
 func ReadDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -30,6 +31,7 @@ func ReadDBstring(filename string) (string, error) {
 	return string(file), nil
 }
 
+//TestDBConnection Just pings the DB
 func TestDBConnection() error {
 	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {
@@ -48,7 +50,7 @@ func TestDBConnection() error {
 	return nil
 }
 
-//EstablishConn() creates the DB Connnection
+//EstablishConn creates the DB Connnection
 func EstablishConn() (*sql.DB, error) {
 	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {
@@ -64,6 +66,8 @@ func EstablishConn() (*sql.DB, error) {
 	}
 	return db, nil
 }
+
+//CreatePostDB registers the post in the DB
 func CreatePostDB(post model.PostData) error {
 	db, err := EstablishConn()
 	defer db.Close()
@@ -76,7 +80,9 @@ func CreatePostDB(post model.PostData) error {
 	}
 	return nil
 }
-func ReadpostDB(ID int) (model.PostData, error) {
+
+//ReadPostDB gets postdata from DB
+func ReadPostDB(ID int) (model.PostData, error) {
 	result := model.PostData{}
 	db, err := EstablishConn()
 	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt, key FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt, &result.Key)
@@ -90,6 +96,8 @@ func ReadpostDB(ID int) (model.PostData, error) {
 	}
 	return result, err
 }
+
+//SaveChanges registers edits in DB
 func SaveChanges(post model.PostData) error {
 	db, err := EstablishConn()
 	if err != nil {
@@ -103,6 +111,8 @@ func SaveChanges(post model.PostData) error {
 	db.Close()
 	return nil
 }
+
+//CountPosts runs SQL count on DB
 func CountPosts() int {
 	var count int
 	db, err := EstablishConn()
@@ -113,6 +123,8 @@ func CountPosts() int {
 	db.Close()
 	return count
 }
+
+//PostMetas returns some data used for index overview
 func PostMetas() (model.PostCounter, error) {
 	posts := model.PostCounter{}
 	db, err := EstablishConn()
@@ -135,7 +147,9 @@ func PostMetas() (model.PostCounter, error) {
 	db.Close()
 	return posts, err
 }
-func Deletepost(post model.PostData) error {
+
+//DeletePost deletes post in DB
+func DeletePost(post model.PostData) error {
 	db, err := EstablishConn()
 	if err != nil {
 		return err
@@ -147,6 +161,8 @@ func Deletepost(post model.PostData) error {
 	db.Close()
 	return nil
 }
+
+//IncrementViewCounter increments the viewcounter in DB
 func IncrementViewCounter(id int) error {
 	db, err := EstablishConn()
 	_, err = db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
@@ -156,6 +172,8 @@ func IncrementViewCounter(id int) error {
 	defer db.Close()
 	return nil
 }
+
+//CheckForDuplicateID Checks if ID is already used for a post in DB
 func CheckForDuplicateID(id int) bool {
 	db, err := EstablishConn()
 	if err != nil {
@@ -169,6 +187,7 @@ func CheckForDuplicateID(id int) bool {
 	return true
 }
 
+//GetProp gets the requested hash from the DB
 func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
 		var hash string

@@ -8,16 +8,16 @@ import (
 )
 
 func TestDBconn(t *testing.T) {
-	err := testDBConnection()
+	err := TestDBConnection()
 	if err != nil {
 		t.Error(err)
 	}
-	post, err := findpostfortest()
+	post, err := Findpostfortest()
 	if err != nil {
 		t.Error(err)
 	}
 	fmt.Printf("The first post in the DB has the id: %v\n", post)
-	redpost, err := readpostDB(post)
+	redpost, err := ReadPostDB(post)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +35,7 @@ func TestPostCreateEditDelete(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	createdpost, err := readpostDB(newpost.ID)
+	createdpost, err := ReadPostDB(newpost.ID)
 	createdpost.Hash = "Testpass"
 	if err != nil {
 		t.Error(err)
@@ -43,7 +43,7 @@ func TestPostCreateEditDelete(t *testing.T) {
 	if createdpost.Title != newpost.Title {
 		t.Error(createdpost.Content, newpost.Title)
 	}
-	err = deletepost(createdpost)
+	err = DeletePost(createdpost)
 	if err != nil {
 		t.Error(err)
 	}

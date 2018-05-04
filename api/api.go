@@ -43,7 +43,7 @@ func DeletePostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
-		err = sql.Deletepost(post)
+		err = sql.DeletePost(post)
 	}
 	if err != nil {
 		log.Println(err)
