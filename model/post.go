@@ -20,10 +20,14 @@ type PostData struct {
 	Time      time.Time     `json:"Time"`
 	Views     int           `json:"Views"`
 }
+type PostCreate struct {
+	csrfField string
+}
 
 type PostDecrypt struct {
-	ID   int
-	Mode string
+	ID    int
+	Mode  string
+	Token string
 }
 
 type PostCounter struct {

@@ -13,6 +13,7 @@ import (
 	"github.com/KFBI1706/Txtdump/helper"
 	"github.com/KFBI1706/Txtdump/model"
 	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
@@ -75,13 +76,22 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 		parsePost(&post)
 		tmpl.ExecuteTemplate(w, "display", post)
 	} else if post.PostPerms == 3 {
-		tmpl.ExecuteTemplate(w, "displayPass", model.PostDecrypt{ID: post.ID, Mode: "request"})
+		err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
+			csrf.TemplateTag: csrf.TemplateField(r),
+			"ID":             post.ID,
+			"Mode":           "request",
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
 func CreatePostTemplateWeb(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
-	err := tmpl.ExecuteTemplate(w, "createpost", nil)
+	err := tmpl.ExecuteTemplate(w, "createpost", map[string]interface{}{
+		csrf.TemplateTag: csrf.TemplateField(r),
+	})
 	if err != nil {
 		log.Println(err)
 	}
@@ -116,14 +126,35 @@ func handle404(w http.ResponseWriter, r *http.Request) {
 func postTemplate(w http.ResponseWriter, r *http.Request, templateString string) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
 	post := ProcessRequest(w, r)
-	var err error
-	if post.PostPerms == 3 && templateString == "edit" {
-		err = tmpl.ExecuteTemplate(w, "displayPass", model.PostDecrypt{ID: post.ID, Mode: "edit"})
+	if templateString == "edit" {
+		if post.PostPerms == 3 {
+			err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
+				csrf.TemplateTag: csrf.TemplateField(r),
+				"ID":             post.ID,
+				"Mode":           templateString,
+			})
+			if err != nil {
+				log.Println(err)
+			}
+		} else {
+			err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
+				csrf.TemplateTag: csrf.TemplateField(r),
+				"ID":             post.ID,
+				"Title":          post.Title,
+				"Content":        post.Content,
+			})
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	} else {
-		err = tmpl.ExecuteTemplate(w, templateString, post)
-	}
-	if err != nil {
-		log.Println(err)
+		err := tmpl.ExecuteTemplate(w, templateString, map[string]interface{}{
+			csrf.TemplateTag: csrf.TemplateField(r),
+			"ID":             post.ID,
+		})
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
@@ -133,7 +164,15 @@ func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		parsePost(&post)
-		tmpl.ExecuteTemplate(w, "edit", post)
+		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
+			csrf.TemplateTag: csrf.TemplateField(r),
+			"ID":             post.ID,
+			"Title":          post.Title,
+			"Content":        post.Content,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -142,7 +181,7 @@ func EditPostTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
-	postTemplate(w, r, "DeletePost")
+	postTemplate(w, r, "deletepost")
 }
 
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {

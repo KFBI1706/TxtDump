@@ -46,6 +46,13 @@ func GetEncKey(post *model.PostData) (key [32]byte) {
 	return
 }
 
+/*GetToken generates a random token used to prefent CSRF attacks*/
+func GetToken() string {
+	data := make([]byte, 64)
+	rand.Read(data)
+	return base64.StdEncoding.EncodeToString(data)
+}
+
 func getKey(post *model.PostData) (dk []byte) {
 	prop, err := sql.GetProp("salt", post.ID)
 	if err != nil {

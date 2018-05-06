@@ -47,8 +47,10 @@
       <h1>Unencrypt File</h1>
     </div>
     <form action="/post/{{.ID}}/{{.Mode}}/decrypt" method="POST">
+        {{.csrfField}}
       <label>Password</label>
       <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
+
       <br>
       <input type="submit" class="btn btn-danger" value="Submit password">
     </form>

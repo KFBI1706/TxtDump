@@ -5,6 +5,7 @@
   <div class="text-header col-md-12">
     <h1 class="text-center">Create a new post</h1>
     <form action="/post/create/new" method="POST" id="postForm">
+      {{.csrfField}}
       <div class="topcontainer">
         <div class="form-group col-md-9 topbar">
           <label for="formGroupExampleInput">Title</label>
@@ -74,6 +75,7 @@
       <h1>Delete post</h1>
     </div>
     <form action="/post/{{.ID}}/delete/post" method="POST">
+        {{.csrfField}}
       <label>Password</label>
       <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
       <br>
@@ -88,6 +90,7 @@
   <div class="text-header col-md-12">
     <h1 class="text-center">Edit Post</h1>
     <form action="/post/{{.ID}}/edit/post" method="POST">
+        {{.csrfField}}
       <div class="form-group col-md-9 topbar">
         <label for="formGroupExampleInput">Title</label>
         <input type="text" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Title" value="{{.Title}}">

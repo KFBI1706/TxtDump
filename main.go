@@ -12,6 +12,7 @@ import (
 
 	"github.com/KFBI1706/Txtdump/helper"
 	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
@@ -22,6 +23,7 @@ func main() {
 	}
 	dbdrop := flag.Bool("dropdb", false, "Drop current table and all data")
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
+	production := flag.Bool("production", false, "Is the server in production?")
 	port := flag.Int("port", 1337, "for using a custom port")
 	flag.Parse()
 	addr := fmt.Sprintf(":%v", *port)
@@ -42,6 +44,7 @@ func main() {
 		os.Exit(3)
 	}
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
+	CSRF := csrf.Protect([]byte("OTAyNDhmajBkYnBhamtudnBhc29ldXI"), csrf.Secure(*production))
 	router := mux.NewRouter()
 	router.HandleFunc("/", logging(html.DisplayIndex)).Methods("GET")
 	router.HandleFunc("/api/v1/post/amount", logging(api.PostcounterAPI)).Methods("GET")
@@ -62,7 +65,7 @@ func main() {
 	router.HandleFunc("/documentation", logging(html.Documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
 	router.Walk(routerWalk)
-	err = http.ListenAndServe(addr, router)
+	err = http.ListenAndServe(addr, CSRF(router))
 	if err != nil {
 		log.Fatal(err)
 	}

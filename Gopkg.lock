@@ -20,10 +20,22 @@
   version = "v1.1"
 
 [[projects]]
+  name = "github.com/gorilla/csrf"
+  packages = ["."]
+  revision = "69581736821c33d85bbf378f42f6ad864dbd85de"
+  version = "v1.5"
+
+[[projects]]
   name = "github.com/gorilla/mux"
   packages = ["."]
   revision = "53c1911da2b537f792e7cafcb446b05ffe33b996"
   version = "v1.6.1"
+
+[[projects]]
+  name = "github.com/gorilla/securecookie"
+  packages = ["."]
+  revision = "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -39,6 +51,12 @@
   name = "github.com/microcosm-cc/bluemonday"
   packages = ["."]
   revision = "542fd4642604d0d0c26112396ce5b1a9d01eee0b"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/russross/blackfriday"
@@ -138,6 +156,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f3d44e8e01bcbdb44bd22ba3cedfd8f6ca58bc11eb5b0c60be87ddb26026307f"
+  inputs-digest = "d733a64cacef223736fa6a56048be1a9fa9be2155d654f7ac2ec0e2a83768175"
   solver-name = "gps-cdcl"
   solver-version = 1
