@@ -201,21 +201,15 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
-		log.Println(post.Content)
-		log.Println(post.Title)
-		log.Println(post.Hash)
 		if post.PostPerms == 3 {
 			key := crypto.GetEncKey(&post)
-			b, _ := b64.StdEncoding.DecodeString(post.Content)
+			b := []byte(post.Content)
 			ct, err := crypto.EncryptBytes(b, &key)
 			if err != nil {
 				log.Fatal(err)
 			}
 			post.Content = b64.StdEncoding.EncodeToString(ct)
 		}
-		log.Println(post.Content)
-		log.Println(post.Title)
-		log.Println(post.Hash)
 		if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
 			err = sql.SaveChanges(post)
 		}
