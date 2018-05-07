@@ -15,16 +15,16 @@
                         <th scope="col">ID</th>
                         <th scope="col">Title</th>
                         <th scope="col">Views</th>
+                        <th scope="col">PostPerms</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{range .Meta}}
                     <tr>
-                        <td class="col-2" scope="row">
-                            <a href="/post/{{.PostID}}/request">{{.PostID}}</a>
-                            </th>
-                            <td>{{.Title}}</td>
-                            <td>{{.Views}}</td>
+                        <td class="col-2" scope="row"><a href="/post/{{.PostID}}/request">{{.PostID}}</a></td>
+                        <td>{{.Title}}</td>
+                        <td>{{.Views}}</td>
+                        <td>{{.PostPerms}}</td>
                     </tr>
                     {{end}}
                 </tbody>

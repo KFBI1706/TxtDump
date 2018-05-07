@@ -35,7 +35,8 @@ type PostCounter struct {
 	Meta  []PostMeta `json:"Meta"`
 }
 type PostMeta struct {
-	PostID int    `json:"ID"`
-	Title  string `json:"Title"`
-	Views  int    `json:"View"`
+	PostID    int    `json:"ID"`
+	Title     string `json:"Title"`
+	Views     int    `json:"View"`
+	PostPerms int    `json:"PostPerms"`
 }

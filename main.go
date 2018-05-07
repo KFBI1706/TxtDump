@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/KFBI1706/TxtDump/model"
 	"github.com/KFBI1706/Txtdump/api"
 	"github.com/KFBI1706/Txtdump/html"
 
@@ -21,6 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	test := model.PostMeta{PostPerms: 2}
 	dbdrop := flag.Bool("dropdb", false, "Drop current table and all data")
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
 	production := flag.Bool("production", false, "Is the server in production?")

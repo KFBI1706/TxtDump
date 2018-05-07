@@ -135,13 +135,13 @@ func PostMetas() (model.PostCounter, error) {
 	if err != nil {
 		return posts, err
 	}
-	rows, err := db.Query("SELECT id, title, views FROM text LIMIT 20")
+	rows, err := db.Query("SELECT id, title, views, postperms FROM text LIMIT 20")
 	if err != nil {
 		return posts, err
 	}
 	for rows.Next() {
 		var meta model.PostMeta
-		rows.Scan(&meta.PostID, &meta.Title, &meta.Views)
+		rows.Scan(&meta.PostID, &meta.Title, &meta.Views, &meta.PostPerms)
 		posts.Meta = append(posts.Meta, meta)
 	}
 	db.Close()
