@@ -1,0 +1,65 @@
+body {
+  padding-top: 5rem;
+}
+
+.text-header {
+  margin-top: 50px;
+  margin-bottom: 25px;
+}
+
+.text-header h6 {
+  color: rgb(80, 80, 80);
+  font-size: 14px;
+}
+
+.text-header hr {
+  color: #333;
+  border-top: 2px solid rgba(0, 0, 0, .1);
+}
+
+.text-content {
+  height: 500px;
+}
+
+.counter {
+  font-size: 30px;
+}
+
+.sub-counter {
+  font-size: 22px;
+}
+
+.infobox {
+  height: 200px;
+}
+
+.content {
+  height: 500px;
+  width: 100%;
+}
+
+.content-box {
+  height: 500px;
+}
+
+code {
+  background-color: #eee;
+}
+
+pre {
+  background-color: #eee;
+}
+
+.topbar {
+  padding-left: 0px;
+  float: left;
+  display: inline;
+}
+
+.derpimbadatcss {
+  padding-right: 0px;
+}
+
+.bax {
+  height: 120px;
+}

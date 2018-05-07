@@ -8,19 +8,6 @@
   revision = "40e40b42552a9cb37d6e98f4ad31f63ae53ea43a"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/KFBI1706/Txtdump"
-  packages = [
-    "api",
-    "crypto",
-    "helper",
-    "html",
-    "model",
-    "sql"
-  ]
-  revision = "9fd20d6c1785301b05725bff5553401bfead070e"
-
-[[projects]]
   name = "github.com/elithrar/simple-scrypt"
   packages = ["."]
   revision = "d150773194090feb6c897805a7bcea8d49544e2c"
@@ -169,6 +156,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e163178f16c0f8604e1072cc69a59fb96da23637ae6185eb05e613548d7bb9f"
+  inputs-digest = "d733a64cacef223736fa6a56048be1a9fa9be2155d654f7ac2ec0e2a83768175"
   solver-name = "gps-cdcl"
   solver-version = 1
