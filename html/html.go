@@ -161,9 +161,19 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
+
+	//post.Hash = r.FormValue("Pass")
+	//if crypto.RequestDecrypt(&post) {
+	//	parsePost(&post)
+	//	tmpl.ExecuteTemplate(w, "display", post)
+	//}
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		parsePost(&post)
+		log.Println("parsed post")
+		log.Println(post.ID)
+		log.Println(post.Title)
+		log.Println(post.Content)
 		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
@@ -191,6 +201,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
 		post.Hash = r.FormValue("Pass")
+		log.Println(post.Content)
+		log.Println(post.Title)
+		log.Println(post.Hash)
 		if post.PostPerms == 3 {
 			key := crypto.GetEncKey(&post)
 			b, _ := b64.StdEncoding.DecodeString(post.Content)
@@ -200,7 +213,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 			}
 			post.Content = b64.StdEncoding.EncodeToString(ct)
 		}
-
+		log.Println(post.Content)
+		log.Println(post.Title)
+		log.Println(post.Hash)
 		if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
 			err = sql.SaveChanges(post)
 		}
