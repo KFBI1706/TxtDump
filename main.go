@@ -7,10 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/KFBI1706/TxtDump/helper"
 	"github.com/KFBI1706/Txtdump/api"
 	"github.com/KFBI1706/Txtdump/html"
-
-	"github.com/KFBI1706/Txtdump/helper"
 	"github.com/KFBI1706/Txtdump/sql"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -40,6 +39,7 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+			err = helper.SetupTestDB()
 		}
 		os.Exit(3)
 	}

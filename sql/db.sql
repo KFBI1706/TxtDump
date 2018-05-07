@@ -1,15 +1,34 @@
+/*
+    The table Text is used in production
+*/
 CREATE TABLE text
 (
-   id character varying(100) PRIMARY KEY NOT NULL,
-   editid integer NOT NULL,
-   hash character varying(256) NULL,
-   salt character varying(32) NULL,
-   key character varying(256) NULL,
-   postperms integer NOT NULL,
-   text character varying NOT NULL,
-   created_at timestamp without time zone,
-   title character varying,
-   views integer
+id character varying(100) PRIMARY KEY NOT NULL,
+editid integer NOT NULL,
+hash character varying(256) NULL,
+salt character varying(32) NULL,
+key character varying(256) NULL,
+postperms integer NOT NULL,
+text character varying NOT NULL,
+created_at timestamp without time zone,
+title character varying,
+views integer
+);
+/*
+    The table text_test is used for tests
+*/
+CREATE TABLE text_test
+(
+id character varying(100) PRIMARY KEY NOT NULL,
+editid integer NOT NULL,
+hash character varying(256) NULL,
+salt character varying(32) NULL,
+key character varying(256) NULL,
+postperms integer NOT NULL,
+text character varying NOT NULL,
+created_at timestamp without time zone,
+title character varying,
+views integer
 );
 /*
 # Note on post perms:
