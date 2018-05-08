@@ -39,7 +39,6 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-			err = helper.SetupTestDB()
 		}
 		os.Exit(3)
 	}

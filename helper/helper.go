@@ -51,27 +51,6 @@ func SetupDB() error {
 	return nil
 }
 
-/*SetupTestDB is used to setup the database
-no input arguments
-returns error*/
-func SetupTestDB() error {
-	db, err := sql.EstablishConn()
-	if err != nil {
-		return err
-	}
-	sql, err := sql.ReadDBstring("sql/testdb/test.sql")
-	if err != nil {
-		return err
-	}
-	res, err := db.Exec(sql)
-	fmt.Println(res)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	return nil
-}
-
 /*ClearOutDB is used to clear a table
 no input arguments
 returns error*/
