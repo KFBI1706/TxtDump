@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/KFBI1706/Txtdump/helper"
-	model "github.com/KFBI1706/Txtdump/model"
+	"github.com/KFBI1706/Txtdump/model"
 	"github.com/KFBI1706/Txtdump/sql"
 	scrypt "github.com/elithrar/simple-scrypt"
 	_scrypt "golang.org/x/crypto/scrypt"

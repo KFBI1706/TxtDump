@@ -15,3 +15,10 @@ function modalIfNoPass() {
         $('#noPassModal').modal(document)
     }
 }
+
+if(window.location.pathname == "/post/create")  {
+    document.getElementById("newpost").classList.add('active');
+}
+else if(window.location.pathname == "/documentation"){
+    document.getElementById("doc").classList.add('active');
+}
