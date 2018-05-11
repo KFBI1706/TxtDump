@@ -47,10 +47,7 @@ func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
 }
 
 func parsePost(post *model.PostData) {
-	err := sql.IncrementViewCounter(post.ID)
-	if err != nil {
-		log.Println(err)
-	}
+	defer sql.IncrementViewCounter(post.ID)
 	post.Md = parse(post.Content)
 	mdhead := getMDHeader(post.Md)
 	if mdhead != "" && post.Title == "" {

@@ -3,13 +3,15 @@ package sql
 import (
 	"database/sql"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"time"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/KFBI1706/Txtdump/model"
 	//Import Postgres Libary
-	_ "github.com/lib/pq"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // HexToBytes decodes the inputted hex string
@@ -33,25 +35,23 @@ func ReadDBstring(filename string) (string, error) {
 
 //TestDBConnection Just pings the DB
 func TestDBConnection() error {
-	dbstring, err := ReadDBstring("dbstring")
-	if err != nil {
-		return err
-	}
-	db, err := sql.Open("postgres", dbstring)
-	if err != nil {
-		return err
-	}
-	err = db.Ping()
-	if err != nil {
-		return err
-	}
-	log.Println("DB connection sucsessfully established")
-	db.Close()
 	return nil
 }
 
 //EstablishConn creates the DB Connnection
-func EstablishConn() (*sql.DB, error) {
+func EstablishConn() (*gorm.DB, error) {
+	dbstring, err := ReadDBstring("dbstring")
+	if err != nil {
+		return nil, err
+	}
+	db, err := gorm.Open("postgres", dbstring)
+	if err != nil {
+		return nil, err
+	}
+	db.AutoMigrate(model.PostData{})
+	return db, nil
+}
+func EstablishConnOld() (*sql.DB, error) {
 	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func EstablishConn() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+	return db, err
 }
 
 //CreatePostDB registers the post in the DB
@@ -74,7 +74,7 @@ func CreatePostDB(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO text (id, title, text, created_at, editid, views, postperms, hash, salt, key) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9); ", post.ID, post.Title, post.Content, time.Now(), post.EditID, post.PostPerms, post.Hash, post.Salt, post.Key)
+	db.Create(&post)
 	if err != nil {
 		return err
 	}
@@ -85,15 +85,8 @@ func CreatePostDB(post model.PostData) error {
 func ReadPostDB(ID int) (model.PostData, error) {
 	result := model.PostData{}
 	db, err := EstablishConn()
-	err = db.QueryRow("SELECT id, text, title, created_at, views, postperms, salt, key FROM text WHERE id = $1", ID).Scan(&result.ID, &result.Content, &result.Title, &result.Time, &result.Views, &result.PostPerms, &result.Salt, &result.Key)
+	db.First(&result, ID)
 	db.Close()
-	if err != nil && err == sql.ErrNoRows {
-		log.Println(err)
-		return result, err
-	}
-	if err != nil && result.Title == "" {
-		result.Title = ""
-	}
 	return result, err
 }
 
@@ -103,11 +96,7 @@ func SaveChanges(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-
-	_, err = db.Exec("UPDATE text SET title = $1, text = $2 WHERE id = $3;", post.Title, post.Content, post.ID)
-	if err != nil {
-		return err
-	}
+	db.Where("ID = $1", post.ID).Updates(post)
 	db.Close()
 	return nil
 }
@@ -116,7 +105,7 @@ func SaveChanges(post model.PostData) error {
 func CountPosts() int {
 	var count int
 	db, err := EstablishConn()
-	err = db.QueryRow("SELECT COUNT(*) as count FROM text").Scan(&count)
+	db.First("SELECT COUNT(*) as count FROM post_data").Scan(&count)
 	if err != nil {
 		log.Println(err)
 	}
@@ -131,21 +120,21 @@ func PostMetas() (model.PostCounter, error) {
 	if err != nil {
 		return posts, err
 	}
-	err = db.QueryRow("SELECT COUNT(*) AS count FROM text").Scan(&posts.Count)
+	db.First("SELECT COUNT(*) AS count FROM post_data").Scan(&posts.Count)
 	if err != nil {
 		return posts, err
 	}
-	rows, err := db.Query("SELECT id, title, views, postperms FROM text LIMIT 20")
-	if err != nil {
-		return posts, err
-	}
-	for rows.Next() {
-		var meta model.PostMeta
-		rows.Scan(&meta.PostID, &meta.Title, &meta.Views, &meta.PostPerms)
-		posts.Meta = append(posts.Meta, meta)
-	}
-	db.Close()
-	return posts, err
+	/*	db.Query("SELECT id, title, views, postperms FROM post_data LIMIT 20")
+		if err != nil {
+			return posts, err
+		}
+		for rows.Next() {
+			var meta model.PostMeta
+			rows.Scan(&meta.PostID, &meta.Title, &meta.Views, &meta.PostPerms)
+			posts.Meta = append(posts.Meta, meta)
+		}
+		db.Close()
+	*/return posts, err
 }
 
 //DeletePost deletes post in DB
@@ -154,7 +143,7 @@ func DeletePost(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("DELETE FROM text WHERE id = $1", post.ID)
+	db.Delete(&post.ID)
 	if err != nil {
 		return err
 	}
@@ -165,10 +154,10 @@ func DeletePost(post model.PostData) error {
 //IncrementViewCounter increments the viewcounter in DB
 func IncrementViewCounter(id int) error {
 	db, err := EstablishConn()
-	_, err = db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
+	db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
 	defer db.Close()
 	return nil
 }
@@ -179,11 +168,9 @@ func CheckForDuplicateID(id int) bool {
 	if err != nil {
 		log.Println(err)
 	}
-	res := db.QueryRow("SELECT id FROM text WHERE id = $1", id).Scan(id)
+	db.First(&id)
 	db.Close()
-	if res != sql.ErrNoRows {
-		return false
-	}
+
 	return true
 }
 
@@ -195,7 +182,7 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 		if err != nil {
 			log.Println(err)
 		}
-		err = db.QueryRow("SELECT "+prop+" FROM text WHERE id = $1", id).Scan(&hash)
+		db.First("SELECT "+prop+" FROM post_data WHERE id = $1", id).Scan(&hash)
 		if err != nil {
 			log.Println(err)
 		}
@@ -203,4 +190,41 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 		return HexToBytes(hash), err
 	}
 	return nil, nil
+}
+
+/*SetupDB is used to setup the database
+no input arguments
+returns error*/
+func SetupDB() error {
+	db, err := EstablishConnOld()
+	if err != nil {
+		return err
+	}
+	sql, err := ReadDBstring("sql/db.sql")
+	if err != nil {
+		return err
+	}
+	res, err := db.Exec(sql)
+	fmt.Println(res)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	return nil
+}
+
+/*ClearOutDB is used to clear a table
+no input arguments
+returns error*/
+func ClearOutDB() error {
+	db, err := EstablishConnOld()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DROP TABLE text, text_test;")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	return nil
 }

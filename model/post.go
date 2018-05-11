@@ -5,35 +5,40 @@ import (
 	"time"
 )
 
+//PostData contains all the info related to the posts
 type PostData struct {
-	ID        int           `json:"ID"`
-	EditID    int           `json:"EditID"`
-	Hash      string        `json:"Password"`
-	Salt      string        `json:"Salt"`
-	AuthHash  string        `json:"authHash"`
-	Key       string        `json:"Key"`
-	PostPerms int           `json:"PostPerms,string"`
-	Content   string        `json:"Content"`
-	Md        template.HTML `json:""`
-	Title     string        `json:"Title"`
-	TitleMD   template.HTML `json:""`
-	Time      time.Time     `json:"Time"`
-	Views     int           `json:"Views"`
+	ID        int           `json:"ID" gorm:"Column:id;primary_key"`
+	EditID    int           `json:"EditID" gorm:"Column:editid"`
+	Hash      string        `json:"Password" gorm:"Column:hash"`
+	Salt      string        `json:"Salt" gorm:"Column:salt"`
+	AuthHash  string        `json:"authHash" gorm:"-"`
+	Key       string        `json:"Key" gorm:"Column:key"`
+	PostPerms int           `json:"PostPerms,string" gorm:"Column:postperms"`
+	Content   string        `json:"Content" gorm:"Column:text"`
+	Md        template.HTML `json:"" gorm:"-"`
+	Title     string        `json:"Title" gorm:"Column:title"`
+	TitleMD   template.HTML `json:"" gorm:"-"`
+	Time      time.Time     `json:"Time" gorm:"Column:created_at"`
+	Views     int           `json:"Views" gorm:"Column:views"`
 }
 type PostCreate struct {
 	csrfField string
 }
 
+//PostDecrypt is used for decrypting post content
 type PostDecrypt struct {
 	ID    int
 	Mode  string
 	Token string
 }
 
+//PostCounter is used on index to provide some metadata about current posts
 type PostCounter struct {
 	Count int        `json:"Count"`
 	Meta  []PostMeta `json:"Meta"`
 }
+
+//PostMeta is used as array for Post Metadata in PostCoutner
 type PostMeta struct {
 	PostID    int    `json:"ID"`
 	Title     string `json:"Title"`

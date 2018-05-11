@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/KFBI1706/TxtDump/helper"
+	"github.com/KFBI1706/TxtDump/model"
+	"github.com/KFBI1706/TxtDump/sql"
 	"github.com/KFBI1706/Txtdump/api"
 	"github.com/KFBI1706/Txtdump/html"
-	"github.com/KFBI1706/Txtdump/sql"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 func main() {
@@ -28,20 +29,22 @@ func main() {
 	addr := fmt.Sprintf(":%v", *port)
 	if *dbdrop || *dbsetup {
 		if *dbdrop {
-			err = helper.ClearOutDB()
+			err = sql.ClearOutDB()
 			if err != nil {
 				log.Println(err)
 			}
 		}
 		fmt.Println(*dbsetup)
 		if *dbsetup {
-			err = helper.SetupDB()
+			err = sql.SetupDB()
 			if err != nil {
 				log.Println(err)
 			}
 		}
 		os.Exit(3)
 	}
+	test := model.PostData{ID: 913124, Content: "Mordi", Title: "tits", PostPerms: 1}
+	sql.CreatePostDB(test)
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
 	CSRF := csrf.Protect([]byte("OTAyNDhmajBkYnBhamtudnBhc29ldXI"), csrf.Secure(*production))
 	router := mux.NewRouter()
