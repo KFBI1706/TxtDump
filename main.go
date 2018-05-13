@@ -6,14 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/KFBI1706/TxtDump/model"
+	
+	_ "github.com/KFBI1706/TxtDump/model"
 	"github.com/KFBI1706/TxtDump/sql"
 	"github.com/KFBI1706/Txtdump/api"
 	"github.com/KFBI1706/Txtdump/html"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 func main() {
@@ -43,8 +42,6 @@ func main() {
 		}
 		os.Exit(3)
 	}
-	test := model.PostData{ID: 913124, Content: "Mordi", Title: "tits", PostPerms: 1}
-	sql.CreatePostDB(test)
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
 	CSRF := csrf.Protect([]byte("OTAyNDhmajBkYnBhamtudnBhc29ldXI"), csrf.Secure(*production))
 	router := mux.NewRouter()
