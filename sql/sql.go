@@ -39,7 +39,7 @@ func TestDBConnection() error {
 		return err
 	}
 	if db.HasTable(&model.PostData{}) != true {
-		return errors.New("Table does not exsist. Run with -setupdb to fix this")
+		return errors.New("Table does not exist. Run with -setupdb to fix this")
 	}
 	return nil
 }
@@ -109,15 +109,14 @@ func SaveChanges(post model.PostData) error {
 }
 
 //CountPosts runs SQL count on DB
-func CountPosts() int {
-	var count int
+func CountPosts() (count int) {
 	db, err := EstablishConn()
 	db.First("SELECT COUNT(*) as count FROM post_data").Scan(&count)
 	if err != nil {
-		log.Println(err)
+		log.Println("sql ", err)
 	}
 	db.Close()
-	return count
+	return
 }
 
 //PostMetas returns some data used for index overview
