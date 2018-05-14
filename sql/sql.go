@@ -92,32 +92,40 @@ func CreatePostDB(post model.PostData) error {
 func ReadPostDB(ID int) (model.PostData, error) {
 	result := model.PostData{}
 	db, err := EstablishConn()
-	db.First(&result, ID)
-	db.Close()
+	defer db.Close()
+	err = db.First(&result, ID).Error
+	if err != nil {
+		return result, err
+	}
 	return result, err
 }
 
 //SaveChanges registers edits in DB
 func SaveChanges(post model.PostData) error {
 	db, err := EstablishConn()
+	defer db.Close()
 	if err != nil {
 		return err
 	}
-	db.Where("ID = $1", post.ID).Updates(post)
-	db.Close()
+	log.Println(post)
+	err = db.Model(&model.PostData{}).UpdateColumns(&post).Error
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	return nil
 }
 
 //CountPosts runs SQL count on DB
 func CountPosts() int {
-	var count int
 	db, err := EstablishConn()
-	db.First("SELECT COUNT(*) as count FROM post_data").Scan(&count)
+
 	if err != nil {
 		log.Println(err)
 	}
 	db.Close()
-	return count
+	//TODO: FIX THIS
+	return 0
 }
 
 //PostMetas returns some data used for index overview

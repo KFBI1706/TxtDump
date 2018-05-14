@@ -2,7 +2,7 @@ module "github.com/KFBI1706/TxtDump"
 
 require (
 	"github.com/elithrar/simple-scrypt" v1.3.0
-	"github.com/gorilla/csrf" v1.5
+	"github.com/gorilla/csrf" v1.5.0
 	"github.com/gorilla/mux" v1.6.1
 	"github.com/gorilla/securecookie" v1.1.1
 	"github.com/jinzhu/gorm" v1.9.1
