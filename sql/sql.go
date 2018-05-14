@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 	"encoding/hex"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"log"
 
@@ -34,6 +34,13 @@ func ReadDBstring(filename string) (string, error) {
 
 //TestDBConnection Just pings the DB
 func TestDBConnection() error {
+	db, err := EstablishConn()
+	if err != nil {
+		return err
+	}
+	if db.HasTable(&model.PostData{}) != true {
+		return errors.New("Table does not exsist. Run with -setupdb to fix this")
+	}
 	return nil
 }
 
@@ -47,7 +54,6 @@ func EstablishConn() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.AutoMigrate(model.PostData{})
 	return db, nil
 }
 
@@ -75,7 +81,7 @@ func CreatePostDB(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	db.Create(&post)
+	err = db.Create(&post).Error
 	if err != nil {
 		return err
 	}
@@ -158,7 +164,11 @@ func IncrementViewCounter(id int) error {
 	if err != nil {
 		return err
 	}
-	db.Exec("UPDATE text SET views = views + 1 WHERE id = $1", id)
+	err = db.Exec("UPDATE post_data SET views = views + 1 WHERE id = $1", id).Error
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	defer db.Close()
 	return nil
 }
@@ -169,7 +179,9 @@ func CheckForDuplicateID(id int) bool {
 	if err != nil {
 		log.Println(err)
 	}
-	db.First(&id)
+	if db.NewRecord(model.PostData{ID: id}) {
+		return false
+	}
 	db.Close()
 
 	return true
@@ -197,20 +209,13 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 no input arguments
 returns error*/
 func SetupDB() error {
-	db, err := EstablishConnOld()
+	db, err := EstablishConn()
 	if err != nil {
 		return err
 	}
-	sql, err := ReadDBstring("sql/db.sql")
-	if err != nil {
-		return err
+	if db.HasTable(&model.PostData{}) != true {
+		db.AutoMigrate(&model.PostData{})
 	}
-	res, err := db.Exec(sql)
-	fmt.Println(res)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
 	return nil
 }
 
@@ -218,14 +223,10 @@ func SetupDB() error {
 no input arguments
 returns error*/
 func ClearOutDB() error {
-	db, err := EstablishConnOld()
+	db, err := EstablishConn()
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("DROP TABLE text, text_test;")
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+	db.DropTableIfExists(&model.PostData{})
 	return nil
 }

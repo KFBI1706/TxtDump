@@ -6,26 +6,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/KFBI1706/TxtDump/api"
 	"github.com/KFBI1706/TxtDump/html"
-	"github.com/KFBI1706/TxtDump/model"
 	"github.com/KFBI1706/TxtDump/sql"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	testpost := model.PostData{Content: "test", Title: "testerino", ID: 501251, PostPerms: 1, Time: time.Now()}
-	err := sql.CreatePostDB(testpost)
-	if err != nil {
-		log.Println(err)
-	}
-	err = sql.TestDBConnection()
-	if err != nil {
-		log.Fatal(err)
-	}
 	dbdrop := flag.Bool("dropdb", false, "Drop current table and all data")
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
 	production := flag.Bool("production", false, "Is the server in production?")
@@ -34,19 +23,23 @@ func main() {
 	addr := fmt.Sprintf(":%v", *port)
 	if *dbdrop || *dbsetup {
 		if *dbdrop {
-			err = sql.ClearOutDB()
+			err := sql.ClearOutDB()
 			if err != nil {
 				log.Println(err)
 			}
 		}
 		fmt.Println(*dbsetup)
 		if *dbsetup {
-			err = sql.SetupDB()
+			err := sql.SetupDB()
 			if err != nil {
 				log.Println(err)
 			}
 		}
 		os.Exit(3)
+	}
+	err := sql.TestDBConnection()
+	if err != nil {
+		log.Fatal(err)
 	}
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
 	CSRF := csrf.Protect([]byte("OTAyNDhmajBkYnBhamtudnBhc29ldXI"), csrf.Secure(*production))
