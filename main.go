@@ -6,17 +6,23 @@ import (
 	"log"
 	"net/http"
 	"os"
-	
-	_ "github.com/KFBI1706/TxtDump/model"
+	"time"
+
+	"github.com/KFBI1706/TxtDump/api"
+	"github.com/KFBI1706/TxtDump/html"
+	"github.com/KFBI1706/TxtDump/model"
 	"github.com/KFBI1706/TxtDump/sql"
-	"github.com/KFBI1706/Txtdump/api"
-	"github.com/KFBI1706/Txtdump/html"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	err := sql.TestDBConnection()
+	testpost := model.PostData{Content: "test", Title: "testerino", ID: 501251, PostPerms: 1, Time: time.Now()}
+	err := sql.CreatePostDB(testpost)
+	if err != nil {
+		log.Println(err)
+	}
+	err = sql.TestDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}

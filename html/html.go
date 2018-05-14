@@ -9,14 +9,15 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/KFBI1706/Txtdump/crypto"
-	"github.com/KFBI1706/Txtdump/helper"
-	"github.com/KFBI1706/Txtdump/model"
-	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/KFBI1706/TxtDump/crypto"
+	"github.com/KFBI1706/TxtDump/helper"
+	"github.com/KFBI1706/TxtDump/model"
+	"github.com/KFBI1706/TxtDump/sql"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
+//DisplayIndex renders the Index template with some metadata
 func DisplayIndex(w http.ResponseWriter, r *http.Request) {
 	posts := model.PostCounter{Count: sql.CountPosts()}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
@@ -31,6 +32,7 @@ func DisplayIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//ProcessRequest Processes an request for post
 func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)

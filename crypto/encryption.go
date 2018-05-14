@@ -9,9 +9,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/KFBI1706/Txtdump/helper"
-	"github.com/KFBI1706/Txtdump/model"
-	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/KFBI1706/TxtDump/helper"
+	"github.com/KFBI1706/TxtDump/model"
+	"github.com/KFBI1706/TxtDump/sql"
 	scrypt "github.com/elithrar/simple-scrypt"
 	_scrypt "golang.org/x/crypto/scrypt"
 )

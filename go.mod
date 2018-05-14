@@ -1,9 +1,15 @@
 module "github.com/KFBI1706/TxtDump"
 
 require (
+	"github.com/elithrar/simple-scrypt" v1.3.0
+	"github.com/gorilla/csrf" v1.5
 	"github.com/gorilla/mux" v1.6.1
+	"github.com/gorilla/securecookie" v1.1.1
+	"github.com/jinzhu/gorm" v1.9.1
+	"github.com/jinzhu/inflection" v0.0.0-20180308033659-04140366298a
 	"github.com/lib/pq" v0.0.0-20180201184707-88edab080323
 	"github.com/microcosm-cc/bluemonday" v0.0.0-20171222152607-542fd4642604
+	"github.com/pkg/errors" v0.8.0
 	"github.com/russross/blackfriday" v1.5.1
 	"github.com/sergi/go-diff" v1.0.0
 	"github.com/shurcooL/github_flavored_markdown" v0.0.0-20171120162553-28433ea3fc83

@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/KFBI1706/TxtDump/sql"
 	scrypt "github.com/elithrar/simple-scrypt"
 	_scrypt "golang.org/x/crypto/scrypt"
 )

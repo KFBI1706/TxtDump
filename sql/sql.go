@@ -7,9 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/KFBI1706/TxtDump/model"
 	"github.com/jinzhu/gorm"
-
-	"github.com/KFBI1706/Txtdump/model"
 	//Import Postgres Libary
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -51,6 +50,8 @@ func EstablishConn() (*gorm.DB, error) {
 	db.AutoMigrate(model.PostData{})
 	return db, nil
 }
+
+//EstablishConnOld is only here while i migrate the DB to GORM Orm
 func EstablishConnOld() (*sql.DB, error) {
 	dbstring, err := ReadDBstring("dbstring")
 	if err != nil {

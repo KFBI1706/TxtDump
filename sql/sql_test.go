@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/KFBI1706/Txtdump/model"
+	"github.com/KFBI1706/TxtDump/model"
 	_ "github.com/lib/pq"
 )
 

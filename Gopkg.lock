@@ -8,19 +8,6 @@
   revision = "40e40b42552a9cb37d6e98f4ad31f63ae53ea43a"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/KFBI1706/Txtdump"
-  packages = [
-    "api",
-    "crypto",
-    "helper",
-    "html",
-    "model",
-    "sql"
-  ]
-  revision = "9fd20d6c1785301b05725bff5553401bfead070e"
-
-[[projects]]
   name = "github.com/elithrar/simple-scrypt"
   packages = ["."]
   revision = "d150773194090feb6c897805a7bcea8d49544e2c"
@@ -73,13 +60,13 @@
     "hstore",
     "oid"
   ]
-  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
   branch = "master"
   name = "github.com/microcosm-cc/bluemonday"
   packages = ["."]
-  revision = "542fd4642604d0d0c26112396ce5b1a9d01eee0b"
+  revision = "995366fdf961d03629cd17361bddd32745718e2c"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -114,7 +101,7 @@
     "reflectfind",
     "reflectsource"
   ]
-  revision = "364c5ae8518b51f5fda954762864d6f4d5c30c89"
+  revision = "9e1955d9fb6e1ee2345ba1f5e71669263e719e27"
 
 [[projects]]
   branch = "master"
@@ -126,7 +113,7 @@
   branch = "master"
   name = "github.com/shurcooL/graphql"
   packages = ["ident"]
-  revision = "d0549edd16dceb6939e538fdb1b4f2ec7ee816cc"
+  revision = "62c9ce094e75302d560f7adcdf16c06d05aaa958"
 
 [[projects]]
   branch = "master"
@@ -144,7 +131,7 @@
   branch = "master"
   name = "github.com/shurcooL/octiconssvg"
   packages = ["."]
-  revision = "91d14858bf8188ba5143d67a3a677ea559000b0a"
+  revision = "f4482000187f70884083d861259564f0822a2fb0"
 
 [[projects]]
   branch = "master"
@@ -171,7 +158,7 @@
     "pbkdf2",
     "scrypt"
   ]
-  revision = "12892e8c234f4fe6f6803f052061de9057903bb2"
+  revision = "034e5325b6ab92faa14d15c30e86919e911cf8e0"
 
 [[projects]]
   branch = "master"
@@ -180,11 +167,11 @@
     "html",
     "html/atom"
   ]
-  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
+  revision = "2491c5de3490fced2f6cff376127c667efeed857"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f3faec918765c116d5448cc1dc4d2be75e20d0277afbbc59f24adc295a65f84b"
+  inputs-digest = "a047e2f40a8c45d35277e5e0f42dee07d4f0d5b50acf885606e01c663f361a7c"
   solver-name = "gps-cdcl"
   solver-version = 1

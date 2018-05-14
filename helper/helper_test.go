@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KFBI1706/Txtdump/helper"
+	"github.com/KFBI1706/TxtDump/helper"
 )
 
 func TestIDGenerator(t *testing.T) {

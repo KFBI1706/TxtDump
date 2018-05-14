@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/KFBI1706/Txtdump/crypto"
-	"github.com/KFBI1706/Txtdump/helper"
-	"github.com/KFBI1706/Txtdump/html"
-	"github.com/KFBI1706/Txtdump/model"
-	"github.com/KFBI1706/Txtdump/sql"
+	"github.com/KFBI1706/TxtDump/crypto"
+	"github.com/KFBI1706/TxtDump/helper"
+	"github.com/KFBI1706/TxtDump/html"
+	"github.com/KFBI1706/TxtDump/model"
+	"github.com/KFBI1706/TxtDump/sql"
 )
 
 func EditPostAPI(w http.ResponseWriter, r *http.Request) {
