@@ -221,16 +221,19 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		}
 		if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
 			err = sql.SaveChanges(post)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
 		err = sql.DeletePost(post)
 	}
-	url := "/"
 	if err != nil {
-		log.Println(err)
-		url = fmt.Sprintf("/post/%v/request", post.ID)
+		fmt.Fprintln(w, "Something went wrong")
+		return
 	}
+	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 
 }
