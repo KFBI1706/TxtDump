@@ -38,8 +38,9 @@ func TestDBConnection() error {
 	if err != nil {
 		return err
 	}
-	if db.HasTable(&model.PostData{}) != true {
-		return errors.New("Table does not exsist. Run with -setupdb to fix this")
+	var postData model.PostData
+	if db.HasTable(&postData) != true {
+		return errors.New("Table does not exist. Run with -setupdb to fix this")
 	}
 	return nil
 }
@@ -90,7 +91,7 @@ func CreatePostDB(post model.PostData) error {
 
 //ReadPostDB gets postdata from DB
 func ReadPostDB(ID int) (model.PostData, error) {
-	result := model.PostData{}
+	var result model.PostData
 	db, err := EstablishConn()
 	defer db.Close()
 	err = db.First(&result, ID).Error
@@ -116,20 +117,20 @@ func SaveChanges(post model.PostData) error {
 }
 
 //CountPosts runs SQL count on DB
-func CountPosts() int {
+func CountPosts() (count int) {
 	db, err := EstablishConn()
-
 	if err != nil {
-		log.Println(err)
+		log.Println("sql ", err)
 	}
-	db.Close()
+	defer db.Close()
+	count = 0
 	//TODO: FIX THIS
-	return 0
+	return
 }
 
 //PostMetas returns some data used for index overview
 func PostMetas() (model.PostCounter, error) {
-	posts := model.PostCounter{}
+	var posts model.PostCounter
 	db, err := EstablishConn()
 	if err != nil {
 		return posts, err
@@ -220,8 +221,9 @@ func SetupDB() error {
 	if err != nil {
 		return err
 	}
-	if db.HasTable(&model.PostData{}) != true {
-		db.AutoMigrate(&model.PostData{})
+	var postData model.PostData
+	if !db.HasTable(&postData) {
+		db.AutoMigrate(&postData)
 	}
 	return nil
 }
@@ -234,6 +236,7 @@ func ClearOutDB() error {
 	if err != nil {
 		return err
 	}
-	db.DropTableIfExists(&model.PostData{})
+	var postData model.PostData
+	db.DropTableIfExists(&postData)
 	return nil
 }

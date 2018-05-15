@@ -28,7 +28,6 @@ func main() {
 				log.Println(err)
 			}
 		}
-		fmt.Println(*dbsetup)
 		if *dbsetup {
 			err := sql.SetupDB()
 			if err != nil {
