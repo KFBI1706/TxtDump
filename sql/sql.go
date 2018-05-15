@@ -93,15 +93,10 @@ func CreatePostDB(post model.PostData) error {
 //ReadPostDB gets postdata from DB
 func ReadPostDB(ID int) (model.PostData, error) {
 	var result model.PostData
-	var results []model.PostData
 	db, err := EstablishConn()
 	defer db.Close()
-	fmt.Printf("finding %v\n", ID)
-	err = db.Table("post_data").Where("id=?", ID).First(&result).Error
-	fmt.Printf("%v\n", result)
-	db.Table("post_data").Find(&results)
-	fmt.Printf("%v\n", results)
-	fmt.Println(db.Table("post_data").RowsAffected)
+	err = db.First(&result, ID).Error
+	fmt.Println(result)
 	return result, err
 }
 

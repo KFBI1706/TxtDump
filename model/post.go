@@ -20,7 +20,7 @@ type PostData struct {
 	TitleMD    template.HTML `json:"" gorm:"-"`
 	CreateTime time.Time     `json:"Time" gorm:"Column:created_at"`
 	UpdateTime time.Time     `json:"Time" gorm:"Column:updated_at"`
-	DeleteTime time.Time     `json:"Time" gorm:"Column:deleted_at"`
+	DeleteTime *time.Time    `json:"Time" gorm:"Column:deleted_at"`
 	Views      int           `json:"Views" gorm:"Column:views"`
 }
 type PostCreate struct {
