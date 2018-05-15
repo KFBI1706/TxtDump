@@ -115,7 +115,6 @@ func SaveChanges(post model.PostData) error {
 	log.Println(post)
 	err = db.Model(&model.PostData{}).UpdateColumns(&post).Error
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -162,7 +161,7 @@ func DeletePost(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	db.Delete(&post.ID)
+	err = db.Delete(&post.ID).Error
 	if err != nil {
 		return err
 	}
@@ -202,17 +201,17 @@ func CheckForDuplicateID(id int) bool {
 //GetProp gets the requested hash from the DB
 func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
-		var hash string
+		var hash []string
 		db, err := EstablishConn()
 		if err != nil {
 			log.Println(err)
 		}
-		db.First("SELECT "+prop+" FROM post_data WHERE id = $1", id).Scan(&hash)
+		err = db.First(&model.PostData{}, id).Pluck(prop, &hash).Error
 		if err != nil {
-			log.Println(err)
+			return nil, err
 		}
 		db.Close()
-		return HexToBytes(hash), err
+		return HexToBytes(hash[0]), err
 	}
 	return nil, nil
 }
