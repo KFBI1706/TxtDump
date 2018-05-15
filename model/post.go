@@ -7,7 +7,7 @@ import (
 
 //PostData contains all the info related to the posts
 type PostData struct {
-	ID         int           `json:"ID" gorm:"Column:id";"primary_key"`
+	ID         int           `json:"ID" gorm:"Column:id;primary_key"`
 	EditID     int           `json:"EditID" gorm:"Column:editid"`
 	Hash       string        `json:"Password" gorm:"Column:hash"`
 	Salt       string        `json:"Salt" gorm:"Column:salt"`
@@ -19,8 +19,8 @@ type PostData struct {
 	Title      string        `json:"Title" gorm:"Column:title"`
 	TitleMD    template.HTML `json:"" gorm:"-"`
 	CreateTime time.Time     `json:"Time" gorm:"Column:created_at"`
-	UpdateTime time.Time     `json:"Time" gorm:"Column:updated_at"`
-	DeleteTime *time.Time    `json:"Time" gorm:"Column:deleted_at"`
+	UpdateTime time.Time     `json:"Updated" gorm:"Column:updated_at"`
+	DeleteTime *time.Time    `json:"Deleted" gorm:"Column:deleted_at"`
 	Views      int           `json:"Views" gorm:"Column:views"`
 }
 type PostCreate struct {

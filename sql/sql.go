@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -27,7 +26,6 @@ func HexToBytes(s string) []byte {
 func ReadDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	return string(file), nil
@@ -96,7 +94,6 @@ func ReadPostDB(ID int) (model.PostData, error) {
 	db, err := EstablishConn()
 	defer db.Close()
 	err = db.First(&result, ID).Error
-	fmt.Println(result)
 	return result, err
 }
 

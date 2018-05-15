@@ -1,13 +1,28 @@
 package sql
 
 import (
-	"database/sql"
+	"fmt"
+	"math/rand"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/KFBI1706/TxtDump/model"
+	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
+
+var posts []model.PostData
+
+func TestGenerateRandomPostData(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		rand.Seed(time.Now().UTC().UnixNano())
+		post := model.PostData{}
+		post.ID = rand.Intn(9999999-1000000) + 1000000
+		posts = append(posts, post)
+	}
+	fmt.Println(posts)
+}
 
 func TestReadDBstring(t *testing.T) {
 	type args struct {
@@ -20,6 +35,7 @@ func TestReadDBstring(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Totally not here for code coverage", args: args{filename: "testdb/test.sql"}, want: "Testerino", wantErr: false},
+		{name: "Test on non exsisting file", args: args{filename: "testdb/xd.sql"}, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -55,14 +71,15 @@ func TestDBConnectionfunc(t *testing.T) {
 func TestEstablishConn(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    *sql.DB
+		want    *gorm.DB
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		//	{name: "Establish conn to prod", want: gorm.DB{}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := EstablishConn()
+			defer got.Close()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EstablishConn() error = %v, wantErr %v", err, tt.wantErr)
 				return
