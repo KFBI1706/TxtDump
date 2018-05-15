@@ -56,10 +56,10 @@ Example:
 ```json
 curl -H "Content-Type: application/json" -X POST -d '{"Hash":"password"}' http://localhost:1337/api/v1/post/4750794/delete
 ```
-#### Dbstring example:
+#### Dbstring example: 
 The program looks for a file named dbstring when running this is then converted into the info used to connect to the DB for more info about this read: https://godoc.org/github.com/lib/pq
 ```
-user=postgres dbname=db password=12345 host=HOSTIP sslmode=disable
+user=postgres dbname=web password=12345 host=192.168.10.179
 ```
 ## Command line arguments
 ```

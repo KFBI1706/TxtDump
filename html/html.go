@@ -58,6 +58,7 @@ func parsePost(post *model.PostData) {
 	post.TitleMD = template.HTML(post.Title)
 }
 
+//RequestPostDecrypt does exactly like what it sounds like it does
 func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
@@ -68,6 +69,7 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//RequestPostWeb renders the content of the post to W/http.ResponseWriter
 func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
@@ -81,11 +83,14 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 			"Mode":           "request",
 		})
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			fmt.Fprintln(w, "Something went wrong")
+			return
 		}
 	}
 }
 
+//CreatePostTemplateWeb renders the html template for adding a new post to W/http.ResponseWriter
 func CreatePostTemplateWeb(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/post.html"))
 	err := tmpl.ExecuteTemplate(w, "createpost", map[string]interface{}{
@@ -95,6 +100,8 @@ func CreatePostTemplateWeb(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 }
+
+//CreatePostWeb pareses posted data from r and registers it to DB
 func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -157,6 +164,7 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 	}
 }
 
+//EditPostDecrypt renders the edit template
 func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
@@ -180,7 +188,9 @@ func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 			"Content":        post.Content,
 		})
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			fmt.Fprintln(w, "Something went wrong")
+			return
 		}
 	}
 }
@@ -225,6 +235,7 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 
 }
 
+//EditPostForm handles
 func EditPostForm(w http.ResponseWriter, r *http.Request) {
 	postForm(w, r, "edit")
 }
