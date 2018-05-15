@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -92,12 +93,15 @@ func CreatePostDB(post model.PostData) error {
 //ReadPostDB gets postdata from DB
 func ReadPostDB(ID int) (model.PostData, error) {
 	var result model.PostData
+	var results []model.PostData
 	db, err := EstablishConn()
 	defer db.Close()
-	err = db.First(&result, ID).Error
-	if err != nil {
-		return result, err
-	}
+	fmt.Printf("finding %v\n", ID)
+	err = db.Table("post_data").Where("id=?", ID).First(&result).Error
+	fmt.Printf("%v\n", result)
+	db.Table("post_data").Find(&results)
+	fmt.Printf("%v\n", results)
+	fmt.Println(db.Table("post_data").RowsAffected)
 	return result, err
 }
 
@@ -125,7 +129,6 @@ func CountPosts() (count int) {
 	}
 	defer db.Close()
 	count = 0
-	//TODO: FIX THIS
 	return
 }
 
