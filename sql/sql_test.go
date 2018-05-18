@@ -1,7 +1,6 @@
 package sql
 
 import (
-	"fmt"
 	"math/rand"
 	"reflect"
 	"testing"
@@ -103,6 +102,9 @@ func TestEstablishConn(t *testing.T) {
 func TestCreateReadSaveDelete(t *testing.T) {
 	generateRandomPostData()
 	for _, post := range posts {
+		if !CheckForDuplicateID(post.ID) {
+			t.Error("Duplicate ID")
+		}
 		err := CreatePostDB(post)
 		if err != nil {
 			t.Error(err)
@@ -120,10 +122,13 @@ func TestCreateReadSaveDelete(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+		savedpost, err := ReadPostDB(readpost.ID)
+		if err != nil || savedpost.Content != readpost.Content {
+			t.Error("something went wrong saving changes")
+		}
 		err = DeletePost(readpost)
 		if err != nil {
 			t.Error(err)
 		}
-		fmt.Println(readpost)
 	}
 }
