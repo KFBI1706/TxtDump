@@ -26,7 +26,6 @@ func HexToBytes(s string) []byte {
 func ReadDBstring(filename string) (string, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	return string(file), nil
