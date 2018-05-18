@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -96,7 +95,6 @@ func ReadPostDB(ID int) (model.PostData, error) {
 	db, err := EstablishConn()
 	defer db.Close()
 	err = db.First(&result, ID).Error
-	fmt.Println(result)
 	return result, err
 }
 
@@ -156,7 +154,7 @@ func DeletePost(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	err = db.Delete(&post.ID).Error
+	err = db.Delete(&post).Error
 	if err != nil {
 		return err
 	}
