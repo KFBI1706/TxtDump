@@ -75,7 +75,12 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.PostPerms == 1 || post.PostPerms == 2 {
 		parsePost(&post)
-		tmpl.ExecuteTemplate(w, "display", post)
+		err := tmpl.ExecuteTemplate(w, "display", post)
+		if err != nil {
+			log.Println(err)
+			fmt.Fprintln(w, "Something went wrong")
+			return
+		}
 	} else if post.PostPerms == 3 {
 		err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
@@ -205,21 +210,26 @@ func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
 
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	post := ProcessRequest(w, r)
+	//TODO: rewrite this, not broken, just bad
 	var err error
 	if operation == "edit" {
 		post.Content = r.FormValue("Content")
 		post.Title = r.FormValue("Title")
+		hash := post.Hash
 		post.Hash = r.FormValue("Pass")
 		if post.PostPerms == 3 {
 			key := crypto.GetEncKey(&post)
+			fmt.Println("encrypting", post.Content)
 			b := []byte(post.Content)
 			ct, err := crypto.EncryptBytes(b, &key)
 			if err != nil {
 				log.Fatal(err)
 			}
 			post.Content = b64.StdEncoding.EncodeToString(ct)
+			post.Hash = hash
 		}
-		if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
+		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
+			fmt.Println("hash ", post.Hash)
 			err = sql.SaveChanges(post)
 			if err != nil {
 				log.Println(err)

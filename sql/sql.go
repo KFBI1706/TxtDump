@@ -152,7 +152,7 @@ func DeletePost(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	err = db.Delete(&post.ID).Error
+	err = db.Delete(&post).Error
 	if err != nil {
 		return err
 	}
