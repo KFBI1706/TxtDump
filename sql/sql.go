@@ -104,7 +104,6 @@ func SaveChanges(post model.PostData) error {
 	if err != nil {
 		return err
 	}
-	log.Println(post)
 	err = db.Model(&model.PostData{}).UpdateColumns(&post).Error
 	if err != nil {
 		return err
