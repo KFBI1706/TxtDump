@@ -1,7 +1,6 @@
 package sql
 
 import (
-	"database/sql"
 	"encoding/hex"
 	"errors"
 	"io/ioutil"
@@ -57,23 +56,6 @@ func EstablishConn() (*gorm.DB, error) {
 	return db, nil
 }
 
-//EstablishConnOld is only here while i migrate the DB to GORM Orm
-func EstablishConnOld() (*sql.DB, error) {
-	dbstring, err := ReadDBstring("dbstring")
-	if err != nil {
-		return nil, err
-	}
-	db, err := sql.Open("postgres", dbstring)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-	return db, err
-}
-
 //CreatePostDB registers the post in the DB
 func CreatePostDB(post model.PostData) error {
 	db, err := EstablishConn()
@@ -112,38 +94,35 @@ func SaveChanges(post model.PostData) error {
 }
 
 //CountPosts runs SQL count on DB
-func CountPosts() (count int) {
+func CountPosts() int {
 	db, err := EstablishConn()
 	if err != nil {
 		log.Println("sql ", err)
 	}
 	defer db.Close()
-	count = 0
-	return
+	var count int
+	err = db.Model(&model.PostData{}).Count(&count).Error
+	if err != nil {
+		log.Println(err)
+	}
+	return count
 }
 
 //PostMetas returns some data used for index overview
 func PostMetas() (model.PostCounter, error) {
-	var posts model.PostCounter
+	postMeta := []model.PostData{}
+	posts := model.PostCounter{Count: CountPosts()}
 	db, err := EstablishConn()
+	defer db.Close()
 	if err != nil {
 		return posts, err
 	}
-	db.First("SELECT COUNT(*) AS count FROM post_data").Scan(&posts.Count)
+	err = db.Find(&postMeta, &model.PostData{}).Error
 	if err != nil {
-		return posts, err
+		log.Println(err)
 	}
-	/*	db.Query("SELECT id, title, views, postperms FROM post_data LIMIT 20")
-		if err != nil {
-			return posts, err
-		}
-		for rows.Next() {
-			var meta model.PostMeta
-			rows.Scan(&meta.PostID, &meta.Title, &meta.Views, &meta.PostPerms)
-			posts.Meta = append(posts.Meta, meta)
-		}
-		db.Close()
-	*/return posts, err
+	posts.Meta = postMeta
+	return posts, err
 }
 
 //DeletePost deletes post in DB

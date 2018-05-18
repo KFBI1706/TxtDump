@@ -37,13 +37,5 @@ type PostDecrypt struct {
 //PostCounter is used on index to provide some metadata about current posts
 type PostCounter struct {
 	Count int        `json:"Count"`
-	Meta  []PostMeta `json:"Meta"`
-}
-
-//PostMeta is used as array for Post Metadata in PostCoutner
-type PostMeta struct {
-	PostID    int    `json:"ID"`
-	Title     string `json:"Title"`
-	Views     int    `json:"View"`
-	PostPerms int    `json:"PostPerms"`
+	Meta  []PostData `json:"Meta"`
 }

@@ -19,9 +19,8 @@ import (
 
 //DisplayIndex renders the Index template with some metadata
 func DisplayIndex(w http.ResponseWriter, r *http.Request) {
-	posts := model.PostCounter{Count: sql.CountPosts()}
+	posts := model.PostCounter{}
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
-
 	posts, err := sql.PostMetas()
 	if err != nil {
 		log.Println(err)
