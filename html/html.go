@@ -199,10 +199,12 @@ func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//EditPostTemplate is a handler function used to call postTemplate with the "edit" parameter
 func EditPostTemplate(w http.ResponseWriter, r *http.Request) {
 	postTemplate(w, r, "edit")
 }
 
+//DeletePostTemplate is a handler function used to call postTemplate with the "delete" parameter
 func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
 	postTemplate(w, r, "deletepost")
 }
@@ -251,14 +253,17 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 
 }
 
-//EditPostForm handles
+//EditPostForm handle function to call postForm with the "edit" parameter
 func EditPostForm(w http.ResponseWriter, r *http.Request) {
 	postForm(w, r, "edit")
 }
 
+//DeletePostForm handle function to call postForm with the "delete" parameter
 func DeletePostForm(w http.ResponseWriter, r *http.Request) {
 	postForm(w, r, "delete")
 }
+
+//Documentation used to display the README file as documentation
 func Documentation(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	file, err := ioutil.ReadFile("README.md")
