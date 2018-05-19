@@ -1,4 +1,4 @@
-package config
+package model
 
 //Configuration contains all the configurable variables for this app
 type Configuration struct {
