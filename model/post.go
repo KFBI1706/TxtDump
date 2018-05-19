@@ -7,6 +7,7 @@ import (
 
 //PostData contains all the info related to the posts
 type PostData struct {
+	PostEdit
 	ID         int           `json:"ID" gorm:"Column:id;primary_key"`
 	EditID     int           `json:"EditID" gorm:"Column:editid"`
 	Hash       string        `json:"Password" gorm:"Column:hash"`
@@ -16,12 +17,14 @@ type PostData struct {
 	PostPerms  int           `json:"PostPerms,string" gorm:"Column:postperms"`
 	Content    string        `json:"Content" gorm:"Column:text"`
 	Md         template.HTML `json:"" gorm:"-"`
-	Title      string        `json:"Title" gorm:"Column:title"`
 	TitleMD    template.HTML `json:"" gorm:"-"`
 	CreateTime time.Time     `json:"Time" gorm:"Column:created_at"`
 	UpdateTime time.Time     `json:"Updated" gorm:"Column:updated_at"`
 	DeleteTime *time.Time    `json:"Deleted" gorm:"Column:deleted_at"`
 	Views      int           `json:"Views" gorm:"Column:views"`
+}
+type PostEdit struct {
+	Title string `json:"Title" gorm:"Column:title"`
 }
 
 //PostCreate will be used as a struct when posts are created, as to try to reduce the use of the god struct PostData
