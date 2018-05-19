@@ -225,9 +225,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 				log.Fatal(err)
 			}
 			post.Content = b64.StdEncoding.EncodeToString(ct)
-			post.Hash = hash
 		}
 		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
+			post.Hash = hash
 			err = sql.SaveChanges(post)
 			if err != nil {
 				log.Println(err)
@@ -235,7 +235,12 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		}
 	} else if operation == "delete" {
 		post.Hash = r.FormValue("Pass")
-		err = sql.DeletePost(post)
+		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
+			err = sql.DeletePost(post)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	}
 	if err != nil {
 		fmt.Fprintln(w, "Something went wrong")
