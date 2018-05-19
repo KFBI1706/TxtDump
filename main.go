@@ -11,7 +11,6 @@ import (
 	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/html"
 	"github.com/KFBI1706/TxtDump/sql"
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
@@ -52,7 +51,6 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
-	CSRF := csrf.Protect([]byte(conf.CSRFString), csrf.Secure(conf.Production))
 	router := mux.NewRouter()
 	router.HandleFunc("/", logging(html.DisplayIndex)).Methods("GET")
 	router.HandleFunc("/api/v1/post/amount", logging(api.PostcounterAPI)).Methods("GET")
@@ -76,7 +74,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = http.ListenAndServe(addr, CSRF(router))
+	err = http.ListenAndServe(addr, router)
 	if err != nil {
 		log.Fatal(err)
 	}
