@@ -3,11 +3,10 @@ package sql
 import (
 	"encoding/hex"
 	"errors"
-	"io/ioutil"
 	"log"
 
+	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/model"
-	"github.com/jinzhu/gorm"
 	//Import Postgres Libary
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -21,49 +20,18 @@ func HexToBytes(s string) []byte {
 	return data
 }
 
-//ReadDBstring Returns the file in filename as a string.
-func ReadDBstring(filename string) (string, error) {
-	file, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return "", err
-	}
-	return string(file), nil
-}
-
 //TestDBConnection Just pings the DB
 func TestDBConnection() error {
-	db, err := EstablishConn()
-	if err != nil {
-		return err
-	}
 	var postData model.PostData
-	if db.HasTable(&postData) != true {
+	if config.DB.HasTable(&postData) != true {
 		return errors.New("Table does not exist. Run with -setupdb to fix this")
 	}
 	return nil
 }
 
-//EstablishConn creates the DB Connnection
-func EstablishConn() (*gorm.DB, error) {
-	dbstring, err := ReadDBstring("dbstring")
-	if err != nil {
-		return nil, err
-	}
-	db, err := gorm.Open("postgres", dbstring)
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
-}
-
 //CreatePostDB registers the post in the DB
 func CreatePostDB(post model.PostData) error {
-	db, err := EstablishConn()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	err = db.Create(&post).Error
+	err := config.DB.Create(&post).Error
 	if err != nil {
 		return err
 	}
@@ -73,20 +41,13 @@ func CreatePostDB(post model.PostData) error {
 //ReadPostDB gets postdata from DB
 func ReadPostDB(ID int) (model.PostData, error) {
 	var result model.PostData
-	db, err := EstablishConn()
-	defer db.Close()
-	err = db.First(&result, ID).Error
+	err := config.DB.First(&result, ID).Error
 	return result, err
 }
 
 //SaveChanges registers edits in DB
 func SaveChanges(post model.PostData) error {
-	db, err := EstablishConn()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	err = db.Model(&model.PostData{}).UpdateColumns(&post).Error
+	err := config.DB.Model(&model.PostData{}).UpdateColumns(&post).Error
 	if err != nil {
 		return err
 	}
@@ -95,13 +56,8 @@ func SaveChanges(post model.PostData) error {
 
 //CountPosts runs SQL count on DB
 func CountPosts() int {
-	db, err := EstablishConn()
-	if err != nil {
-		log.Println("sql ", err)
-	}
-	defer db.Close()
 	var count int
-	err = db.Model(&model.PostData{}).Count(&count).Error
+	err := config.DB.Model(&model.PostData{}).Count(&count).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -112,12 +68,7 @@ func CountPosts() int {
 func PostMetas() (model.PostCounter, error) {
 	postMeta := []model.PostData{}
 	posts := model.PostCounter{Count: CountPosts()}
-	db, err := EstablishConn()
-	defer db.Close()
-	if err != nil {
-		return posts, err
-	}
-	err = db.Find(&postMeta, &model.PostData{}).Error
+	err := config.DB.Find(&postMeta, &model.PostData{}).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -127,44 +78,28 @@ func PostMetas() (model.PostCounter, error) {
 
 //DeletePost deletes post in DB
 func DeletePost(post model.PostData) error {
-	db, err := EstablishConn()
+	err := config.DB.Delete(&post).Error
 	if err != nil {
 		return err
 	}
-	err = db.Delete(&post).Error
-	if err != nil {
-		return err
-	}
-	db.Close()
 	return nil
 }
 
 //IncrementViewCounter increments the viewcounter in DB
 func IncrementViewCounter(id int) error {
-	db, err := EstablishConn()
-	if err != nil {
-		return err
-	}
-	err = db.Exec("UPDATE post_data SET views = views + 1 WHERE id = $1", id).Error
+	err := config.DB.Exec("UPDATE post_data SET views = views + 1 WHERE id = $1", id).Error
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	defer db.Close()
 	return nil
 }
 
 //CheckForDuplicateID Checks if ID is already used for a post in DB
 func CheckForDuplicateID(id int) bool {
-	db, err := EstablishConn()
-	if err != nil {
-		log.Println(err)
-	}
-	if db.NewRecord(model.PostData{ID: id}) {
+	if config.DB.NewRecord(model.PostData{ID: id}) {
 		return false
 	}
-	db.Close()
-
 	return true
 }
 
@@ -172,15 +107,10 @@ func CheckForDuplicateID(id int) bool {
 func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
 		var hash []string
-		db, err := EstablishConn()
-		if err != nil {
-			log.Println(err)
-		}
-		err = db.First(&model.PostData{}, id).Pluck(prop, &hash).Error
+		err := config.DB.First(&model.PostData{}, id).Pluck(prop, &hash).Error
 		if err != nil {
 			return nil, err
 		}
-		db.Close()
 		return HexToBytes(hash[0]), err
 	}
 	return nil, nil
@@ -190,13 +120,9 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 no input arguments
 returns error*/
 func SetupDB() error {
-	db, err := EstablishConn()
-	if err != nil {
-		return err
-	}
 	var postData model.PostData
-	if !db.HasTable(&postData) {
-		db.AutoMigrate(&postData)
+	if !config.DB.HasTable(&postData) {
+		config.DB.AutoMigrate(&postData)
 	}
 	return nil
 }
@@ -205,11 +131,7 @@ func SetupDB() error {
 no input arguments
 returns error*/
 func ClearOutDB() error {
-	db, err := EstablishConn()
-	if err != nil {
-		return err
-	}
 	var postData model.PostData
-	db.DropTableIfExists(&postData)
+	config.DB.DropTableIfExists(&postData)
 	return nil
 }

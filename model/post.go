@@ -23,6 +23,17 @@ type PostData struct {
 	DeleteTime *time.Time    `json:"Deleted" gorm:"Column:deleted_at"`
 	Views      int           `json:"Views" gorm:"Column:views"`
 }
+
+//Configuration contains all the configurable variables for this app
+type Configuration struct {
+	Port             int
+	DBStringLocation string `json:DBStringLocation,omitempty`
+	Path             string
+	Production       bool `json:Production,omitempty`
+	CSRFString       string
+}
+
+//PostCreate will be used as a struct when posts are created, as to try to reduce the use of the god struct PostData
 type PostCreate struct {
 	csrfField string
 }

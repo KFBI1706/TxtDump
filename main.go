@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/KFBI1706/TxtDump/api"
+	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/html"
 	"github.com/KFBI1706/TxtDump/sql"
 	"github.com/gorilla/csrf"
@@ -15,11 +16,21 @@ import (
 )
 
 func main() {
+	conf := config.ParseConfig("development")
+	var defaultDir string
+	if conf.DBStringLocation != "" {
+		defaultDir = conf.DBStringLocation
+	} else {
+		defaultDir = "dbstring"
+	}
+	dir := flag.String("dir", defaultDir, "root-directory for important files such as dbstring")
 	dbdrop := flag.Bool("dropdb", false, "Drop current table and all data")
 	dbsetup := flag.Bool("setupdb", false, "Setup db when running")
-	production := flag.Bool("production", false, "Is the server in production?")
-	port := flag.Int("port", 1337, "for using a custom port")
+	//production flag should be an explicit env variable
+	port := flag.Int("port", conf.Port, "for using a custom port")
 	flag.Parse()
+	config.InitDB(*dir)
+	defer config.DB.Close()
 	addr := fmt.Sprintf(":%v", *port)
 	if *dbdrop || *dbsetup {
 		if *dbdrop {
@@ -41,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
-	CSRF := csrf.Protect([]byte("OTAyNDhmajBkYnBhamtudnBhc29ldXI"), csrf.Secure(*production))
+	CSRF := csrf.Protect([]byte(conf.CSRFString), csrf.Secure(conf.Production))
 	router := mux.NewRouter()
 	router.HandleFunc("/", logging(html.DisplayIndex)).Methods("GET")
 	router.HandleFunc("/api/v1/post/amount", logging(api.PostcounterAPI)).Methods("GET")
@@ -61,7 +72,10 @@ func main() {
 	router.HandleFunc("/post/create/new", logging(html.CreatePostWeb))
 	router.HandleFunc("/documentation", logging(html.Documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
-	router.Walk(routerWalk)
+	err = router.Walk(routerWalk)
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = http.ListenAndServe(addr, CSRF(router))
 	if err != nil {
 		log.Fatal(err)

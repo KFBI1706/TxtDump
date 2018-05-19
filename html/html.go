@@ -228,7 +228,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 			post.Hash = hash
 		}
 		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
-			fmt.Println("hash ", post.Hash)
 			err = sql.SaveChanges(post)
 			if err != nil {
 				log.Println(err)

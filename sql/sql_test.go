@@ -2,12 +2,11 @@ package sql
 
 import (
 	"math/rand"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/model"
-	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
 
@@ -32,34 +31,11 @@ func randomString(len int) string {
 	return string(bytes)
 }
 
-func TestReadDBstring(t *testing.T) {
-	type args struct {
-		filename string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{name: "Totally not here for code coverage", args: args{filename: "testdb/test.sql"}, want: "Testerino", wantErr: false},
-		{name: "Test on non exsisting file", args: args{filename: "testdb/xd.sql"}, wantErr: true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ReadDBstring(tt.args.filename)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadDBstring() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ReadDBstring() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+func TestMain(m *testing.M) {
+	conf := config.ParseConfig("development")
+	config.InitDB(conf.DBStringLocation)
 }
 
-//This will fail if there is not a dbstring file in the SQL folder. This should probably be fixed by config file
 func TestDBConnectionfunc(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -71,29 +47,6 @@ func TestDBConnectionfunc(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := TestDBConnection(); (err != nil) != tt.wantErr {
 				t.Errorf("TestDBConnection() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestEstablishConn(t *testing.T) {
-	tests := []struct {
-		name    string
-		want    *gorm.DB
-		wantErr bool
-	}{
-		//	{name: "Establish conn to prod", want: gorm.DB{}, wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := EstablishConn()
-			defer got.Close()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("EstablishConn() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("EstablishConn() = %v, want %v", got, tt.want)
 			}
 		})
 	}
