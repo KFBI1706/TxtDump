@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+if ! LC_ALL=C grep -q -P '[^\x00-\x7f]' "$1"; then
+    echo "NO EMOJI REEE!"
+    exit 1
+fi
