@@ -111,7 +111,8 @@ func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := model.PostData{Content: r.FormValue("Content"), Title: r.FormValue("Title")}
+	newpost := model.PostData{Content: r.FormValue("Content")}
+	newpost.Title = r.FormValue("Title")
 	newpost.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
 	if err != nil {
 		log.Println(err)
