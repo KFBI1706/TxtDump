@@ -20,7 +20,7 @@ func GenFromSeed() int {
 
 /*DeterminePerms converts the postPerm string to int
 one input argument string (postperm)
-two return arugments which returns the int (num), and error (err)*/
+two return arguments which returns the int (num), and error (err)*/
 func DeterminePerms(postperm string) (int, error) {
 	num, err := strconv.Atoi(postperm)
 	if err != nil {

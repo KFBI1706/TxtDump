@@ -7,7 +7,7 @@ import (
 
 	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/model"
-	//Import Postgres Libary
+	//Import Postgres Library
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 

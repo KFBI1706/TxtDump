@@ -18,7 +18,7 @@ import (
 
 /*RequestDecrypt decrypts the post if the field post.Hash is the correct password.
 It takes a pointer to the model.PostData as the only argument
-and returns a bool based on if the post is successfuly decrypted*/
+and returns a bool based on if the post is successfully decrypted*/
 func RequestDecrypt(post *model.PostData) bool {
 	if CheckPass(post.Hash, post.ID, post.PostPerms) {
 		key := GetEncKey(post)
