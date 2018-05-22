@@ -67,3 +67,8 @@ user=postgres dbname=web password=12345 host=192.168.10.179
 -dropdb Drops the text table and all data. if run together with -setupdb it will drop then create a new emtpy table
 -port Run with custom port. Defualt port is: 1337
 ```
+## config.json
+Change "Path" to your own path for the project
+```json
+"Path": "/home/vetlo/Documents/code/go/src/github.com/KFBI1706/TxtDump/"
+```

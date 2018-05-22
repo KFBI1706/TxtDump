@@ -243,6 +243,8 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 			if err != nil {
 				log.Println(err)
 			}
+			http.Redirect(w, r, "/", 302)
+			return
 		}
 	}
 	if err != nil {
