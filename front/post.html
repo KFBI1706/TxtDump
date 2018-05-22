@@ -16,8 +16,11 @@
         <div class="form-group col-md-3 topbar derpimbadatcss">
           <label class="">Use custom password</label>
           <br>
-          <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()">
+          <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()"> 
           <input type="password" name="Pass" class="form-control" id="customField" disabled="true" placeholder="Password">
+          <div class="progress">
+            <div id="StrengthProgressBar" class="progress-bar"></div>
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -38,7 +41,6 @@
         </button>
       </div>
 
-      <!-- Modal TODO: Write JS for this -->
       <div class="modal fade" id="noPassModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
@@ -65,6 +67,8 @@
 <script>
   var simplemde = new SimpleMDE();
 </script>
+<script src="/static/js/zxcvbn.js" async></script>
+
 <!-- Button trigger modal -->
 {{ template "layoutEnd"}} {{end}}
 

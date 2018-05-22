@@ -2,5 +2,5 @@
     "Port": 1337,
     "Production": false,
     "CSRFString": "OTAyNDhmajBkYnBhamtudnBhc29ldXI",
-    "Path": "/home/kb/Projects/go/src/github.com/KFBI1706/TxtDump"
+    "Path": "/home/vetlo/Documents/code/go/src/github.com/KFBI1706/TxtDump/"
 }
