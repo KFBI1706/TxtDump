@@ -2,6 +2,7 @@ package helper_test
 
 import (
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -12,6 +13,8 @@ import (
 func TestMain(m *testing.M) {
 	conf := config.ParseConfig("development")
 	config.InitDB(conf.DBStringLocation)
+	code := m.Run()
+	os.Exit(code)
 }
 
 func TestIDGenerator(t *testing.T) {

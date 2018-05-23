@@ -27,10 +27,12 @@ func InitDB(dbstringLocation string) {
 	}
 }
 
-func findConfig(env string) string {
+func projectRoot() string {
 	gp := os.Getenv("GOPATH")
-	ap := path.Join(gp, "src/github.com/KFBI1706/TxtDump")
-	return path.Join(ap, "config."+env+".json")
+	return path.Join(gp, "src/github.com/KFBI1706/TxtDump")
+}
+func findConfig(env string) string {
+	return path.Join(projectRoot(), "config."+env+".json")
 }
 
 //ParseConfig does all the ParseConfig magic, with eventual support for environment variables etc.
@@ -45,6 +47,7 @@ func ParseConfig(env string) (config model.Configuration) {
 	if err = decoder.Decode(&config); err != nil {
 		panic(err)
 	}
+	config.Path = projectRoot()
 	config.DBStringLocation = config.Path + "/dbstring"
 	return
 }

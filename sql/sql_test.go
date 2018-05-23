@@ -2,6 +2,7 @@ package sql
 
 import (
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -35,6 +36,8 @@ func randomString(len int) string {
 func TestMain(m *testing.M) {
 	conf := config.ParseConfig("development")
 	config.InitDB(conf.DBStringLocation)
+	code := m.Run()
+	os.Exit(code)
 }
 
 func TestDBConnectionfunc(t *testing.T) {
