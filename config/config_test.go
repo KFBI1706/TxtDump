@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -26,8 +27,10 @@ func assertPanic(t *testing.T, f func()) {
 }
 
 func TestMain(m *testing.M) {
+	//setup
 	TestString = "hello"
-	err := ioutil.WriteFile("/tmp/testfile", []byte(TestString), 0644)
+	testFilePath := "/tmp/testfile"
+	err := ioutil.WriteFile(testFilePath, []byte(TestString), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -36,8 +39,14 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+	TestConfiguration = model.Configuration{Port: 1337, DBStringLocation: findDBString(projectRoot()), Path: projectRoot(), Production: false, CSRFString: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+	workingConf, _ := findConfig("working")
+	workingJson, _ := json.Marshal(TestConfiguration)
+	err = ioutil.WriteFile(workingConf, workingJson, 0644)
+	//test run
 	retCode := m.Run()
-	err = os.Remove("/tmp/testfile")
+	//teardown
+	err = os.Remove(testFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -45,6 +54,11 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+	err = os.Remove(workingConf)
+	if err != nil {
+		panic(err)
+	}
+	//exit
 	os.Exit(retCode)
 }
 
@@ -92,7 +106,6 @@ func TestParseConfig(t *testing.T) {
 	type args struct {
 		env string
 	}
-	//root := projectRoot()
 	tests := []struct {
 		name       string
 		args       args
@@ -102,8 +115,7 @@ func TestParseConfig(t *testing.T) {
 		{"Testing missing file", args{env: "asdf"}, model.Configuration{}, true},
 
 		{"Testing corrupted file", args{env: "_corrupted"}, model.Configuration{}, true},
-
-		// TODO: Add test cases.
+		{"Testing working file", args{env: "working"}, TestConfiguration, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
