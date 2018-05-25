@@ -42,6 +42,7 @@ func CreatePostDB(post model.PostData) error {
 func ReadPostDB(ID int) (model.PostData, error) {
 	var result model.PostData
 	err := config.DB.First(&result, ID).Error
+	result = model.PostData{Key: "", Salt: ""}
 	return result, err
 }
 
