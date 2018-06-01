@@ -36,6 +36,10 @@ func randomString(len int) string {
 func TestMain(m *testing.M) {
 	conf := config.ParseConfig("development")
 	config.InitDB(conf.DBStringLocation)
+	var postData model.PostData
+	if !config.DB.HasTable(&postData) {
+		config.DB.AutoMigrate(&postData)
+	}
 	code := m.Run()
 	os.Exit(code)
 }
