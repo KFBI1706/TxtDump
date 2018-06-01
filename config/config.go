@@ -38,6 +38,10 @@ func InitDB(dbstringLocation string) {
 	if DB, err = gorm.Open("postgres", readFile(dbstringLocation)); err != nil {
 		log.Panic(err)
 	}
+	var postData model.PostData
+	if !DB.HasTable(&postData) {
+		DB.AutoMigrate(&postData)
+	}
 }
 
 func projectRoot() string {
