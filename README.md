@@ -1,4 +1,4 @@
-# TxtDump
+# TxtDump [![Build Status](https://travis-ci.org/KFBI1706/TxtDump.svg?branch=master)](https://travis-ci.org/KFBI1706/TxtDump)
 ## All current routes:
 ```
 /
