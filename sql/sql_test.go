@@ -8,6 +8,7 @@ import (
 
 	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/model"
+	"github.com/KFBI1706/TxtDump/sql"
 	_ "github.com/lib/pq"
 )
 
@@ -36,6 +37,9 @@ func randomString(len int) string {
 func TestMain(m *testing.M) {
 	conf := config.ParseConfig("development")
 	config.InitDB(conf.DBStringLocation)
+	if sql.TestDBConnection() != nil {
+		sql.SetupDB()
+	}
 	code := m.Run()
 	os.Exit(code)
 }
