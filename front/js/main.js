@@ -1,9 +1,9 @@
-function activateCustomPass() {
-    var customPass = document.getElementById("customPass").checked;
+function activateCustomPass(checkbox = "customPass", element = "customField") {
+    var customPass = document.getElementById(checkbox).checked;
     if (customPass == true) {
-        document.getElementById('customField').disabled = false;
+        document.getElementById(element).disabled = false;
     } else {
-        document.getElementById('customField').disabled = true;
+        document.getElementById(element).disabled = true;
     }
 }
 

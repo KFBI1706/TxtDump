@@ -111,8 +111,7 @@ func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := model.PostData{Content: r.FormValue("Content")}
-	newpost.Title = r.FormValue("Title")
+	newpost := model.PostData{Content: r.FormValue("Content"), PostEdit: model.PostEdit{Title: r.FormValue("Title")}}
 	newpost.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
 	if err != nil {
 		log.Println(err)
@@ -215,8 +214,10 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	//TODO: rewrite this, not broken, just bad
 	var err error
 	if operation == "edit" {
-		post.Content = r.FormValue("Content")
-		post.Title = r.FormValue("Title")
+		post = model.PostData{
+			Content:  r.FormValue("Content"),
+			PostEdit: model.PostEdit{Title: r.FormValue("Title")},
+		}
 		hash := post.Hash
 		post.Hash = r.FormValue("Pass")
 		if post.PostPerms == 3 {
