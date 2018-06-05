@@ -49,8 +49,8 @@ func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
 
 func parsePost(post *model.PostData) {
 	defer sql.IncrementViewCounter(post.ID)
-	post.Md = parse(post.Content)
-	mdhead := getMDHeader(post.Md)
+	post.MD = parse(post.Content)
+	mdhead := getMDHeader(post.MD)
 	if mdhead != "" && post.Title == "" {
 		post.Title = mdhead
 	}
@@ -212,12 +212,11 @@ func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	post := ProcessRequest(w, r)
 	//TODO: rewrite this, not broken, just bad
+	url := fmt.Sprintf("/post/%v/request", post.ID)
 	var err error
 	if operation == "edit" {
-		post = model.PostData{
-			Content:  r.FormValue("Content"),
-			PostEdit: model.PostEdit{Title: r.FormValue("Title")},
-		}
+		post.Content = r.FormValue("Content")
+		post.Title = r.FormValue("Title")
 		hash := post.Hash
 		post.Hash = r.FormValue("Pass")
 		if post.PostPerms == 3 {
@@ -252,7 +251,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		fmt.Fprintln(w, "Something went wrong")
 		return
 	}
-	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 
 }
@@ -275,7 +273,7 @@ func Documentation(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	doc := parse(string(file))
-	err = tmpl.ExecuteTemplate(w, "doc", model.PostData{Md: doc})
+	err = tmpl.ExecuteTemplate(w, "doc", model.PostRender{MD: doc})
 	if err != nil {
 		log.Println(err)
 	}
