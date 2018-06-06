@@ -17,7 +17,7 @@ import (
 
 func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := html.ProcessRequest(w, r)
-	newpost := model.PostData{}
+	newpost := model.Post{}
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
@@ -84,7 +84,7 @@ func RequestPostAPI(w http.ResponseWriter, r *http.Request) {
 
 func RequestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := html.ProcessRequest(w, r)
-	newpost := model.PostData{}
+	newpost := model.Post{}
 	err := json.NewDecoder(r.Body).Decode(&newpost)
 	if err != nil {
 		log.Println(err)
@@ -94,7 +94,7 @@ func RequestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatePostAPI(w http.ResponseWriter, r *http.Request) {
-	newpost := model.PostData{}
+	newpost := model.Post{}
 	rand.Seed(time.Now().UnixNano())
 	newpost.ID = helper.GenFromSeed()
 	err := json.NewDecoder(r.Body).Decode(&newpost)

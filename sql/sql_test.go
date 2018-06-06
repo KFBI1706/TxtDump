@@ -11,12 +11,14 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var posts []model.PostData
+var posts []model.Post
 
 func generateRandomPostData() {
 	for len(posts) < 10 {
 		rand.Seed(time.Now().UTC().UnixNano())
-		post := model.PostData{Content: randomString(20), Hash: randomString(8), PostPerms: 2, Views: 0}
+		data := model.Data{Content: randomString(20), PostPerms: 2}
+		meta := model.Meta{Views: 0}
+		post := model.Post{Data: data, Meta: meta}
 		post.Title = randomString(10)
 		post.ID = rand.Intn(9999999-1000000) + 1000000
 		post.EditID = rand.Intn(9999999-1000000) + 1000000
@@ -36,10 +38,6 @@ func randomString(len int) string {
 func TestMain(m *testing.M) {
 	conf := config.ParseConfig("development")
 	config.InitDB(conf.DBStringLocation)
-	var postData model.PostData
-	if !config.DB.HasTable(&postData) {
-		config.DB.AutoMigrate(&postData)
-	}
 	code := m.Run()
 	os.Exit(code)
 }

@@ -17,9 +17,9 @@ import (
 )
 
 /*RequestDecrypt decrypts the post if the field post.Hash is the correct password.
-It takes a pointer to the model.PostData as the only argument
+It takes a pointer to the model.Post as the only argument
 and returns a bool based on if the post is successfully decrypted*/
-func RequestDecrypt(post *model.PostData) bool {
+func RequestDecrypt(post *model.Post) bool {
 	if CheckPass(post.Hash, post.ID, post.PostPerms) {
 		key := GetEncKey(post)
 		ct, _ := base64.StdEncoding.DecodeString(post.Content)
@@ -34,9 +34,9 @@ func RequestDecrypt(post *model.PostData) bool {
 }
 
 /*GetEncKey gets the encryption key used for the file by decrypting the stored-key with the passord scrypt-hash
-takes a pointer to model.PostData as the only argument
+takes a pointer to model.Post as the only argument
  and returns a 32 length byte array*/
-func GetEncKey(post *model.PostData) (key [32]byte) {
+func GetEncKey(post *model.Post) (key [32]byte) {
 	dk := getKey(post)
 	key = [32]byte{}
 	copy(key[:], dk[0:32])
@@ -53,7 +53,7 @@ func GetToken() string {
 	return base64.StdEncoding.EncodeToString(data)
 }
 
-func getKey(post *model.PostData) (dk []byte) {
+func getKey(post *model.Post) (dk []byte) {
 	prop, err := sql.GetProp("salt", post.ID)
 	if err != nil {
 		log.Println(err)
@@ -75,9 +75,9 @@ func encryptPost(content []byte, key *[32]byte) (string, string) {
 }
 
 /*SecurePost generates a secure post for a unencrypted post. encryption varies based upon PostPerms
-takes a pointer to model.PostData and a unencrypted password-string as arguments
+takes a pointer to model.Post and a unencrypted password-string as arguments
 returns nothing*/
-func SecurePost(post *model.PostData, pass string) {
+func SecurePost(post *model.Post, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = helper.GenFromSeed()
 	if post.PostPerms > 1 {

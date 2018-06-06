@@ -26,7 +26,7 @@ func checkFile(pth string) error {
 }
 
 func readFile(pth string) string {
-	if checkFile(pth) != nil {
+	if err := checkFile(pth); err != nil {
 		return ""
 	}
 	bytes, _ := ioutil.ReadFile(pth)
@@ -37,10 +37,12 @@ func InitDB(dbstringLocation string) {
 	var err error
 	if DB, err = gorm.Open("postgres", readFile(dbstringLocation)); err != nil {
 		log.Panic(err)
-	}
-	var postData model.PostData
-	if !DB.HasTable(&postData) {
-		DB.AutoMigrate(&postData)
+	} else {
+		var post model.Post
+		if !DB.HasTable(&post) {
+			DB.AutoMigrate(&post)
+		}
+
 	}
 }
 

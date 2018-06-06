@@ -17,22 +17,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//DisplayIndex renders the Index template with some metadata
-func DisplayIndex(w http.ResponseWriter, r *http.Request) {
-	posts := model.PostCounter{}
-	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
-	posts, err := sql.PostMetas()
-	if err != nil {
-		log.Println(err)
-	}
-	err = tmpl.ExecuteTemplate(w, "index", posts)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
 //ProcessRequest Processes an request for post
-func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
+func ProcessRequest(w http.ResponseWriter, r *http.Request) model.Post {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -47,14 +33,27 @@ func ProcessRequest(w http.ResponseWriter, r *http.Request) model.PostData {
 	return post
 }
 
-func parsePost(post *model.PostData) {
-	defer sql.IncrementViewCounter(post.ID)
-	post.Md = parse(post.Content)
-	mdhead := getMDHeader(post.Md)
-	if mdhead != "" && post.Title == "" {
-		post.Title = mdhead
+//DisplayIndex renders the Index template with some metadata
+func DisplayIndex(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
+	posts, err := sql.PostMetas()
+	if err != nil {
+		log.Println(err)
 	}
-	post.TitleMD = template.HTML(post.Title)
+	err = tmpl.ExecuteTemplate(w, "index", posts)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func parsePost(ID int, data model.Data) (markdown model.Markdown) {
+	defer sql.IncrementViewCounter(ID)
+	markdown.Md = parse(data.Content)
+	if mdhead := getMDHeader(markdown.Md); mdhead != "" && data.Title == "" {
+		data.Title = mdhead
+	}
+	markdown.TitleMD = template.HTML(data.Title)
+	return
 }
 
 //RequestPostDecrypt does exactly like what it sounds like it does
@@ -63,7 +62,7 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
-		parsePost(&post)
+		parsePost(post.ID, post.Data)
 		tmpl.ExecuteTemplate(w, "display", post)
 	}
 }
@@ -73,7 +72,7 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.PostPerms == 1 || post.PostPerms == 2 {
-		parsePost(&post)
+		parsePost(post.ID, post.Data)
 		err := tmpl.ExecuteTemplate(w, "display", post)
 		if err != nil {
 			log.Println(err)
@@ -111,8 +110,7 @@ func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := model.PostData{Content: r.FormValue("Content")}
-	newpost.Title = r.FormValue("Title")
+	newpost := model.Post{Data: model.Data{Content: r.FormValue("Content"), Title: r.FormValue("Title")}}
 	newpost.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
 	if err != nil {
 		log.Println(err)
@@ -140,19 +138,17 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 	if templateString == "edit" {
 		if post.PostPerms == 3 {
 			err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
-				csrf.TemplateTag: csrf.TemplateField(r),
-				"ID":             post.ID,
-				"Mode":           templateString,
+				"ID":   post.ID,
+				"Mode": templateString,
 			})
 			if err != nil {
 				log.Println(err)
 			}
 		} else {
 			err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
-				csrf.TemplateTag: csrf.TemplateField(r),
-				"ID":             post.ID,
-				"Title":          post.Title,
-				"Content":        post.Content,
+				"ID":      post.ID,
+				"Title":   post.Data.Title,
+				"Content": post.Data.Content,
 			})
 			if err != nil {
 				log.Println(err)
@@ -173,23 +169,17 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
-
-	//post.Hash = r.FormValue("Pass")
-	//if crypto.RequestDecrypt(&post) {
-	//	parsePost(&post)
-	//	tmpl.ExecuteTemplate(w, "display", post)
-	//}
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
-		parsePost(&post)
+		parsePost(post.ID, post.Data)
 		log.Println("parsed post")
 		log.Println(post.ID)
-		log.Println(post.Title)
+		log.Println(post.Data.Title)
 		log.Println(post.Content)
 		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
-			"Title":          post.Title,
+			"Title":          post.Data.Title,
 			"Content":        post.Content,
 		})
 		if err != nil {
@@ -274,7 +264,7 @@ func Documentation(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	doc := parse(string(file))
-	err = tmpl.ExecuteTemplate(w, "doc", model.PostData{Md: doc})
+	err = tmpl.ExecuteTemplate(w, "doc", model.Markdown{Md: doc})
 	if err != nil {
 		log.Println(err)
 	}
