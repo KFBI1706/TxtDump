@@ -16,14 +16,11 @@ var posts []model.Post
 func generateRandomPostData() {
 	for len(posts) < 10 {
 		rand.Seed(time.Now().UTC().UnixNano())
-		data := model.Data{Content: randomString(20), PostPerms: 2}
-		meta := model.Meta{Views: 0}
-		post := model.Post{Data: data, Meta: meta}
+		post := model.Post{Data: model.Data{Content: randomString(20), PostPerms: 2}, Meta: model.Meta{Views: 0}}
 		post.Title = randomString(10)
 		post.ID = rand.Intn(9999999-1000000) + 1000000
 		post.EditID = rand.Intn(9999999-1000000) + 1000000
 		posts = append(posts, post)
-
 	}
 }
 func randomString(len int) string {

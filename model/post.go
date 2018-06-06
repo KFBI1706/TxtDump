@@ -13,7 +13,7 @@ type Post struct {
 	Crypto
 }
 
-//PostData contains all the info related to the posts
+//Post contains all the info related to the posts
 type Data struct {
 	Title     string `json:"Title" gorm:"Column:title"`
 	PostPerms int    `json:"PostPerms,string" gorm:"Column:postperms"`
@@ -49,18 +49,6 @@ type PostNew struct {
 
 type Edit struct {
 	EditID int `json:"EditID" gorm:"Column:editid"`
-}
-
-//PostCreate will be used as a struct when posts are created, as to try to reduce the use of the god struct PostData
-type PostCreate struct {
-	csrfField string
-}
-
-//PostDecrypt is used for decrypting post content
-type PostDecrypt struct {
-	Post
-	Mode  string
-	Token string
 }
 
 //PostCounter is used on index to provide some metadata about current posts

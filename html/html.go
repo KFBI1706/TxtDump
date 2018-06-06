@@ -203,6 +203,7 @@ func DeletePostTemplate(w http.ResponseWriter, r *http.Request) {
 func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	post := ProcessRequest(w, r)
 	//TODO: rewrite this, not broken, just bad
+	url := fmt.Sprintf("/post/%v/request", post.ID)
 	var err error
 	if operation == "edit" {
 		post.Content = r.FormValue("Content")
@@ -241,7 +242,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		fmt.Fprintln(w, "Something went wrong")
 		return
 	}
-	url := fmt.Sprintf("/post/%v/request", post.ID)
 	http.Redirect(w, r, url, 302)
 
 }

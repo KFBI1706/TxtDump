@@ -71,7 +71,8 @@ func RequestPostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the Hash")
 		return
 	}
-	result.EditID = 0
+	result.Hash = ""
+	result.Salt = ""
 	err := json.NewEncoder(w).Encode(result)
 	if err != nil {
 		log.Println(err)
