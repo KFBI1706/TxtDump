@@ -3,7 +3,6 @@ package sql
 import (
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/KFBI1706/TxtDump/config"
@@ -96,7 +95,6 @@ func IncrementViewCounter(id int) error {
 
 //CheckForDuplicateID Checks if ID is already used for a post in DB
 func CheckForDuplicateID(id int) bool {
-	fmt.Println(model.PostNew{model.Post{ID: 1}}.ID)
 	if config.DB.NewRecord(model.PostNew{model.Post{ID: id}}) {
 		return false
 	}

@@ -15,6 +15,7 @@ import (
 	"github.com/KFBI1706/TxtDump/sql"
 )
 
+//EditPostAPI is the HTTP handler for editing posts
 func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := html.ProcessRequest(w, r)
 	newpost := model.Post{}
@@ -35,6 +36,7 @@ func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newpost)
 }
 
+//DeletePostAPI is the HTTP handler for deleteing posts
 func DeletePostAPI(w http.ResponseWriter, r *http.Request) {
 	post := html.ProcessRequest(w, r)
 	err := json.NewDecoder(r.Body).Decode(&post)
@@ -54,6 +56,7 @@ func DeletePostAPI(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+//PostcounterAPI is returns some metadata about data in the DB
 func PostcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := model.PostCounter{Count: sql.CountPosts()}
 	posts, err := sql.PostMetas()
@@ -63,6 +66,7 @@ func PostcounterAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
+//RequestPostAPI is the HTTP handler for "reading" posts
 func RequestPostAPI(w http.ResponseWriter, r *http.Request) {
 	result := html.ProcessRequest(w, r)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -73,16 +77,14 @@ func RequestPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	result.Hash = ""
 	result.Salt = ""
+	defer sql.IncrementViewCounter(result.ID)
 	err := json.NewEncoder(w).Encode(result)
-	if err != nil {
-		log.Println(err)
-	}
-	err = sql.IncrementViewCounter(result.ID)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
+//RequestPostWithPassAPI is for reading posts that are password encrypted
 func RequestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
 	existingpost := html.ProcessRequest(w, r)
 	newpost := model.Post{}
@@ -94,6 +96,7 @@ func RequestPostWithPassAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newpost)
 }
 
+//CreatePostAPI is the HTTP handler for registering posts via the API
 func CreatePostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost := model.Post{}
 	rand.Seed(time.Now().UnixNano())

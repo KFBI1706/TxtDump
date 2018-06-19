@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+//Post is the "master" struct
 type Post struct {
 	ID int `json:"ID" gorm:"Column:id;primary_key"`
 	Data
@@ -13,13 +14,14 @@ type Post struct {
 	Crypto
 }
 
-//Post contains all the info related to the posts
+//Data contains all the info related to the posts
 type Data struct {
 	Title     string `json:"Title" gorm:"Column:title"`
 	PostPerms int    `json:"PostPerms,string" gorm:"Column:postperms"`
 	Content   string `json:"Content" gorm:"Column:text"`
 }
 
+//Crypto contains the cryptographic aspect of the post
 type Crypto struct {
 	Hash     string `json:"Password" gorm:"Column:hash"`
 	Salt     string `json:"Salt" gorm:"Column:salt"`
@@ -27,6 +29,7 @@ type Crypto struct {
 	Key      string `json:"Key" gorm:"Column:key"`
 }
 
+//Meta Contains most of the metadata views timestamps etc
 type Meta struct {
 	Views      int        `json:"Views" gorm:"Column:views"`
 	CreateTime time.Time  `json:"Time" gorm:"Column:created_at"`
@@ -34,11 +37,13 @@ type Meta struct {
 	DeleteTime *time.Time `json:"Deleted" gorm:"Column:deleted_at"`
 }
 
+//Markdown Contains the data used for rendering the post on the HTML frontend
 type Markdown struct {
-	Md      template.HTML `json:"" gorm:"-"`
+	MD      template.HTML `json:"" gorm:"-"`
 	TitleMD template.HTML `json:"" gorm:"-"`
 }
 
+//PostNew is used for registering a new post
 type PostNew struct {
 	Post
 	//ID int `json:"ID" gorm:"Column:id;primary_key"`

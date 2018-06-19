@@ -48,8 +48,8 @@ func DisplayIndex(w http.ResponseWriter, r *http.Request) {
 
 func parsePost(ID int, data model.Data) (markdown model.Markdown) {
 	defer sql.IncrementViewCounter(ID)
-	markdown.Md = parse(data.Content)
-	if mdhead := getMDHeader(markdown.Md); mdhead != "" && data.Title == "" {
+	markdown.MD = parse(data.Content)
+	if mdhead := getMDHeader(markdown.MD); mdhead != "" && data.Title == "" {
 		data.Title = mdhead
 	}
 	markdown.TitleMD = template.HTML(data.Title)
@@ -264,7 +264,7 @@ func Documentation(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	doc := parse(string(file))
-	err = tmpl.ExecuteTemplate(w, "doc", model.Markdown{Md: doc})
+	err = tmpl.ExecuteTemplate(w, "doc", model.Markdown{MD: doc})
 	if err != nil {
 		log.Println(err)
 	}
