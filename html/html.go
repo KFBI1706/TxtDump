@@ -72,7 +72,7 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.PostPerms == 1 || post.PostPerms == 2 {
-		parsePost(post.ID, post.Data)
+		post.Markdown = parsePost(post.ID, post.Data)
 		err := tmpl.ExecuteTemplate(w, "display", post)
 		if err != nil {
 			log.Println(err)

@@ -12,6 +12,7 @@ type Post struct {
 	Meta
 	Edit
 	Crypto
+	Markdown
 }
 
 //Data contains all the info related to the posts

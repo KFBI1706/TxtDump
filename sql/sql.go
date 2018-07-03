@@ -85,7 +85,7 @@ func DeletePost(post model.Post) error {
 
 //IncrementViewCounter increments the viewcounter in DB
 func IncrementViewCounter(id int) error {
-	err := config.DB.Exec("UPDATE post_data SET views = views + 1 WHERE id = $1", id).Error
+	err := config.DB.Exec("UPDATE posts SET views = views + 1 WHERE id = $1", id).Error
 	if err != nil {
 		log.Println(err)
 		return err
