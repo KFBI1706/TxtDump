@@ -2,7 +2,6 @@ package model
 
 import (
 	"html/template"
-	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -39,10 +38,9 @@ type Crypto struct {
 
 //Meta Contains most of the metadata views timestamps etc
 type Meta struct {
-	Views      int        `json:"Views" gorm:"Column:views"`
-	CreateTime time.Time  `json:"Time" gorm:"Column:created_at"`
-	UpdateTime time.Time  `json:"Updated" gorm:"Column:updated_at"`
-	DeleteTime *time.Time `json:"Deleted" gorm:"Column:deleted_at"`
+	gorm.Model
+	PostID int
+	Views  int `json:"Views" gorm:"Column:views"`
 }
 
 //Markdown Contains the data used for rendering the post on the HTML frontend

@@ -39,15 +39,8 @@ func InitDB(dbstringLocation string) {
 	if DB, err = gorm.Open("postgres", readFile(dbstringLocation)); err != nil {
 		log.Panic(err)
 	} else {
-		var post model.Post
-		var data model.Data
-		if !DB.HasTable(&post) {
-			DB.AutoMigrate(&post)
-		}
-		if !DB.HasTable(&data) {
-			DB.AutoMigrate(&data)
-		}
-		DB.Model(&post).Related(&data)
+		DB.AutoMigrate(&model.Post{}, &model.Data{}, model.Meta{}, model.Crypto{}, model.Markdown{}, model.Edit{})
+
 	}
 }
 

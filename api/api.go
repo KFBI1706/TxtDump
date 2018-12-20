@@ -59,10 +59,10 @@ func DeletePostAPI(w http.ResponseWriter, r *http.Request) {
 //PostcounterAPI is returns some metadata about data in the DB
 func PostcounterAPI(w http.ResponseWriter, r *http.Request) {
 	posts := model.PostCounter{Count: sql.CountPosts()}
-	posts, err := sql.PostMetas()
-	if err != nil {
-		log.Println(err)
-	}
+	//	//posts, err := sql.PostMetas()
+	//	if err != nil {
+	//		log.Println(err)
+	//	}
 	json.NewEncoder(w).Encode(posts)
 }
 

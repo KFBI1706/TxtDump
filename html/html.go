@@ -46,7 +46,7 @@ func DisplayIndex(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	err = tmpl.ExecuteTemplate(w, "index", model.M{"Meta": metas, "Data": datas})
+	err = tmpl.ExecuteTemplate(w, "index", model.M{"Count": sql.CountPosts(), "Meta": metas, "Data": datas})
 	if err != nil {
 		log.Println(err)
 	}
@@ -124,6 +124,7 @@ func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 	newpost := model.Post{ID: helper.GenFromSeed(), Data: model.Data{Content: r.FormValue("Content"), Title: r.FormValue("Title")}}
 	newpost.Data.PostID = newpost.ID
+	newpost.Meta.PostID = newpost.ID
 	newpost.Data.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
 	if err != nil {
 		log.Println(err)

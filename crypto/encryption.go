@@ -7,9 +7,7 @@ import (
 	"errors"
 	"log"
 	"math/rand"
-	"time"
 
-	"github.com/KFBI1706/TxtDump/helper"
 	"github.com/KFBI1706/TxtDump/model"
 	"github.com/KFBI1706/TxtDump/sql"
 	scrypt "github.com/elithrar/simple-scrypt"
@@ -78,8 +76,6 @@ func encryptPost(content []byte, key *[32]byte) (string, string) {
 takes a pointer to model.Post and a unencrypted password-string as arguments
 returns nothing*/
 func SecurePost(post *model.Post, pass string) {
-	rand.Seed(time.Now().UnixNano())
-	post.ID = helper.GenFromSeed()
 	if post.Data.PostPerms > 1 {
 		if salt, hash, sha256hash, err := securePass(pass); sha256hash != "" {
 			post.Crypto.Salt = salt

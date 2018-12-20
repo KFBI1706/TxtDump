@@ -66,11 +66,18 @@ func CountPosts() int {
 }
 
 //PostMetas returns some metadata used for index overview
-func PostMetas() (model.PostCounter, error) {
-	//posts := []model.Post{}
-	//config.DB.Debug().Find(&posts)
-	postCounter := model.PostCounter{List: []model.Meta{}, Count: CountPosts()}
-	return postCounter, nil
+func PostMetas() (metas []model.Meta, err error) {
+	var posts []model.Post
+	if err = config.DB.Debug().Preload("Meta").Find(&posts).Error; err != nil {
+		log.Println(err)
+		return metas, err
+	}
+	metas = make([]model.Meta, len(posts))
+	for i := range posts {
+		metas[i] = posts[i].Meta
+	}
+	log.Println(metas)
+	return metas, err
 }
 
 //PostDatas returns some data used for index overview
@@ -131,7 +138,7 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 no input arguments
 returns error*/
 func SetupDB() error {
-	return config.DB.Debug().AutoMigrate(&model.Post{}, &model.Data{}).Error
+	return config.DB.Debug().AutoMigrate(&model.Post{}, &model.Data{}, model.Meta{}, model.Crypto{}, model.Markdown{}, model.Edit{}).Error
 }
 
 /*ClearOutDB is used to clear a table
