@@ -2,25 +2,21 @@
 <link rel="stylesheet" href="/static/css/simplemde.min.css">
 <script src="/static/js/simplemde.min.js"></script>
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-  <div class="text-header col-md-12">
+  <article class="text-header col-md-12">
     <h4>Create a new post</h4>
     <form action="/post/create/new" method="POST" id="postForm">
       {{.csrfField}}
-      <div class="topcontainer">
+      <section class="topcontainer">
         <div class="form-group col-md-9 topbar">
           <label for="formGroupExampleInput">Title</label><br>
           <input type="text" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Title">
         </div>
-        <div class="form-group col-md-3 topbar derpimbadatcss">
+        <aside class="form-group col-md-3 topbar derpimbadatcss">
           <label class="">Use custom password</label>
-          <br>
           <input type="checkbox" name="CustomPass" id="customPass" onclick="activateCustomPass()"> 
           <input type="password" name="Pass" class="form-control" id="customField" disabled="true" placeholder="Password">
-          <div class="progress">
-            <div id="StrengthProgressBar" class="progress-bar"></div>
-          </div>
-        </div>
-      </div>
+        </aside>
+      </section>
       <div class="form-group">
           <label>Viewing/editing settings</label><br>
           <select class="form-control" name="postperms">
@@ -59,7 +55,7 @@
         </div>
       </div>
     </form>
-  </div>
+  </article>
 
 </main>
 <script>
