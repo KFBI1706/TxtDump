@@ -181,10 +181,6 @@ func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		parsePost(post.ID, post.Data)
-		log.Println("parsed post")
-		log.Println(post.ID)
-		log.Println(post.Data.Title)
-		log.Println(post.Content)
 		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
