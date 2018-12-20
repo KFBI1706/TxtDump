@@ -9,7 +9,10 @@ function activateCustomPass(checkbox = "customPass", element = "customField") {
 }
 
 function debugLog(){
-	console.log(document.getElementById("debug").innerHTML);
+    debug = document.getElementById("debug")
+    if (debug) {
+	    console.log(debug.innerHTML);
+    }
 }
 
 function modalIfNoPass() {

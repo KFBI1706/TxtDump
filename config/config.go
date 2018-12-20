@@ -42,6 +42,7 @@ func InitDB(dbstringLocation string) {
 		DB.AutoMigrate(&model.Post{}, &model.Data{}, model.Meta{}, model.Crypto{}, model.Markdown{}, model.Edit{})
 
 	}
+	//DB = DB.Debug()
 }
 
 func projectRoot() string {

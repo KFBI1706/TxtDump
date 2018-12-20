@@ -7,6 +7,7 @@ import (
 
 	"github.com/KFBI1706/TxtDump/config"
 	"github.com/KFBI1706/TxtDump/model"
+	"github.com/jinzhu/gorm"
 	//Import Postgres Library
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -42,17 +43,21 @@ func CreatePostDB(post model.Post) error {
 //ReadPostDB gets postdata from DB
 func ReadPostDB(ID int) (model.Post, error) {
 	var result model.Post
-	err := config.DB.First(&result, ID).Error
+	err := config.DB.Preload("Data").Preload("Meta").First(&result, ID).Error
 	return result, err
 }
 
 //SaveChanges registers edits in DB
-func SaveChanges(post model.Post) error {
-	err := config.DB.Model(&model.Post{}).UpdateColumns(&post).Error
-	if err != nil {
+func SaveChanges(post model.Post) (err error) {
+	log.Println("\nsaving!!!!!!!!\n")
+	log.Println(post)
+	if err = config.DB.Debug().Model(&model.Data{}).UpdateColumns(&post.Data).Error; err != nil {
 		return err
 	}
-	return nil
+	if err = config.DB.Debug().Model(&model.Crypto{}).UpdateColumns(&post.Crypto).Error; err != nil {
+		return err
+	}
+	return err
 }
 
 //CountPosts runs SQL count on DB
@@ -105,7 +110,7 @@ func DeletePost(post model.Post) error {
 
 //IncrementViewCounter increments the viewcounter in DB
 func IncrementViewCounter(id int) error {
-	err := config.DB.Exec("UPDATE posts SET views = views + 1 WHERE id = $1", id).Error
+	err := config.DB.Model(&model.Meta{}).Update("views", gorm.Expr("views + 1")).Error
 	if err != nil {
 		log.Println(err)
 		return err
@@ -124,12 +129,12 @@ func CheckForDuplicateID(id int) bool {
 //GetProp gets the requested hash from the DB
 func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
-		var hash []string
-		err := config.DB.First(&model.Post{}, id).Pluck(prop, &hash).Error
+		var post model.Post
+		err := config.DB.Preload("Crypto").First(&model.Post{}, id).First(&post).Error
 		if err != nil {
 			return nil, err
 		}
-		return HexToBytes(hash[0]), err
+		return HexToBytes(post.Crypto.Hash), err
 	}
 	return nil, nil
 }

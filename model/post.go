@@ -30,6 +30,8 @@ type Data struct {
 
 //Crypto contains the cryptographic aspect of the post
 type Crypto struct {
+	gorm.Model
+	PostID   int
 	Hash     string `json:"Password" gorm:"Column:hash"`
 	Salt     string `json:"Salt" gorm:"Column:salt"`
 	AuthHash string `json:"authHash" gorm:"-"`

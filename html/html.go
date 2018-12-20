@@ -68,8 +68,8 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	post.Crypto.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
-		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
-			"meta": post.Meta})
+		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "Markdown": parsePost(post.ID, post.Data),
+			"Meta": post.Meta})
 		if err != nil {
 			log.Println(err)
 			fmt.Fprintln(w, "Something went wrong")
@@ -230,7 +230,9 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 			}
 			post.Data.Content = b64.StdEncoding.EncodeToString(ct)
 		}
-		if crypto.CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms) {
+		ok := crypto.CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms)
+		log.Println(ok, post.Crypto.Hash, post.ID, post.Data.PostPerms)
+		if ok {
 			post.Crypto.Hash = hash
 			err = sql.SaveChanges(post)
 			if err != nil {
@@ -253,7 +255,6 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 		return
 	}
 	http.Redirect(w, r, url, 302)
-
 }
 
 //EditPostForm handle function to call postForm with the "edit" parameter

@@ -26,7 +26,9 @@ func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 	newpost.ID = existingpost.ID
 
 	if valid := crypto.CheckPass(existingpost.Crypto.Hash, existingpost.ID, existingpost.Data.PostPerms); valid {
-		err = sql.SaveChanges(newpost)
+		if err = sql.SaveChanges(newpost); err != nil {
+			panic(err)
+		}
 	}
 	if err != nil {
 		log.Println(err)
