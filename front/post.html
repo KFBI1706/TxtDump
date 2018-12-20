@@ -3,7 +3,7 @@
 <script src="/static/js/simplemde.min.js"></script>
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <div class="text-header col-md-12">
-    <h1 class="text-center">Create a new post</h1>
+    <h4>Create a new post</h4>
     <form action="/post/create/new" method="POST" id="postForm">
       {{.csrfField}}
       <div class="topcontainer">
@@ -76,7 +76,7 @@
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <div class="col-md-12">
     <div class="text-header">
-      <h1>Delete post</h1>
+      <h4>Delete post</h4>
     </div>
     <form action="/post/{{.ID}}/delete/post" method="POST">
         {{.csrfField}}
@@ -92,7 +92,7 @@
 <script src="/static/js/simplemde.min.js"></script>
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <div class="text-header col-md-12">
-    <h1 class="text-center">Edit Post</h1>
+    <h4>Edit Post</h4>
     <form action="/post/{{.ID}}/edit/post" method="POST">
         {{.csrfField}}
       <div class="form-group col-md-9 topbar">
