@@ -81,7 +81,7 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.PostPerms == 1 || post.PostPerms == 2 {
-		err := tmpl.ExecuteTemplate(w, "display", model.M{"markdown": parsePost(post.ID, post.Data),
+		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
 			"meta": post.Meta})
 		if err != nil {
 			log.Println(err)
