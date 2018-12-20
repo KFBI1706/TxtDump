@@ -186,10 +186,6 @@ func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post.Crypto.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		parsePost(post.ID, post.Data)
-		log.Println("parsed post")
-		log.Println(post.ID)
-		log.Println(post.Data.Title)
-		log.Println(post.Data.Content)
 		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
@@ -277,8 +273,7 @@ func Documentation(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	doc := parse(string(file))
-	err = tmpl.ExecuteTemplate(w, "doc", model.Markdown{MD: doc})
+	err = tmpl.ExecuteTemplate(w, "doc", model.Markdown{MD: parse(string(file))})
 	if err != nil {
 		log.Println(err)
 	}
