@@ -40,10 +40,14 @@ func InitDB(dbstringLocation string) {
 		log.Panic(err)
 	} else {
 		var post model.Post
+		var data model.Data
 		if !DB.HasTable(&post) {
 			DB.AutoMigrate(&post)
 		}
-
+		if !DB.HasTable(&data) {
+			DB.AutoMigrate(&data)
+		}
+		DB.Model(&post).Related(&data)
 	}
 }
 

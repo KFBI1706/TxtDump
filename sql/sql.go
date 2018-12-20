@@ -74,9 +74,16 @@ func PostMetas() (model.PostCounter, error) {
 }
 
 //PostDatas returns some data used for index overview
-func PostDatas() ([]model.Data, error) {
-	datas := []model.Data{}
-	err := config.DB.Debug().Find(&datas).Error
+func PostDatas() (datas []model.Data, err error) {
+	var posts []model.Post
+	if err = config.DB.Debug().Preload("Data").Find(&posts).Error; err != nil {
+		log.Println(err)
+		return datas, err
+	}
+	datas = make([]model.Data, len(posts))
+	for i := range posts {
+		datas[i] = posts[i].Data
+	}
 	return datas, err
 }
 

@@ -3,6 +3,8 @@ package model
 import (
 	"html/template"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 //M Generic map[string]interface{} to decode into
@@ -10,18 +12,18 @@ type M map[string]interface{}
 
 //Post is the "master" struct
 type Post struct {
-	ID     int `json:"ID" gorm:"primary_key"`
-	DataID int `gorm:"Column:data_id"`
-	Data
-	Meta
-	Edit
-	Crypto
-	Markdown
+	ID       int `json:"ID" gorm:"primary_key"`
+	Data     Data
+	Meta     Meta
+	Edit     Edit
+	Crypto   Crypto
+	Markdown Markdown
 }
 
 //Data contains all the info related to the posts
 type Data struct {
-	//ID        int
+	gorm.Model
+	PostID    int
 	Title     string `json:"Title" gorm:"Column:title"`
 	PostPerms int    `json:"PostPerms,string" gorm:"Column:postperms"`
 	Content   string `json:"Content" gorm:"Column:text"`

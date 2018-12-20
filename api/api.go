@@ -25,7 +25,7 @@ func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	newpost.ID = existingpost.ID
 
-	if valid := crypto.CheckPass(existingpost.Hash, existingpost.ID, existingpost.PostPerms); valid {
+	if valid := crypto.CheckPass(existingpost.Crypto.Hash, existingpost.ID, existingpost.Data.PostPerms); valid {
 		err = sql.SaveChanges(newpost)
 	}
 	if err != nil {
@@ -44,7 +44,7 @@ func DeletePostAPI(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	if valid := crypto.CheckPass(post.Hash, post.ID, post.PostPerms); valid {
+	if valid := crypto.CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms); valid {
 		err = sql.DeletePost(post)
 	}
 	if err != nil {
@@ -71,12 +71,12 @@ func RequestPostAPI(w http.ResponseWriter, r *http.Request) {
 	result := html.ProcessRequest(w, r)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if result.PostPerms == 3 {
+	if result.Data.PostPerms == 3 {
 		fmt.Fprintf(w, "This post is password protected mah dude you need to POST the Hash")
 		return
 	}
-	result.Hash = ""
-	result.Salt = ""
+	result.Crypto.Hash = ""
+	result.Crypto.Salt = ""
 	defer sql.IncrementViewCounter(result.ID)
 	err := json.NewEncoder(w).Encode(result)
 	if err != nil {
@@ -107,10 +107,10 @@ func CreatePostAPI(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Something went wrong")
 		return
 	}
-	if newpost.PostPerms == 0 || newpost.PostPerms > 3 {
-		newpost.PostPerms = 2
+	if newpost.Data.PostPerms == 0 || newpost.Data.PostPerms > 3 {
+		newpost.Data.PostPerms = 2
 	}
-	crypto.SecurePost(&newpost, newpost.Hash)
+	crypto.SecurePost(&newpost, newpost.Crypto.Hash)
 	sql.CreatePostDB(newpost)
 	json.NewEncoder(w).Encode(newpost)
 }

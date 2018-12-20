@@ -6,8 +6,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/KFBI1706/TxtDump/crypto"
 	"github.com/KFBI1706/TxtDump/helper"
@@ -64,7 +66,7 @@ func parsePost(ID int, data model.Data) (markdown model.Markdown) {
 func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	post.Hash = r.FormValue("Pass")
+	post.Crypto.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
 			"meta": post.Meta})
@@ -80,7 +82,7 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	if post.PostPerms == 1 || post.PostPerms == 2 {
+	if post.Data.PostPerms == 1 || post.Data.PostPerms == 2 {
 		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
 			"meta": post.Meta})
 		if err != nil {
@@ -88,7 +90,7 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "Something went wrong")
 			return
 		}
-	} else if post.PostPerms == 3 {
+	} else if post.Data.PostPerms == 3 {
 		err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
@@ -119,8 +121,10 @@ func CreatePostWeb(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	newpost := model.Post{Data: model.Data{Content: r.FormValue("Content"), Title: r.FormValue("Title")}}
-	newpost.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
+	rand.Seed(time.Now().UnixNano())
+	newpost := model.Post{ID: helper.GenFromSeed(), Data: model.Data{Content: r.FormValue("Content"), Title: r.FormValue("Title")}}
+	newpost.Data.PostID = newpost.ID
+	newpost.Data.PostPerms, err = helper.DeterminePerms(r.FormValue("postperms"))
 	if err != nil {
 		log.Println(err)
 	}
@@ -145,7 +149,7 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
 	post := ProcessRequest(w, r)
 	if templateString == "edit" {
-		if post.PostPerms == 3 {
+		if post.Data.PostPerms == 3 {
 			err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
 				"ID":   post.ID,
 				"Mode": templateString,
@@ -178,18 +182,18 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 func EditPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html", "front/post.html"))
-	post.Hash = r.FormValue("Pass")
+	post.Crypto.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
 		parsePost(post.ID, post.Data)
 		log.Println("parsed post")
 		log.Println(post.ID)
 		log.Println(post.Data.Title)
-		log.Println(post.Content)
+		log.Println(post.Data.Content)
 		err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
 			"Title":          post.Data.Title,
-			"Content":        post.Content,
+			"Content":        post.Data.Content,
 		})
 		if err != nil {
 			log.Println(err)
@@ -215,30 +219,30 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 	url := fmt.Sprintf("/post/%v/request", post.ID)
 	var err error
 	if operation == "edit" {
-		post.Content = r.FormValue("Content")
-		post.Title = r.FormValue("Title")
-		hash := post.Hash
-		post.Hash = r.FormValue("Pass")
-		if post.PostPerms == 3 {
+		post.Data.Content = r.FormValue("Content")
+		post.Data.Title = r.FormValue("Title")
+		hash := post.Crypto.Hash
+		post.Crypto.Hash = r.FormValue("Pass")
+		if post.Data.PostPerms == 3 {
 			key := crypto.GetEncKey(&post)
-			fmt.Println("encrypting", post.Content)
-			b := []byte(post.Content)
+			fmt.Println("encrypting", post.Data.Content)
+			b := []byte(post.Data.Content)
 			ct, err := crypto.EncryptBytes(b, &key)
 			if err != nil {
 				log.Fatal(err)
 			}
-			post.Content = b64.StdEncoding.EncodeToString(ct)
+			post.Data.Content = b64.StdEncoding.EncodeToString(ct)
 		}
-		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
-			post.Hash = hash
+		if crypto.CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms) {
+			post.Crypto.Hash = hash
 			err = sql.SaveChanges(post)
 			if err != nil {
 				log.Println(err)
 			}
 		}
 	} else if operation == "delete" {
-		post.Hash = r.FormValue("Pass")
-		if crypto.CheckPass(post.Hash, post.ID, post.PostPerms) {
+		post.Crypto.Hash = r.FormValue("Pass")
+		if crypto.CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms) {
 			err = sql.DeletePost(post)
 			if err != nil {
 				log.Println(err)

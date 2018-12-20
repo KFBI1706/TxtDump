@@ -16,18 +16,18 @@ import (
 	_scrypt "golang.org/x/crypto/scrypt"
 )
 
-/*RequestDecrypt decrypts the post if the field post.Hash is the correct password.
+/*RequestDecrypt decrypts the post if the field post.Crypto.Hash is the correct password.
 It takes a pointer to the model.Post as the only argument
 and returns a bool based on if the post is successfully decrypted*/
 func RequestDecrypt(post *model.Post) bool {
-	if CheckPass(post.Hash, post.ID, post.PostPerms) {
+	if CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms) {
 		key := GetEncKey(post)
-		ct, _ := base64.StdEncoding.DecodeString(post.Content)
+		ct, _ := base64.StdEncoding.DecodeString(post.Data.Content)
 		pt, err := decrypt(ct, &key)
 		if err != nil {
 			log.Fatal(err)
 		}
-		post.Content = string(pt)
+		post.Data.Content = string(pt)
 		return true
 	}
 	return false
@@ -40,7 +40,7 @@ func GetEncKey(post *model.Post) (key [32]byte) {
 	dk := getKey(post)
 	key = [32]byte{}
 	copy(key[:], dk[0:32])
-	tmp, _ := base64.StdEncoding.DecodeString(post.Key)
+	tmp, _ := base64.StdEncoding.DecodeString(post.Crypto.Key)
 	encKey, _ := decrypt(tmp, &key)
 	copy(key[:], encKey[0:32])
 	return
@@ -58,7 +58,7 @@ func getKey(post *model.Post) (dk []byte) {
 	if err != nil {
 		log.Println(err)
 	}
-	dk, _ = _scrypt.Key([]byte(post.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
+	dk, _ = _scrypt.Key([]byte(post.Crypto.Hash), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,19 +80,19 @@ returns nothing*/
 func SecurePost(post *model.Post, pass string) {
 	rand.Seed(time.Now().UnixNano())
 	post.ID = helper.GenFromSeed()
-	if post.PostPerms > 1 {
+	if post.Data.PostPerms > 1 {
 		if salt, hash, sha256hash, err := securePass(pass); sha256hash != "" {
-			post.Salt = salt
-			post.Hash = sha256hash
-			if post.PostPerms == 3 {
+			post.Crypto.Salt = salt
+			post.Crypto.Hash = sha256hash
+			if post.Data.PostPerms == 3 {
 				encKey := newencryptionKey()
-				post.Content, post.Key = encryptPost([]byte(post.Content), encKey)
+				post.Data.Content, post.Crypto.Key = encryptPost([]byte(post.Data.Content), encKey)
 				tmpKey := sql.HexToBytes(hash)
 				key := [32]byte{}
 				copy(key[:], tmpKey[0:32])
-				tmpKey, _ = base64.StdEncoding.DecodeString(post.Key) //same as encKey
-				tmpKey, _ = encrypt(tmpKey, &key)                     //encrypt the file key with the password hash
-				post.Key = base64.StdEncoding.EncodeToString(tmpKey)
+				tmpKey, _ = base64.StdEncoding.DecodeString(post.Crypto.Key) //same as encKey
+				tmpKey, _ = encrypt(tmpKey, &key)                            //encrypt the file key with the password hash
+				post.Crypto.Key = base64.StdEncoding.EncodeToString(tmpKey)
 
 			}
 		} else {
