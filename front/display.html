@@ -1,21 +1,22 @@
 <!-- Html when a post is found in DB -->
 {{ define "display" }} {{ template "layout" }}
-<main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-  <div class="text-header ">
-    <h1 class="Title">{{.markdown.TitleMD}}</h1>
-    <h6 class="Time">Post created at: {{.meta.CreateTime}}</h6>
-    <h6>{{.meta.Views}} Views</h6>
-    <h6>
+<h1>{{.}}</h1>
+<main role="main" class="container col-sm-12 col-md-9 col-lg-9" itemscope itemtype="https://schema.org/SocialMediaPosting">
+  <section class="text-header">
+    <h1 class="Title" itemprop="headline name">{{.markdown.TitleMD}}</h1>
+    <p class="Time"><strong>Post created at:</strong> <span class="timestamp"itemprop="sdDatePublished">{{.meta.CreateTime}}</span></p>
+    <p><span>{{.meta.Views}}</span> Views</p>
+    <p>
       <a href="/post/{{.ID}}/edit">Edit post</a>
-    </h6>
-    <h6>
+    </p>
+    <p>
       <a href="/post/{{.ID}}/delete">Delete post</a>
-    </h6>
+    </p>
     <hr>
-  </div>
-  <div class="text-content ">
+  </section>
+  <article class="text-content" itemprop="text">
     <span class="content">{{.markdown.MD}}</span>
-  </div>
+  </article>
 </main>
 {{ template "layoutEnd" }} {{end}}
 
@@ -42,7 +43,7 @@
 
 {{ define "displayPass"}} {{ template "layout" }}
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
-  <div class="col-md-12">
+  <article class="col-md-12">
     <div class="text-header">
       <h1>Unencrypt File</h1>
     </div>
@@ -54,6 +55,6 @@
       <br>
       <input type="submit" class="btn btn-danger" value="Submit password">
     </form>
-  </div>
+  </article>
 </main>
 {{ template "layoutEnd" }} {{ end }}

@@ -1,18 +1,16 @@
-body {
-  padding-top: 5rem;
-}
 
-.text-header {
+body main.text-header {
   margin-top: 50px;
   margin-bottom: 25px;
 }
 
-.text-header h6 {
+body main section.text-header p {
   color: rgb(80, 80, 80);
   font-size: 14px;
+  margin: 3px 0px;
 }
 
-.text-header hr {
+body main section.text-header hr {
   color: #333;
   border-top: 2px solid rgba(0, 0, 0, .1);
 }
@@ -49,11 +47,12 @@ code {
 pre {
   background-color: #eee;
 }
-
+.topcontainer {
+  display: flex;
+  flex-direction: row;
+}
 .topbar {
   padding-left: 0px;
-  float: left;
-  display: inline;
 }
 
 .derpimbadatcss {
