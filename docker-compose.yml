@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: txtdump
+      POSTGRES_USER: dumper
+      POSTGRES_PASSWORD: 12345
+    ports:
+        - 5432:5432
+  app:
+    environment:
+      HOST: db
+      DB: txtdump
+      USER: dumper
+      PASSWORD: 12345
+      PORT: 1337
+    build: .
+    command:
+    volumes:
+        - .:/go/src/app
+    working_dir: /go/src/app
+    command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "main.go"]
+    ports:
+        - "8080:1337"
+    depends_on:
+        - db
+    links:
+        - db

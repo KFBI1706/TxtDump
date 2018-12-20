@@ -9,15 +9,13 @@ import (
 
 	"github.com/KFBI1706/TxtDump/model"
 	"github.com/jinzhu/gorm"
+	//Postgres dialect for gorm
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 //DB : is a exported variable for access from other packages, as this is the package that inits the DB
 var DB *gorm.DB
 
-//InitDB function reads the file location contents, which should contain database parameters and uses them to create a pointer to DB
-//takes dbstringLocation (string) as a parameter, which shuold be a full path to the file
-//nothing is returned directly, but if the function executes correctly the exported DB variable should be a *DB
 func checkFile(pth string) error {
 	if _, err := os.Stat(pth); os.IsNotExist(err) {
 		return err
@@ -33,6 +31,9 @@ func readFile(pth string) string {
 	return string(bytes)
 }
 
+//InitDB function reads the file location contents, which should contain database parameters and uses them to create a pointer to DB
+//takes dbstringLocation (string) as a parameter, which shuold be a full path to the file
+//nothing is returned directly, but if the function executes correctly the exported DB variable should be a *DB
 func InitDB(dbstringLocation string) {
 	var err error
 	if DB, err = gorm.Open("postgres", readFile(dbstringLocation)); err != nil {
@@ -47,9 +48,7 @@ func InitDB(dbstringLocation string) {
 }
 
 func projectRoot() string {
-	gp := os.Getenv("GOPATH")
-	pth := path.Join(gp, "src/github.com/KFBI1706/TxtDump")
-	return pth
+	return os.Getenv("PWD")
 }
 func findConfig(env string) (string, error) {
 	pth := projectRoot()
