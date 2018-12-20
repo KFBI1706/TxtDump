@@ -23,7 +23,8 @@ func HexToBytes(s string) []byte {
 //TestDBConnection Just pings the DB
 func TestDBConnection() error {
 	var post model.Post
-	if config.DB.HasTable(&post) != true {
+	var data model.Data
+	if config.DB.HasTable(&post) != true || config.DB.HasTable(&data) != true {
 		return errors.New("Table does not exist. Run with -setupdb to fix this")
 	}
 	return nil
@@ -64,14 +65,19 @@ func CountPosts() int {
 	return count
 }
 
-//PostMetas returns some data used for index overview
+//PostMetas returns some metadata used for index overview
 func PostMetas() (model.PostCounter, error) {
-	posts := model.PostCounter{Meta: []model.Data{}, Count: CountPosts()}
-	err := config.DB.Find(&posts.Meta, &model.Post{}).Error
-	if err != nil {
-		log.Println(err)
-	}
-	return posts, err
+	//posts := []model.Post{}
+	//config.DB.Debug().Find(&posts)
+	postCounter := model.PostCounter{List: []model.Meta{}, Count: CountPosts()}
+	return postCounter, nil
+}
+
+//PostDatas returns some data used for index overview
+func PostDatas() ([]model.Data, error) {
+	datas := []model.Data{}
+	err := config.DB.Debug().Find(&datas).Error
+	return datas, err
 }
 
 //DeletePost deletes post in DB
@@ -95,7 +101,7 @@ func IncrementViewCounter(id int) error {
 
 //CheckForDuplicateID Checks if ID is already used for a post in DB
 func CheckForDuplicateID(id int) bool {
-	if config.DB.NewRecord(model.PostNew{model.Post{ID: id}}) {
+	if config.DB.NewRecord(model.PostNew{Post: model.Post{ID: id}}) {
 		return false
 	}
 	return true
@@ -118,11 +124,7 @@ func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 no input arguments
 returns error*/
 func SetupDB() error {
-	var post model.Post
-	if !config.DB.HasTable(&post) {
-		config.DB.AutoMigrate(&post)
-	}
-	return nil
+	return config.DB.Debug().AutoMigrate(&model.Post{}, &model.Data{}).Error
 }
 
 /*ClearOutDB is used to clear a table

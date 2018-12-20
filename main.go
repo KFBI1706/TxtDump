@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/KFBI1706/TxtDump/api"
 	"github.com/KFBI1706/TxtDump/config"
@@ -44,7 +43,6 @@ func main() {
 				log.Println(err)
 			}
 		}
-		os.Exit(3)
 	}
 	err := sql.TestDBConnection()
 	if err != nil {

@@ -5,9 +5,13 @@ import (
 	"time"
 )
 
+//M Generic map[string]interface{} to decode into
+type M map[string]interface{}
+
 //Post is the "master" struct
 type Post struct {
-	ID int `json:"ID" gorm:"Column:id;primary_key"`
+	ID     int `json:"ID" gorm:"primary_key"`
+	DataID int `gorm:"Column:data_id"`
 	Data
 	Meta
 	Edit
@@ -17,6 +21,7 @@ type Post struct {
 
 //Data contains all the info related to the posts
 type Data struct {
+	//ID        int
 	Title     string `json:"Title" gorm:"Column:title"`
 	PostPerms int    `json:"PostPerms,string" gorm:"Column:postperms"`
 	Content   string `json:"Content" gorm:"Column:text"`
@@ -53,6 +58,7 @@ type PostNew struct {
 	//data PostData
 }
 
+//Edit is used for editing a post
 type Edit struct {
 	EditID int `json:"EditID" gorm:"Column:editid"`
 }
@@ -60,5 +66,5 @@ type Edit struct {
 //PostCounter is used on index to provide some metadata about current posts
 type PostCounter struct {
 	Count int    `json:"Count"`
-	Meta  []Data `json:"Meta"`
+	List  []Meta `json:"List"`
 }

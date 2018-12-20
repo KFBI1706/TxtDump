@@ -36,11 +36,15 @@ func ProcessRequest(w http.ResponseWriter, r *http.Request) model.Post {
 //DisplayIndex renders the Index template with some metadata
 func DisplayIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/index.html"))
-	posts, err := sql.PostMetas()
+	metas, err := sql.PostMetas()
 	if err != nil {
 		log.Println(err)
 	}
-	err = tmpl.ExecuteTemplate(w, "index", posts)
+	datas, err := sql.PostDatas()
+	if err != nil {
+		log.Println(err)
+	}
+	err = tmpl.ExecuteTemplate(w, "index", model.M{"Meta": metas, "Data": datas})
 	if err != nil {
 		log.Println(err)
 	}
@@ -62,8 +66,13 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	post.Hash = r.FormValue("Pass")
 	if crypto.RequestDecrypt(&post) {
-		parsePost(post.ID, post.Data)
-		tmpl.ExecuteTemplate(w, "display", post)
+		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
+			"meta": post.Meta})
+		if err != nil {
+			log.Println(err)
+			fmt.Fprintln(w, "Something went wrong")
+			return
+		}
 	}
 }
 
@@ -72,8 +81,8 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
 	if post.PostPerms == 1 || post.PostPerms == 2 {
-		post.Markdown = parsePost(post.ID, post.Data)
-		err := tmpl.ExecuteTemplate(w, "display", post)
+		err := tmpl.ExecuteTemplate(w, "display", model.M{"markdown": parsePost(post.ID, post.Data),
+			"meta": post.Meta})
 		if err != nil {
 			log.Println(err)
 			fmt.Fprintln(w, "Something went wrong")

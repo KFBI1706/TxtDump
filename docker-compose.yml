@@ -20,7 +20,7 @@ services:
     volumes:
         - .:/go/src/app
     working_dir: /go/src/app
-    command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "main.go"]
+    command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "main.go", "-setupdb"]
     ports:
         - "8080:1337"
     depends_on:
