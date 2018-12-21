@@ -20,10 +20,11 @@
                 </thead>
                 <tbody>
                     {{range $index, $value := .Data}}
+                    {{$m:= index $.Meta $index }}
                     <tr>
                         <td class="col-2" scope="row"><a href="/post/{{$value.PostID}}/request">{{$value.PostID}}</a></td>
                         <td>{{$value.Title}}</td>
-                        <td></td>
+                        <td>{{$m.Views}}</td>
                         <td>{{$value.PostPerms}}</td>
                     </tr>
                     {{end}}
