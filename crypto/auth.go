@@ -35,19 +35,20 @@ func securePass(ps string) (string, string, string, error) {
 ps is the password in string form, id is the id of the post and perms is the post permissions
 it returns a bool based on it's success*/
 func CheckPass(ps string, id int, perms int) bool {
-	prop, err := sql.GetProp("salt", id)
+	salt, err := sql.GetProp("salt", id)
 	if err != nil {
 		log.Println(err)
 	}
-	dk, err := _scrypt.Key([]byte(ps), prop, 16384, 8, 1, scrypt.DefaultParams.DKLen)
+	dk, err := _scrypt.Key([]byte(ps), salt, 16384, 8, 1, scrypt.DefaultParams.DKLen)
 	if err != nil {
 		log.Fatal(err)
 	}
-	prop, err = sql.GetProp("hash", id)
+	hash, err := sql.GetProp("hash", id)
 	if err != nil {
 		log.Println(err)
 	}
-	if subtle.ConstantTimeCompare(sql.HexToBytes(sha256encode(dk)), prop) == 1 || perms == 1 {
+	fmt.Printf("Salt %s Hash %s scrypt: %s\n", salt, hash, dk)
+	if subtle.ConstantTimeCompare(sql.HexToBytes(sha256encode(dk)), hash) == 1 || perms == 1 {
 		return true
 	}
 	return false

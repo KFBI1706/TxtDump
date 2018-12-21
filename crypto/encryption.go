@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"math/rand"
 
@@ -18,9 +19,16 @@ import (
 It takes a pointer to the model.Post as the only argument
 and returns a bool based on if the post is successfully decrypted*/
 func RequestDecrypt(post *model.Post) bool {
-	if CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms) {
+	if ok := CheckPass(post.Crypto.Hash, post.ID, post.Data.PostPerms); ok {
+		p, err := sql.ReadPostDB(post.ID)
+		post = &p
+		log.Printf("checkPass fine %v\n post %#v\n", ok, p)
 		key := GetEncKey(post)
-		ct, _ := base64.StdEncoding.DecodeString(post.Data.Content)
+		ct, err := base64.StdEncoding.DecodeString(post.Data.Content)
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Println(ct)
 		pt, err := decrypt(ct, &key)
 		if err != nil {
 			log.Fatal(err)
@@ -39,7 +47,12 @@ func GetEncKey(post *model.Post) (key [32]byte) {
 	key = [32]byte{}
 	copy(key[:], dk[0:32])
 	tmp, _ := base64.StdEncoding.DecodeString(post.Crypto.Key)
-	encKey, _ := decrypt(tmp, &key)
+	log.Println(tmp, post.Crypto.Key)
+	encKey, err := decrypt(tmp, &key)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Printf("keys: %v %v\n", key, encKey)
 	copy(key[:], encKey[0:32])
 	return
 }
@@ -53,6 +66,7 @@ func GetToken() string {
 
 func getKey(post *model.Post) (dk []byte) {
 	prop, err := sql.GetProp("salt", post.ID)
+	log.Println(prop, post.Crypto.Hash)
 	if err != nil {
 		log.Println(err)
 	}
@@ -142,16 +156,14 @@ func decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
-
+	log.Println(len(ciphertext), gcm.NonceSize())
 	if len(ciphertext) < gcm.NonceSize() {
 		return nil, errors.New("malformed ciphertext")
 	}
-
 	return gcm.Open(nil,
 		ciphertext[:gcm.NonceSize()],
 		ciphertext[gcm.NonceSize():],

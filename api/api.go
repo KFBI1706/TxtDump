@@ -29,8 +29,7 @@ func EditPostAPI(w http.ResponseWriter, r *http.Request) {
 		if err = sql.SaveChanges(newpost); err != nil {
 			panic(err)
 		}
-	}
-	if err != nil {
+	} else {
 		log.Println(err)
 		fmt.Fprint(w, "Wrong Password")
 		return

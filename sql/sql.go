@@ -37,6 +37,10 @@ func CreatePostDB(post model.Post) error {
 	if err != nil {
 		return err
 	}
+	if err = SaveChanges(post); err != nil {
+		return err
+	}
+	log.Println(ReadPostDB(post.ID))
 	return nil
 }
 
@@ -49,8 +53,6 @@ func ReadPostDB(ID int) (model.Post, error) {
 
 //SaveChanges registers edits in DB
 func SaveChanges(post model.Post) (err error) {
-	log.Println("\nsaving!!!!!!!!\n")
-	log.Println(post)
 	if err = config.DB.Debug().Model(&model.Data{}).UpdateColumns(&post.Data).Error; err != nil {
 		return err
 	}
@@ -72,6 +74,7 @@ func CountPosts() int {
 
 //PostMetas returns some metadata used for index overview
 func PostMetas() (metas []model.Meta, err error) {
+	//Use pluck
 	var posts []model.Post
 	if err = config.DB.Debug().Preload("Meta").Find(&posts).Error; err != nil {
 		log.Println(err)
@@ -87,6 +90,7 @@ func PostMetas() (metas []model.Meta, err error) {
 
 //PostDatas returns some data used for index overview
 func PostDatas() (datas []model.Data, err error) {
+	//Use pluck
 	var posts []model.Post
 	if err = config.DB.Debug().Preload("Data").Find(&posts).Error; err != nil {
 		log.Println(err)
@@ -129,12 +133,13 @@ func CheckForDuplicateID(id int) bool {
 //GetProp gets the requested hash from the DB
 func GetProp(prop string, id int) ([]byte, error) { //todo:encoding parameter
 	if prop == "salt" || prop == "hash" {
-		var post model.Post
-		err := config.DB.Preload("Crypto").First(&model.Post{}, id).First(&post).Error
+		var s string
+		err := config.DB.Debug().Model(&model.Crypto{}).Select(prop).Where(&model.Crypto{PostID: id}).Row().Scan(&s)
+		log.Println(s)
 		if err != nil {
 			return nil, err
 		}
-		return HexToBytes(post.Crypto.Hash), err
+		return HexToBytes(s), err
 	}
 	return nil, nil
 }
