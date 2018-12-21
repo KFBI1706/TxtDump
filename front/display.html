@@ -3,7 +3,7 @@
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9" itemscope itemtype="https://schema.org/SocialMediaPosting">
   <section class="text-header">
     <h1 class="Title" itemprop="headline name">{{.markdown.TitleMD}}</h1>
-    <p class="Time"><strong>Post created at:</strong> <span class="timestamp"itemprop="sdDatePublished">{{.meta.CreatedAt}}</span></p>
+    <p class="Time"><strong>Post created at:</strong> <time class="timestamp"itemprop="sdDatePublished" id="timestamp">{{.meta.CreatedAt.Format "02 Jan 2006 15:04"}}</time></p>
     <p><span>{{.meta.Views}}</span> Views</p>
     <p>
       <a href="/post/{{.ID}}/edit">Edit post</a>
@@ -47,7 +47,7 @@
       <h1>Unencrypt File</h1>
     </div>
     <form action="/post/{{.ID}}/{{.Mode}}/decrypt" method="POST">
-        {{.csrfField}}
+       <p id="debug">{{.csrfField}}</p>
       <label>Password</label>
       <input type="password" class="form-control col-md-12" id="formGroupExampleInput" placeholder="(Optional)" name="Pass">
 

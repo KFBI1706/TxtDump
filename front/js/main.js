@@ -1,4 +1,4 @@
-window.onload = debugLog;
+window.onload = init;
 function activateCustomPass(checkbox = "customPass", element = "customField") {
     var customPass = document.getElementById(checkbox).checked;
     if (customPass == true) {
@@ -8,11 +8,11 @@ function activateCustomPass(checkbox = "customPass", element = "customField") {
     }
 }
 
-function debugLog(){
-    debug = document.getElementById("debug")
+function init(){
+	debug = document.getElementById("debug");
     if (debug) {
-	    console.log(debug.innerHTML);
-    }
+	    consolle.log(debug.innerHTML);
+	}
 }
 
 function modalIfNoPass() {
