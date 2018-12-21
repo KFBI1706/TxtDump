@@ -1,24 +1,24 @@
 window.onload = init;
-function activateCustomPass(checkbox = "customPass", element = "customField") {
-    var customPass = document.getElementById(checkbox).checked;
-    if (customPass == true) {
-        document.getElementById(element).disabled = false;
-    } else {
-        document.getElementById(element).disabled = true;
-    }
-}
+
 
 function init(){
-	debug = document.getElementById("debug");
+	var checkbax = document.getElementById("customPass");
+	if(checkbax) {
+		document.getElementById("customField").disabled = !document.getElementById("customField").disabled;
+		checkbax.onclick = toggle;
+	}
+	var debug = document.getElementById("debug");
     if (debug) {
 	    consolle.log(debug.innerHTML);
 	}
+
+}
+function toggle() {
+	document.getElementById("customField").disabled = !document.getElementById("customField").disabled;
 }
 
 function modalIfNoPass() {
 	var customPass = document.getElementById("customPass").checked;
-	var passField = document.getElementById("customField").value;
-
     if (customPass === true) {
         document.getElementById("postForm").submit();
     } else {
@@ -38,12 +38,12 @@ else if(window.location.pathname == "/documentation"){
     document.getElementById("doc").classList.add('active');
 }
 $(document).ready(function () {
-    var userInputs = new Array();
+	var userInputs = new Array();
     userInputs.push("john.smith@test.com");
     $("#customField").zxcvbnProgressBar({
           passwordInput: "#customField",
           userInputs: userInputs,
-    });
+	});
 });
 
 (function ($) {
