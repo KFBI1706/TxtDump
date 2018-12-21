@@ -16,11 +16,18 @@ function debugLog(){
 }
 
 function modalIfNoPass() {
-    var customPass = document.getElementById("customPass").checked;
-    if (customPass == true) {
+	var customPass = document.getElementById("customPass").checked;
+	var passField = document.getElementById("customField").value;
+
+    if (customPass === true) {
         document.getElementById("postForm").submit();
     } else {
-        $('#noPassModal').modal(document)
+		if(document.getElementById("sel").value != 1 ){
+			$('#noPassModal').modal(document)
+		}
+		else {
+			document.getElementById("postForm").submit();
+		}
     }
 }
 

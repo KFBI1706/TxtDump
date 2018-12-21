@@ -18,36 +18,28 @@ body main section.text-header hr {
   border-top: 2px solid rgba(0, 0, 0, .1);
 }
 
-.text-content {
-  height: 500px;
+main .text-content {
+  min-height: 300px; 
+  height: auto;
 }
-
-.counter {
-  font-size: 30px;
-}
-
-.sub-counter {
-  font-size: 22px;
-}
-
 .infobox {
   height: 200px;
 }
 
-.content {
+main .content {
   height: 500px;
   width: 100%;
 }
 
-.content-box {
+main .content-box {
   height: 500px;
 }
 
-code {
+main code {
   background-color: #eee;
 }
 
-pre {
+main pre {
   background-color: #eee;
 }
 .topcontainer {
