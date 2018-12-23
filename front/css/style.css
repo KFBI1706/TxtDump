@@ -2,11 +2,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   padding-top: 5rem;
 }
+#debug {
+  display: none;
+  padding: none;
+  margin: none;
+}
 body main.text-header {
   margin-top: 300px;
   margin-bottom: 25px;
 }
-
 body main section.text-header p {
   color: rgb(80, 80, 80);
   font-size: 14px;
@@ -17,51 +21,65 @@ body main section.text-header hr {
   color: #333;
   border-top: 2px solid rgba(0, 0, 0, .1);
 }
+@media only screen and (min-width: 800px) {
 
-main .text-content {
-  min-height: 300px; 
-  height: auto;
-}
-.infobox {
-  height: 200px;
-}
 
-main .content {
-  height: 500px;
-  width: 100%;
-}
 
-main .content-box {
-  height: 500px;
-}
+  main .text-content {
+    min-height: 300px;
+    height: auto;
+  }
 
-main code {
-  background-color: #eee;
-}
+  .infobox {
+    height: 200px;
+  }
 
-main pre {
-  background-color: #eee;
-}
-.topcontainer {
-  display: flex;
-  flex-direction: row;
-}
-.topbar {
-  padding-left: 0px;
-}
+  main .content {
+    height: 500px;
+    width: 100%;
+  }
 
-.derpimbadatcss {
-  padding-right: 0px;
-}
+  main .content-box {
+    height: 500px;
+  }
 
-.bax {
-  height: 120px;
+  main code {
+    background-color: #eee;
+  }
+
+  main pre {
+    background-color: #eee;
+  }
+  main section aside.cardColumn {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+  }
+  main section aside div.card {
+    max-height: 25%;
+  }
+  main section aside div.card h4 {
+    font-size: 20px;
+  }
+  main section aside div.card p {
+    font-size: 15px;
+  }
+  section.rowCust {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .topcontainer {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .topbar {
+    padding-left: 0px;
+  }
+  
+
 }
-.progress{
-  margin-top: 10px;
-}
-#debug {
-  display: none;
-  padding: none;
-  margin: none;
+@media only screen and (max-width: 800px) {
+
 }

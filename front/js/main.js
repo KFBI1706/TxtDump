@@ -4,7 +4,8 @@ window.onload = init;
 function init(){
 	var checkbax = document.getElementById("customPass");
 	if(checkbax) {
-		document.getElementById("customField").disabled = !document.getElementById("customField").disabled;
+		checkbax.checked = false;
+		document.getElementById("customField").disabled = true;
 		checkbax.onclick = toggle;
 	}
 	var debug = document.getElementById("debug");
@@ -55,7 +56,6 @@ $(document).ready(function () {
 		}, options);
 
 		return this.each(function () {
-			UpdateProgressBar();
 			$(settings.passwordInput).keyup(function (event) {
 				UpdateProgressBar();
 			});
