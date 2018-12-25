@@ -18,3 +18,12 @@ func getMDHeader(md template.HTML) string {
 	}
 	return ""
 }
+func getIMG(md template.HTML) string {
+	if strings.Contains(string(md), "<img") {
+		imgString := strings.Split(strings.Trim(string(md), `<p>img src="" "  </p>`), `"`)
+		if len(imgString) > 0 && strings.Contains(imgString[0], "htt") {
+			return imgString[0]
+		}
+	}
+	return ""
+}

@@ -19,7 +19,6 @@ func generateRandomPostData() {
 		post := model.Post{Data: model.Data{Content: randomString(20), PostPerms: 2}, Meta: model.Meta{Views: 0}}
 		post.Data.Title = randomString(10)
 		post.ID = rand.Intn(9999999-1000000) + 1000000
-		post.EditID = rand.Intn(9999999-1000000) + 1000000
 		posts = append(posts, post)
 	}
 }

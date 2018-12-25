@@ -58,6 +58,9 @@ func parsePost(ID int, data model.Data) (markdown model.Markdown) {
 	if mdhead := getMDHeader(markdown.MD); mdhead != "" && data.Title == "" {
 		data.Title = mdhead
 	}
+	if thumb := getIMG(markdown.MD); thumb != "" {
+		fmt.Println(thumb)
+	}
 	markdown.TitleMD = template.HTML(data.Title)
 	return
 }
