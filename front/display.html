@@ -1,5 +1,5 @@
 <!-- Html when a post is found in DB -->
-{{ define "display" }} {{ template "layout" }}
+{{ define "display" }} {{ template "layout" .markdown.TitleMD}}
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9" itemscope itemtype="https://schema.org/SocialMediaPosting">
   <section class="text-header">
     <h1 class="Title" itemprop="headline name">{{.markdown.TitleMD}}</h1>
@@ -32,7 +32,9 @@
     <h1 class="Title">The Page does not exsist</h1>
   </div>
 </main>
-{{ end }} {{define "doc"}} {{ template "layout" }}
+{{ end }}
+
+{{define "doc"}} {{ template "layout" }}
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <h2>This page is intended for testing the MD rendering only for the most part</h2>
   <br>
