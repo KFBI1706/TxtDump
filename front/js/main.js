@@ -10,7 +10,7 @@ function init(){
 	}
 	var debug = document.getElementById("debug");
     if (debug) {
-	    consolle.log(debug.innerHTML);
+	    console.log(debug.innerHTML);
 	}
 
 }

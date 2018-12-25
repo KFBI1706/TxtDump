@@ -49,6 +49,7 @@ type Meta struct {
 type Markdown struct {
 	MD      template.HTML `json:"" gorm:"-"`
 	TitleMD template.HTML `json:"" gorm:"-"`
+	IMG     template.HTML `json:"" gorm:"-"`
 }
 
 //PostNew is used for registering a new post

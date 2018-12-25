@@ -5,14 +5,16 @@
   <meta charset="utf8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   {{if .}}
-    <title>{{.}}</title>
-    <meta property="og:title" content="{{.}}"/>
+    <title>{{.markdown.TitleMD}}</title>
+    <meta property="og:title" content="{{.markdown.TitleMD}}"/>
+    <meta property="og:image" content="{{.markdown.IMG}}"/>
+    <meta property="og:url" content="/post/{{.ID}}/request"/>
   {{else}}
     <title>TxtDump</title>
     <meta property="og:title" content="TxtDump Article"/>
+    <meta property="og:url" content="/"/>
   {{end}}
   <meta property="og:type" content="article"/>
-  <meta property="og:url" content="/"/>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="/static/css/style.css" rel="stylesheet">
 </head>

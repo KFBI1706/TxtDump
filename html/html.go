@@ -59,7 +59,7 @@ func parsePost(ID int, data model.Data) (markdown model.Markdown) {
 		data.Title = mdhead
 	}
 	if thumb := getIMG(markdown.MD); thumb != "" {
-		fmt.Println(thumb)
+		markdown.IMG = template.HTML(thumb)
 	}
 	markdown.TitleMD = template.HTML(data.Title)
 	return
