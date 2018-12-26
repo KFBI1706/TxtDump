@@ -87,6 +87,7 @@
 <main role="main" class="container col-sm-12 col-md-9 col-lg-9">
   <div class="text-header col-md-12">
     <h4>Edit Post</h4>
+    <section id="err"></section>
     <form action="/post/{{.ID}}/edit/post" method="POST">
         {{.csrfField}}
     <section class="rowCust">
@@ -96,7 +97,7 @@
       </div>
       <div class="form-group col-md-3">
         <label>Post password</label>
-        <input type="password" name="Pass" class="form-control" id="">
+        <input type="password" name="Pass" class="form-control">
       </div>
     </section>
     <section class="rowCust">

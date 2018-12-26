@@ -85,7 +85,7 @@ func RequestPostDecrypt(w http.ResponseWriter, r *http.Request) {
 func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 	post := ProcessRequest(w, r)
 	tmpl := template.Must(template.ParseFiles("front/layout.html", "front/display.html"))
-	if post.Data.PostPerms == 1 || post.Data.PostPerms == 2 {
+	if post.Data.PostPerms <= 2 {
 		err := tmpl.ExecuteTemplate(w, "display", model.M{"ID": post.ID, "markdown": parsePost(post.ID, post.Data),
 			"meta": post.Meta})
 		if err != nil {
@@ -93,7 +93,7 @@ func RequestPostWeb(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "Something went wrong")
 			return
 		}
-	} else if post.Data.PostPerms == 3 {
+	} else {
 		err := tmpl.ExecuteTemplate(w, "displayPass", map[string]interface{}{
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"ID":             post.ID,
@@ -162,6 +162,11 @@ func postTemplate(w http.ResponseWriter, r *http.Request, templateString string)
 				log.Println(err)
 			}
 		} else {
+			keys, ok := r.URL.Query()["failed"]
+			if ok && len(keys) > 0 && (len(r.URL.Query()["title"]) > 0 && len(r.URL.Query()["content"]) > 0) {
+				post.Data.Title = r.URL.Query()["title"][0]
+				post.Data.Content = r.URL.Query()["content"][0]
+			}
 			err := tmpl.ExecuteTemplate(w, "edit", map[string]interface{}{
 				"ID":      post.ID,
 				"Title":   post.Data.Title,
@@ -241,6 +246,8 @@ func postForm(w http.ResponseWriter, r *http.Request, operation string) {
 			if err != nil {
 				log.Println(err)
 			}
+		} else {
+			url = fmt.Sprintf("/post/%v/edit?failed=true&title=%v&content=%v", post.ID, post.Data.Title, post.Data.Content)
 		}
 	} else if operation == "delete" {
 		post.Crypto.Hash = r.FormValue("Pass")

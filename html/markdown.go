@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"strings"
 
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/shurcooL/github_flavored_markdown"
 )
 
@@ -21,9 +22,13 @@ func getMDHeader(md template.HTML) string {
 func getIMG(md template.HTML) string {
 	if strings.Contains(string(md), "<img") {
 		imgString := strings.Split(strings.Trim(string(md), `<p>img src="" "  </p>`), `"`)
-		if len(imgString) > 0 && strings.Contains(imgString[0], "htt") {
+		if len(imgString) > 0 && strings.Contains(imgString[0], "http") {
 			return imgString[0]
 		}
 	}
 	return ""
+}
+func sanitizeURLStrings(unsafe string) string {
+	pol := bluemonday.UGCPolicy()
+	return pol.Sanitize(unsafe)
 }

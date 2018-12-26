@@ -12,7 +12,13 @@ function init(){
     if (debug) {
 	    console.log(debug.innerHTML);
 	}
-
+	if(window.location.href.includes("failed=true")){
+		var err = document.getElementById("err");
+		errMsg = document.createElement("p");
+		errMsg.innerHTML = "Wrong password";
+		errMsg.classList += "text-danger";
+		err.appendChild(errMsg);
+	}
 }
 function toggle() {
 	document.getElementById("customField").disabled = !document.getElementById("customField").disabled;
