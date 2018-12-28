@@ -14,9 +14,9 @@ type Post struct {
 	ID       int `json:"ID" gorm:"primary_key"`
 	Data     Data
 	Meta     Meta
-	Edit     Edit
-	Crypto   Crypto
-	Markdown Markdown
+	Edit     Edit     `json:"-"`
+	Crypto   Crypto   `json:"-"`
+	Markdown Markdown `json:"-"`
 }
 
 //Data contains all the info related to the posts

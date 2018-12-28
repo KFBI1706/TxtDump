@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/microcosm-cc/bluemonday"
 	"github.com/shurcooL/github_flavored_markdown"
 )
 
@@ -27,8 +26,4 @@ func getIMG(md template.HTML) string {
 		}
 	}
 	return ""
-}
-func sanitizeURLStrings(unsafe string) string {
-	pol := bluemonday.UGCPolicy()
-	return pol.Sanitize(unsafe)
 }
