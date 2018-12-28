@@ -14,15 +14,17 @@ func parse(input string) template.HTML {
 func getMDHeader(md template.HTML) string {
 	if strings.Contains(string(md), "</h1>") {
 		split := strings.SplitAfter(string(md), "</h1>")
-		return split[0]
+		if len(split) > 0 {
+			return split[0]
+		}
 	}
 	return ""
 }
 func getIMG(md template.HTML) string {
 	if strings.Contains(string(md), "<img") {
-		imgString := strings.Split(strings.Trim(string(md), `<p>img src="" "  </p>`), `"`)
-		if len(imgString) > 0 && strings.Contains(imgString[0], "http") {
-			return imgString[0]
+		imgString := strings.Split(strings.Trim(string(md), `<p>img src="" "  </p>`), `"`)[0]
+		if len(imgString) > 0 && strings.Contains(imgString, "http") {
+			return imgString
 		}
 	}
 	return ""
