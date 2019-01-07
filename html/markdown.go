@@ -27,5 +27,5 @@ func getIMG(md template.HTML) string {
 			return imgString
 		}
 	}
-	return ""
+	return "/static/img/logo.png"
 }

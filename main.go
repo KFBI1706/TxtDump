@@ -44,8 +44,7 @@ func main() {
 			}
 		}
 	}
-	err := sql.TestDBConnection()
-	if err != nil {
+	if err := sql.TestDBConnection(); err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("%v Post(s) Currently in DB\n", sql.CountPosts())
@@ -70,12 +69,10 @@ func main() {
 	w.HandleFunc("/create/new", logging(html.CreatePostWeb))
 	router.HandleFunc("/documentation", logging(html.Documentation))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("front/"))))
-	err = router.Walk(routerWalk)
-	if err != nil {
+	if err := router.Walk(routerWalk); err != nil {
 		log.Fatal(err)
 	}
-	err = http.ListenAndServe(addr, router)
-	if err != nil {
+	if err := http.ListenAndServe(addr, router); err != nil {
 		log.Fatal(err)
 	}
 }
